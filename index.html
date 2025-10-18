@@ -1,14 +1,146 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CALCULADORA INFINITY AUDIO</title>
-    <!-- Tailwind por CDN para que el diseño rojo/gris/blanco funcione -->
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-white">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CALCULADORA INFINITY AUDIO</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: { red: '#DC2626', gray: '#6B7280' } } } }
+    }
+  </script>
+  <style>
+    html, body { background:#f6f7f9; }
+    .card { box-shadow: 0 6px 24px rgba(0,0,0,.06); }
+    .paper { background:white; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+    .imgBox { aspect-ratio: 1/1; }
+    @media print { .no-print { display:none !important; } html, body { background:white; } }
+  </style>
+</head>
+<body class="min-h-screen text-gray-900">
+  <div id="app"></div>
+
+  <!-- React + Babel (UMD) -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // --- Config ---
+    const PUBLIC_BASE = "";            // vacío -> funciona en cualquier dominio / ruta
+    const PIN_CODE   = "4321";         // PIN para editar imágenes y características
+    const TIER_ORDER = ["oro","platino","platino_plus","diamante","diamante_plus"];
+    const TIERS = {
+      oro:            {label:"Oro",            amount:1991},
+      platino:        {label:"Platino",        amount:3285},
+      platino_plus:   {label:"Platino Plus",   amount:3395},
+      diamante:       {label:"Diamante",       amount:3895},
+      diamante_plus:  {label:"Diamante Plus",  amount:3995},
+    };
+    const IMG_CAPTIONS = ["RIC / RIC PLUS","BTE POTENTE","INTRACANAL A MEDIDA","INTRACANAL ESTÁNDAR"];
+
+    // --- Utils ---
+    const fmt = (n)=>n.toLocaleString("es-ES",{minimumFractionDigits:2, maximumFractionDigits:2});
+    // cuota de préstamo estándar (para los 6 meses con interés)
+    const monthlyPayment = (principal, months, annualRate) => {
+      const r = annualRate/12;
+      if (r === 0) return principal / months;
+      const pow = Math.pow(1+r, months);
+      return principal * (r*pow)/(pow-1);
+    };
+    const encodeState = (obj)=> btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
+    const decodeState = (s)=> { try { return JSON.parse(decodeURIComponent(escape(atob(s)))); } catch { return null; } };
+
+    function App(){
+      // Estado
+      const [tier, setTier] = useState("diamante_plus"); // empieza arriba (mayor a menor)
+      const [features, setFeatures] = useState({
+        oro: "Incluye:\n· Función A\n· Función B",
+        platino: "Incluye:\n· Función A+\n· Función B+",
+        platino_plus: "Incluye:\n· Función avanzada P",
+        diamante: "Incluye:\n· Función D1\n· Función D2",
+        diamante_plus: "Incluye:\n· Máximo rendimiento",
+      });
+      const [images, setImages] = useState([null,null,null,null]);
+      const [locked, setLocked] = useState(true);
+      const [pinOpen, setPinOpen] = useState(false);
+      const [pin, setPin] = useState("");
+      const [includeImgs, setIncludeImgs] = useState(false);
+      const [shareUrl, setShareUrl] = useState("");
+
+      // Cargar desde hash #s=
+      useEffect(()=>{
+        const m = (window.location.hash||"").match(/#s=([^&]+)/);
+        if(m && m[1]){
+          const st = decodeState(m[1]);
+          if(st && st.tier){
+            setTier(st.tier);
+            if(st.features) setFeatures(st.features);
+            if(st.images) setImages(st.images);
+          }
+        }
+      },[]);
+
+      // Persistencia local
+      useEffect(()=>{
+        const raw = localStorage.getItem("calc_inf_state_v2");
+        if(raw){ try{ const p=JSON.parse(raw); if(p.tier) setTier(p.tier); if(p.features) setFeatures(p.features); if(p.images) setImages(p.images);}catch{} }
+      },[]);
+      useEffect(()=>{
+        localStorage.setItem("calc_inf_state_v2", JSON.stringify({tier,features,images}));
+      },[tier,features,images]);
+
+      // Cálculos 42 meses (36m 0% + 6m al 7,95% TAE)
+      const amount = TIERS[tier].amount;
+      const principalPerMonth     = amount / 42;
+      const cuota36               = principalPerMonth;                 // 36 meses sin intereses
+      const restante6_principal   = amount - (principalPerMonth * 36); // = amount/7
+      const cuota6_795            = monthlyPayment(restante6_principal, 6, 0.0795);
+
+      // RECOMENDADO: 2ª pareja = importe x2
+      const amount2               = amount * 2;
+      const principalPerMonth2    = amount2 / 42;
+      const cuota36_2             = principalPerMonth2;
+      const restante6_principal2  = amount2 - (principalPerMonth2 * 36);
+      const cuota6_795_2          = monthlyPayment(restante6_principal2, 6, 0.0795);
+
+      // Compartir (opcionalmente con imágenes)
+      const genShare = ()=>{
+        const st = {tier, features, images: includeImgs ? images : [null,null,null,null]};
+        const s = encodeState(st);
+        const href = (PUBLIC_BASE || window.location.origin+window.location.pathname) + "#s=" + s;
+        setShareUrl(href);
+        try{ navigator.clipboard.writeText(href); }catch{}
+        alert("Enlace copiado.");
+      };
+
+      // PIN
+      const canEdit = !locked;
+      const askPin = ()=>{ setPin(""); setPinOpen(true); };
+      const checkPin = ()=>{ if(pin===PIN_CODE){ setLocked(false); setPinOpen(false); } else alert("PIN incorrecto"); };
+
+      // Imagen
+      const onPick = (i, file)=>{
+        if(!canEdit){ alert("Bloqueado. Pulsa 'Editar (PIN)' (4321)."); return; }
+        if(!file) return;
+        const r = new FileReader();
+        r.onload = e=>{ const next = images.slice(); next[i] = String(e.target.result); setImages(next); };
+        r.readAsDataURL(file);
+      };
+
+      return (
+        <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-6">
+          {/* Header */}
+          <header className="flex items-center justify-between gap-4">
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-red-700">CALCULADORA INFINITY AUDIO</h1>
+            <div className="no-print flex items-center gap-2">
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input type="checkbox" className="rounded border-gray-300" checked={includeImgs} onChange={e=>setIncludeImgs(e.target.checked)} />
+                Incluir imágenes en el enlace
+              </label>
+              <button type="button" onClick={genShare} className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium bg-red-600 text-white hover:bg-red-700">Compartir enlace</button>
+              {locked
+                ? <button type="button" onClick={ask_analysis
