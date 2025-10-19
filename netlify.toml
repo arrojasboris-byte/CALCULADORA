@@ -1,15 +1,11 @@
 [build]
   command = "npm run build"
   publish = "dist"
-
 [build.environment]
   NODE_VERSION = "18"
-
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
-
-# /admin → sirve public/admin.html
 [[redirects]]
   from = "/admin"
   to = "/admin.html"
