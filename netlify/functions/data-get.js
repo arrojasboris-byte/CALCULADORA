@@ -1,15 +1,15 @@
-// Lee datos públicos (características + imágenes) desde Netlify Blobs
-import { getStore } from '@netlify/blobs';
+// Lee el contenido guardado (CommonJS)
+const { getStore } = require('@netlify/blobs');
 
-export async function handler() {
+exports.handler = async () => {
   try {
-    const store = getStore('catalogo'); // nombre del store
-    // Valores por defecto si aún no hay datos
-    const current = (await store.get('contenido', { type: 'json' })) || {
-      caracteristicasGama: '',
-      imagenes: [],
-      updatedAt: new Date().toISOString(),
-    };
+    const store = getStore('catalogo');
+    const current =
+      (await store.get('contenido', { type: 'json' })) || {
+        caracteristicasGama: '',
+        imagenes: [],
+        updatedAt: new Date().toISOString(),
+      };
     return {
       statusCode: 200,
       headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
@@ -18,4 +18,4 @@ export async function handler() {
   } catch (e) {
     return { statusCode: 500, body: JSON.stringify({ error: 'GET_FAILED', detail: String(e) }) };
   }
-}
+};
