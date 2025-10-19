@@ -1,4 +1,3 @@
-// Lee el contenido guardado (CommonJS)
 const { getStore } = require('@netlify/blobs');
 
 exports.handler = async () => {
