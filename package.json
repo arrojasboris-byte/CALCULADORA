@@ -27,6 +27,16 @@
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview"
+    {
+  "dependencies": {
+    "@netlify/blobs": "^6.4.0"
+  },
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "vite build"
+  }
+}
+
   }
 }
 
