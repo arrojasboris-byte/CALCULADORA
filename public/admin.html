@@ -1,106 +1,52 @@
 <!doctype html>
 <html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Catálogo</title>
-  <meta name="robots" content="noindex,nofollow" />
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto; background:#f6f7f9; margin:0;}
-    .wrap{max-width:980px;margin:0 auto;padding:24px}
-    .card{background:#fff;border-radius:18px;padding:20px;box-shadow:0 6px 24px rgba(0,0,0,.06)}
-    h1{margin:0 0 8px}
-    label{display:block;font-weight:600;margin:12px 0 6px}
-    textarea,input{width:100%;box-sizing:border-box;padding:12px;border-radius:12px;border:1px solid #d0d5dd;background:#fafafa}
-    textarea{min-height:160px}
-    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
-    .primary{background:#d72638;color:#fff}
-    .ghost{background:transparent;border:1px solid #d72638;color:#d72638}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
-    .imgbox{background:#f2f4f7;border:1px dashed #d0d5dd;border-radius:12px;min-height:120px;display:grid;place-items:center;overflow:hidden}
-    .imgbox img{width:100%;height:100%;object-fit:cover}
-    .status{font-size:12px;color:#666}
-    .status.err{color:#b42318}
-    .status.ok{color:#027a48}
-  </style>
-</head>
+<meta charset="utf-8" />
+<title>Admin</title>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>Administrador de Catálogo</h1>
-      <p class="status" id="status">Cargando…</p>
-
-      <label>PIN</label>
-      <input id="pin" type="password" inputmode="numeric" placeholder="4321" />
-
-      <label>Características de gama</label>
-      <textarea id="caracteristicas" placeholder="Ej.: Bluetooth LE, 16 canales, IP68…"></textarea>
-
-      <label>Imágenes (URLs públicas, una por línea)</label>
-      <textarea id="imagenes" placeholder="https://...&#10;https://..."></textarea>
-
-      <div class="row" style="justify-content:flex-end;margin-top:12px">
-        <button id="recargar" class="btn ghost">Recargar</button>
-        <button id="guardar" class="btn primary">Guardar</button>
-      </div>
-
-      <h3>Vista previa</h3>
-      <div id="galeria" class="grid"></div>
-      <p class="status" id="last">—</p>
-    </div>
-  </div>
+  <h1>Admin</h1>
+  <p>
+    Características:<br>
+    <textarea id="car" rows="5" cols="60"></textarea>
+  </p>
+  <p>
+    Imágenes (una por línea):<br>
+    <textarea id="imgs" rows="5" cols="60"></textarea>
+  </p>
+  <p>
+    PIN: <input id="pin" placeholder="4321" />
+    <button id="save">Guardar</button>
+    <button id="load">Cargar</button>
+    <span id="msg"></span>
+  </p>
 
   <script>
-    const GET_URL = '/.netlify/functions/data-get';
-    const SAVE_URL = '/.netlify/functions/data-save';
-    const $ = id => document.getElementById(id);
-    const setStatus = (t, err=false) => { const el=$('status'); el.textContent=t; el.className='status ' + (err?'err':'ok'); };
+    const GET = '/.netlify/functions/data-get';
+    const SAVE = '/.netlify/functions/data-save';
+    const $ = (id)=>document.getElementById(id);
 
-    function pintarGaleria(urls){
-      const g=$('galeria'); g.innerHTML='';
-      (urls||[]).forEach(u=>{
-        const d=document.createElement('div'); d.className='imgbox';
-        if(u){ const img=new Image(); img.src=u; img.loading='lazy'; d.appendChild(img); } else { d.textContent='Sin imagen'; }
-        g.appendChild(d);
-      });
-    }
+    $('load').onclick = async ()=>{
+      $('msg').textContent = 'Cargando...';
+      const r = await fetch(GET, {cache:'no-store'});
+      const d = await r.json();
+      $('car').value = d.caracteristicasGama || '';
+      $('imgs').value = (d.imagenes||[]).join('\n');
+      $('msg').textContent = 'Listo ✓';
+    };
 
-    async function cargar(){
-      setStatus('Cargando…');
-      try{
-        const res=await fetch(GET_URL,{cache:'no-store'});
-        if(!res.ok){ setStatus('Error al cargar: ' + res.status, true); return; }
-        const data=await res.json();
-        $('caracteristicas').value=data.caracteristicasGama||'';
-        $('imagenes').value=(data.imagenes||[]).join('\n');
-        pintarGaleria(data.imagenes||[]);
-        $('last').textContent='Última actualización: '+(data.updatedAt?new Date(data.updatedAt).toLocaleString():'—');
-        setStatus('Listo ✓');
-      }catch(e){ setStatus('Fallo de red al cargar', true); console.error(e); }
-    }
-
-    async function guardar(){
-      const pin=($('pin').value||'').trim();
-      if(!pin){ setStatus('Introduce el PIN', true); $('pin').focus(); return; }
-      const payload={
-        caracteristicasGama:$('caracteristicas').value||'',
-        imagenes:($('imagenes').value||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,20)
+    $('save').onclick = async ()=>{
+      $('msg').textContent = 'Guardando...';
+      const payload = {
+        caracteristicasGama: $('car').value || '',
+        imagenes: $('imgs').value.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,20)
       };
-      setStatus('Guardando…');
-      try{
-        const res=await fetch(SAVE_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pin,payload})});
-        const data=await res.json().catch(()=>null);
-        if(!res.ok){ setStatus(data?.error==='PIN_INCORRECTO'?'PIN incorrecto':('Error al guardar: '+res.status), true); return; }
-        pintarGaleria(data.imagenes||payload.imagenes);
-        $('last').textContent='Última actualización: '+new Date(data.updatedAt).toLocaleString();
-        setStatus('Cambios guardados ✓');
-      }catch(e){ setStatus('Fallo de red al guardar', true); console.error(e); }
-    }
+      const r = await fetch(SAVE, {method:'POST', headers:{'content-type':'application/json'},
+        body: JSON.stringify({ pin: $('pin').value.trim(), payload })});
+      const d = await r.json().catch(()=>null);
+      $('msg').textContent = (d && (d.updatedAt || d.imagenes)) ? 'Guardado ✓' : 'Error (¿PIN 4321?)';
+    };
 
-    $('recargar').addEventListener('click', cargar);
-    $('guardar').addEventListener('click', guardar);
-    cargar();
+    // carga inicial
+    $('load').click();
   </script>
 </body>
 </html>
