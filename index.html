@@ -1,19 +1,341 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Calculadora Infinity</title>
-  </head>
-  <body>
-    <!-- Vite / React monta aquí tu calculadora existente -->
-    <div id="root"></div>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CALCULADORA INFINITY AUDIO</title>
+  <meta name="color-scheme" content="light" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { red: '#DC2626', gray: '#6B7280' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body { background:#f6f7f9; }
+    .card { box-shadow: 0 6px 24px rgba(0,0,0,.06); }
+    .paper { background:white; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+    .imgBox { aspect-ratio: 1/1; }
+    @media print { .no-print { display:none !important; } html, body { background:white; } }
+  </style>
+</head>
+<body class="min-h-screen text-gray-900">
+  <main class="max-w-6xl mx-auto p-4 md:p-8 space-y-6">
 
-    <!-- Tu aplicación (no tocar) -->
-    <script type="module" src="/src/main.tsx"></script>
+    <!-- Header -->
+    <header class="space-y-1">
+      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-red-700 leading-tight">
+        CALCULADORA INFINITY<br/>AUDIO
+      </h1>
+      <p class="text-sm text-gray-600">36 meses sin intereses · 6 meses con 7,95% TAE</p>
+    </header>
 
-    <!-- INTEGRACIÓN: inyecta el contenido de /admin debajo de "Características de gamas" -->
-    <script type="module" src="/catalogo-infy.js"></script>
-  </body>
+    <!-- Formatos de audífonos -->
+    <section class="paper rounded-2xl p-4 md:p-6">
+      <h2 class="text-sm font-semibold text-gray-700 mb-3">Formatos de audífonos</h2>
+      <div id="formatos" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-white border rounded-xl p-3 flex items-center justify-center imgBox">
+          <img id="f0" src="https://images.unsplash.com/photo-1587825140400-5fc71f3143f1?w=600&q=80"
+               alt="Formato 1" class="object-contain h-full w-full">
+        </div>
+        <div class="bg-white border rounded-xl p-3 flex items-center justify-center imgBox">
+          <img id="f1" src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=600&q=80"
+               alt="Formato 2" class="object-contain h-full w-full">
+        </div>
+        <div class="bg-white border rounded-xl p-3 flex items-center justify-center imgBox">
+          <img id="f2" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80"
+               alt="Formato 3" class="object-contain h-full w-full">
+        </div>
+        <div class="bg-white border rounded-xl p-3 flex items-center justify-center imgBox">
+          <img id="f3" src="https://images.unsplash.com/photo-1520975922284-9d1a8ddc7a5b?w=600&q=80"
+               alt="Formato 4" class="object-contain h-full w-full">
+        </div>
+      </div>
+    </section>
+
+    <!-- Características de gamas -->
+    <section class="paper rounded-2xl overflow-hidden">
+      <div class="p-4 md:p-6 border-b flex items-center gap-2">
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+          <div class="flex items-center gap-2">
+            <label class="text-sm text-gray-700 shrink-0">Características de gamas</label>
+            <button id="btn-edit" class="ml-auto text-xs px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700 no-print">
+              Editar
+            </button>
+          </div>
+          <select id="sel-gama" class="w-full rounded-lg border-gray-300 text-sm px-3 py-2">
+            <option value="diamante_plus">Diamante Plus</option>
+            <option value="diamante">Diamante</option>
+            <option value="platino_plus">Platino Plus</option>
+            <option value="platino">Platino</option>
+            <option value="oro">Oro</option>
+          </select>
+          <input id="buscador" placeholder="Buscar característica..." class="rounded-lg border-gray-300 text-sm px-3 py-2" />
+        </div>
+      </div>
+
+      <!-- Texto dinámico + galería -->
+      <div class="p-4 md:p-6 space-y-4">
+        <div id="caracteristicas" class="whitespace-pre-wrap text-sm text-gray-800"></div>
+        <div id="galeria" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+      </div>
+
+      <!-- Tabla (ejemplo) -->
+      <div class="px-4 md:px-6 pb-6">
+        <div class="rounded-xl overflow-hidden border">
+          <div class="bg-red-600 text-white text-xs uppercase px-4 py-2 grid grid-cols-3">
+            <div>Gama</div><div>Precio</div><div>Características</div>
+          </div>
+          <div class="grid grid-cols-3 items-center px-4 py-3 text-sm bg-white border-t">
+            <div class="font-medium">Diamante Plus</div>
+            <div>3995,00 €</div>
+            <div class="text-red-700 flex items-center gap-2">
+              <span class="inline-block h-2 w-2 bg-red-700 rounded-full"></span> Ver características
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Financiación Infinity -->
+    <section class="paper rounded-2xl p-4 md:p-6 space-y-4">
+      <h3 class="text-sm font-semibold text-gray-700">Financiación Infinity</h3>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-red-600 text-white rounded-xl p-4">
+          <div class="text-xs opacity-90 mb-1">Importe total (Diamante Plus)</div>
+          <div class="text-3xl font-extrabold"><span id="importe">3995,00 €</span></div>
+          <div class="text-[11px] opacity-90 mt-1">sin intereses</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 border">
+          <div class="text-xs text-gray-600 mb-1">Cuota 36 meses</div>
+          <div id="cuota36" class="text-xl font-bold">95,12 €</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 border">
+          <div class="text-xs text-gray-600 mb-1">Importe restante (6m)</div>
+          <div id="restante6" class="text-xl font-bold">570,71 €</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 border">
+          <div class="text-xs text-gray-600 mb-1">Financiación 6m (7,95% TAE)</div>
+          <div id="cuota6" class="text-xl font-bold">97,26 €</div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 no-print">
+        <button id="btn-copiar" class="px-3 py-2 rounded-lg border bg-white text-sm">Copiar enlace</button>
+        <button id="btn-pdf" class="px-3 py-2 rounded-lg border bg-white text-sm">Guardar PDF</button>
+        <button id="btn-excel" class="px-3 py-2 rounded-lg border bg-white text-sm">Exportar Excel</button>
+      </div>
+    </section>
+
+    <!-- Upgrade (decorativo) -->
+    <section class="paper rounded-2xl p-4 md:p-6">
+      <h3 class="text-sm font-semibold text-gray-700 mb-3">UPGRADE</h3>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <button class="px-3 py-3 rounded-xl bg-white border hover:bg-gray-50">Diamante Plus (+2004)</button>
+        <button class="px-3 py-3 rounded-xl bg-white border hover:bg-gray-50">Diamante (+1904)</button>
+        <button class="px-3 py-3 rounded-xl bg-white border hover:bg-gray-50">Platino Plus (+1404)</button>
+        <button class="px-3 py-3 rounded-xl bg-white border hover:bg-gray-50">Platino (+1294)</button>
+      </div>
+    </section>
+
+    <!-- Comparar (colapsable simple) -->
+    <section class="paper rounded-2xl">
+      <button id="btn-compara" class="w-full text-left px-4 py-3 text-sm text-gray-700 flex items-center gap-2">
+        <span class="inline-block rotate-0 transition-transform" id="ico-compara">▶</span> Comparar
+      </button>
+      <div id="panel-compara" class="px-4 pb-4 hidden">
+        <div class="text-sm text-gray-600">Aquí puedes incluir tu tabla comparativa.</div>
+      </div>
+    </section>
+
+    <!-- Panel de edición (modal) -->
+    <dialog id="dlg-edit" class="rounded-2xl p-0 w-full max-w-2xl">
+      <form method="dialog" class="p-0 m-0">
+        <div class="p-4 md:p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold">Editar contenido</h3>
+            <button class="px-3 py-1.5 rounded-lg border text-sm">Cerrar</button>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-3">
+            <label class="text-sm text-gray-700">PIN
+              <input id="pin" class="mt-1 w-full rounded-lg border-gray-300 px-3 py-2" placeholder="4321" />
+            </label>
+            <div class="text-xs text-gray-500 self-end">El PIN se valida en el servidor (variable <code>ADMIN_PIN</code> de Netlify).</div>
+          </div>
+
+          <label class="block text-sm text-gray-700">Características de gama
+            <textarea id="txt-car" class="mt-1 w-full rounded-lg border-gray-300 px-3 py-2 h-40"
+              placeholder="Ej.: Bluetooth LE, 16 canales, IP68, carga rápida, reducción de ruido…"></textarea>
+          </label>
+
+          <label class="block text-sm text-gray-700">Imágenes (URLs públicas, una por línea — máx. 20)
+            <textarea id="txt-img" class="mt-1 w-full rounded-lg border-gray-300 px-3 py-2 h-40"
+              placeholder="https://...\nhttps://..."></textarea>
+          </label>
+
+          <div class="flex justify-end gap-2">
+            <button id="btn-reload" type="button" class="px-3 py-2 rounded-lg border bg-white text-sm">Recargar</button>
+            <button id="btn-save"   type="button" class="px-3 py-2 rounded-lg bg-red-600 text-white text-sm">Guardar</button>
+          </div>
+
+          <div id="msg" class="text-sm text-red-600"></div>
+        </div>
+      </form>
+    </dialog>
+
+  </main>
+
+  <script>
+    // ==== Config ====
+    const GET_URL  = '/.netlify/functions/data-get';
+    const SAVE_URL = '/.netlify/functions/data-save';
+
+    // ==== Utilidades ====
+    const fmtMoneda = (n)=> n.toLocaleString('es-ES',{ minimumFractionDigits:2, maximumFractionDigits:2 }) + ' €';
+    const mensualidad = (principal, meses, tae) => {
+      const r = tae/12;
+      if (!r) return principal/meses;
+      const pow = Math.pow(1+r, meses);
+      return principal * (r*pow) / (pow-1);
+    };
+
+    // ==== Estado en memoria ====
+    let state = {
+      caracteristicasGama: '',
+      imagenes: []
+    };
+
+    // ==== Carga inicial desde Functions ====
+    async function cargarDatos() {
+      try {
+        const r = await fetch(GET_URL, { cache:'no-store' });
+        const d = await r.json();
+        state = {
+          caracteristicasGama: typeof d.caracteristicasGama === 'string' ? d.caracteristicasGama : '',
+          imagenes: Array.isArray(d.imagenes) ? d.imagenes : []
+        };
+        pintar();
+      } catch (e) {
+        console.error('Error cargando datos', e);
+        document.getElementById('caracteristicas').textContent = '';
+        document.getElementById('galeria').innerHTML = '';
+      }
+    }
+
+    // ==== Pintado en pantalla ====
+    function pintar() {
+      // Texto
+      document.getElementById('caracteristicas').textContent = state.caracteristicasGama || '';
+
+      // Galería
+      const gal = document.getElementById('galeria');
+      gal.innerHTML = '';
+      (state.imagenes || []).forEach(u => {
+        if (typeof u !== 'string' || !u.trim()) return;
+        const div = document.createElement('div');
+        div.className = 'bg-white border rounded-xl p-3 flex items-center justify-center imgBox';
+        const img = new Image();
+        img.src = u; img.loading='lazy'; img.alt='Imagen';
+        img.className = 'object-cover h-full w-full rounded-lg';
+        div.appendChild(img);
+        gal.appendChild(div);
+      });
+
+      // Financiación (para 3995 €)
+      const amount = 3995;
+      const principalPerMonth   = amount / 42;
+      const restante6principal  = amount - (principalPerMonth * 36);
+      const cuota6              = mensualidad(restante6principal, 6, 0.0795);
+
+      document.getElementById('importe').textContent  = fmtMoneda(amount);
+      document.getElementById('cuota36').textContent  = fmtMoneda(principalPerMonth);
+      document.getElementById('restante6').textContent= fmtMoneda(restante6principal);
+      document.getElementById('cuota6').textContent   = fmtMoneda(cuota6);
+
+      // Formatos de audífonos: si hay 4+ imágenes, las mostramos arriba
+      const imgs = [document.getElementById('f0'), document.getElementById('f1'), document.getElementById('f2'), document.getElementById('f3')];
+      for (let i=0;i<imgs.length;i++) {
+        if (state.imagenes[i]) imgs[i].src = state.imagenes[i];
+      }
+    }
+
+    // ==== Editor (modal) ====
+    function abrirEditor() {
+      const dlg = document.getElementById('dlg-edit');
+      const txtCar = document.getElementById('txt-car');
+      const txtImg = document.getElementById('txt-img');
+      const msg    = document.getElementById('msg');
+
+      txtCar.value = state.caracteristicasGama || '';
+      txtImg.value = (state.imagenes || []).join('\n');
+      msg.textContent = '';
+      dlg.showModal();
+    }
+
+    async function guardarEditor() {
+      const pin   = document.getElementById('pin').value.trim();
+      const car   = document.getElementById('txt-car').value;
+      const imgs  = document.getElementById('txt-img').value
+                      .split('\n').map(s=>s.trim()).filter(Boolean).slice(0,20);
+
+      const msg = document.getElementById('msg');
+      msg.textContent = 'Guardando…';
+
+      try {
+        const r = await fetch(SAVE_URL, {
+          method:'POST',
+          headers:{ 'content-type':'application/json' },
+          body: JSON.stringify({ pin, payload: { caracteristicasGama: car, imagenes: imgs } })
+        });
+        const d = await r.json();
+        if (!r.ok) {
+          msg.textContent = d && d.error==='PIN_INCORRECTO' ? 'PIN incorrecto' : 'No se pudo guardar';
+          return;
+        }
+        // OK
+        state.caracteristicasGama = d.caracteristicasGama || '';
+        state.imagenes = Array.isArray(d.imagenes)? d.imagenes : [];
+        pintar();
+        msg.textContent = 'Guardado ✓';
+      } catch (e) {
+        console.error(e);
+        msg.textContent = 'Error guardando';
+      }
+    }
+
+    // ==== Listeners ====
+    document.getElementById('btn-edit').addEventListener('click', abrirEditor);
+    document.getElementById('btn-save').addEventListener('click', guardarEditor);
+    document.getElementById('btn-reload').addEventListener('click', cargarDatos);
+
+    // Comparar
+    document.getElementById('btn-compara').addEventListener('click', ()=>{
+      const p = document.getElementById('panel-compara');
+      const i = document.getElementById('ico-compara');
+      const open = p.classList.contains('hidden');
+      p.classList.toggle('hidden', !open);
+      i.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
+    });
+
+    // Copiar enlace (simple)
+    document.getElementById('btn-copiar').addEventListener('click', async ()=>{
+      try { await navigator.clipboard.writeText(location.href); alert('Enlace copiado'); }
+      catch { alert('Copia manual: ' + location.href); }
+    });
+
+    // Botones PDF/Excel (placeholders)
+    document.getElementById('btn-pdf').addEventListener('click', ()=>window.print());
+    document.getElementById('btn-excel').addEventListener('click', ()=>alert('Exportar Excel no implementado en esta versión.'));
+
+    // ==== Arranque ====
+    cargarDatos();
+  </script>
+</body>
 </html>
