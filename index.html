@@ -1,121 +1,199 @@
-<!DOCTYPE html>
-el('feedback').innerHTML = '';<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Catálogo Compartido</title>
-<style>
-:root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji'; }
-body { margin: 0; background: #f6f7f9; }
-.container { max-width: 980px; margin: 0 auto; padding: 24px; }
-.card { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 6px 24px rgba(0,0,0,.06); }
-.row { display: flex; gap: 16px; flex-wrap: wrap; }
-.col { flex: 1 1 320px; }
-h1 { margin: 0 0 8px; font-size: 28px; }
-p.muted { color: #667085; margin: 6px 0 16px; }
-textarea, input[type="text"] { width: 100%; box-sizing: border-box; padding: 12px; border-radius: 12px; border: 1px solid #d0d5dd; background: #fafafa; font-size: 14px; }
-textarea { min-height: 160px; resize: vertical; }
-.btn { appearance: none; border: 0; border-radius: 12px; padding: 10px 14px; cursor: pointer; font-weight: 600; }
-.btn-primary { background: #0ea5e9; color: white; }
-.btn-ghost { background: transparent; color: #0ea5e9; }
-.btn:disabled { opacity: .6; cursor: not-allowed; }
-.toolbar { display:flex; gap: 8px; align-items:center; justify-content:flex-end; margin: 12px 0 0; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-.imgbox { background: #f2f4f7; border: 1px dashed #d0d5dd; border-radius: 12px; min-height: 120px; display: grid; place-items: center; overflow: hidden; }
-.imgbox img { width: 100%; height: 100%; object-fit: cover; }
-.pill { display:inline-block; padding:4px 10px; border-radius: 999px; background:#eef2ff; color:#444; font-size:12px; }
-.error { color: #b42318; margin-top: 6px; }
-.success { color: #027a48; margin-top: 6px; }
-details { background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; padding:12px; }
-details summary { cursor:pointer; font-weight:600; }
-.small { font-size: 12px; color: #667085; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Administrador de Catálogo — Calculadora Infinity Audio</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    :root { --bg:#f6f7f9; --card:#fff; --line:#e5e7eb; --muted:#667085; --brand:#d72638; --ok:#027a48; --err:#b42318; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"; background: var(--bg); }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 24px; }
+    .card { background: var(--card); border-radius: 18px; padding: 20px; box-shadow: 0 6px 24px rgba(0,0,0,.06); }
+    h1 { margin: 0 0 2px; font-size: 26px; letter-spacing: .2px; }
+    .muted { color: var(--muted); margin: 0 0 16px; }
+    label { font-weight: 600; display: block; margin: 14px 0 6px; }
+    textarea, input[type="text"], input[type="password"] { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #d0d5dd; background: #fafafa; font-size: 14px; }
+    textarea { min-height: 160px; resize: vertical; }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .btn { appearance: none; border: 0; border-radius: 12px; padding: 10px 14px; font-weight: 700; cursor: pointer; }
+    .btn-ghost { background: transparent; color: var(--brand); border: 1px solid var(--brand); }
+    .btn-primary { background: var(--brand); color: #fff; }
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
+    .bar { display:flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; }
+    .status { font-size: 12px; color: var(--muted); }
+    .status.ok { color: var(--ok); }
+    .status.err { color: var(--err); }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 12px; }
+    .imgbox { background:#f2f4f7; border:1px dashed #d0d5dd; border-radius: 12px; min-height: 120px; display:grid; place-items:center; overflow:hidden; }
+    .imgbox img { width:100%; height:100%; object-fit:cover; }
+    .help { font-size: 12px; color: var(--muted); }
+    hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; background: #eef2ff; border:1px solid #c7d2fe; padding: 0 6px; border-radius: 6px; }
+    .pill { display:inline-block; padding: 2px 10px; border-radius: 999px; background:#eef2ff; color:#222; font-size:12px; }
+  </style>
 </head>
 <body>
-<div class="container">
-<div class="card">
-<h1>Catálogo Compartido</h1>
-<p class="muted">Este enlace siempre muestra la versión más reciente. Para editar, pulsa <strong>Editar</strong> e introduce el PIN.</p>
+  <div class="wrap">
+    <div class="card">
+      <h1>Administrador de Catálogo</h1>
+      <p class="muted">Edita <strong>Características de gama</strong> e <strong>Imágenes</strong>. Necesitas PIN.</p>
 
+      <div class="row">
+        <div style="flex:1; min-width: 220px">
+          <label for="pin">PIN</label>
+          <input id="pin" type="password" inputmode="numeric" placeholder="4321" autocomplete="off" />
+          <p class="help">El PIN se valida en el servidor. Cámbialo en la variable <span class="kbd">ADMIN_PIN</span> de Netlify.</p>
+        </div>
+        <div class="bar" style="flex:1; min-width: 220px">
+          <span id="status" class="status">Cargando…</span>
+          <div class="row" style="justify-content:flex-end">
+            <button id="recargar" class="btn btn-ghost">Recargar</button>
+            <button id="guardar" class="btn btn-primary">Guardar</button>
+          </div>
+        </div>
+      </div>
 
-<div class="row">
-<div class="col">
-<label><strong>Características de gama</strong></label>
-<textarea id="caracteristicas" disabled placeholder="Describe aquí las características de la gama (materiales, opciones, conectividad, etc.)"></textarea>
-</div>
-<div class="col">
-<label><strong>Imágenes (URLs)</strong></label>
-<div id="imagenes-list"></div>
-<button id="add-image" class="btn btn-ghost" disabled>+ Añadir imagen</button>
-<p class="small">Pega direcciones (URLs) de imágenes públicas. Se mostrarán abajo.</p>
-</div>
-</div>
+      <label for="caracteristicas">Características de gama</label>
+      <textarea id="caracteristicas" placeholder="Ej.: Bluetooth LE, 16 canales, IP68, carga rápida, reducción de ruido…"></textarea>
 
+      <label for="imagenes">Imágenes (URLs públicas, una por línea)</label>
+      <textarea id="imagenes" placeholder="https://...&#10;https://..."></textarea>
+      <p class="help">Se mostrarán en la galería. Máx. 20. Usa imágenes ya alojadas (CDN/Drive público/etc.).</p>
 
-<div class="toolbar">
-<span id="status" class="pill">Cargando…</span>
-<button id="edit" class="btn">Editar</button>
-<button id="save" class="btn btn-primary" disabled>Guardar</button>
-<button id="cancel" class="btn" disabled>Cancelar</button>
-</div>
-</html>
-}
+      <hr />
 
+      <div class="bar">
+        <div>
+          <strong>Vista previa</strong>
+          <span id="lastUpdate" class="pill" style="margin-left:8px">—</span>
+        </div>
+        <div class="row">
+          <a class="btn btn-ghost" href="/" target="_blank" rel="noopener">Ver web</a>
+        </div>
+      </div>
 
-function addImageInput() {
-const list = el('imagenes-list');
-const wrapper = document.createElement('div');
-wrapper.style.margin = '6px 0';
-const input = document.createElement('input');
-input.type = 'text';
-input.placeholder = 'https://…';
-input.className = 'img-input';
-input.disabled = false;
-wrapper.appendChild(input);
-list.appendChild(wrapper);
-}
+      <div id="galeria" class="grid" style="margin-top:10px"></div>
+    </div>
+  </div>
 
+  <script>
+    const byId = (id) => document.getElementById(id);
+    const $status = byId('status');
+    const $last = byId('lastUpdate');
+    const $car = byId('caracteristicas');
+    const $imgs = byId('imagenes');
+    const $gal = byId('galeria');
+    const $pin = byId('pin');
 
-function gatherPayload() {
-const caracteristicasGama = el('caracteristicas').value || '';
-const urls = Array.from(document.querySelectorAll('.img-input'))
-.map(i => (i.value || '').trim())
-.filter(Boolean);
-return { caracteristicasGama, imagenes: urls };
-}
+    const GET_URL = '/.netlify/functions/data-get';
+    const SAVE_URL = '/.netlify/functions/data-save';
 
+    async function cargar() {
+      setStatus('Cargando…');
+      try {
+        const res = await fetch(GET_URL, { cache: 'no-store' });
+        if (!res.ok) {
+          if (res.status === 404) {
+            setStatus('No se encuentra la Function data-get (404). Revisa netlify/functions y netlify.toml.', true);
+          } else {
+            setStatus('Error cargando datos (' + res.status + ')', true);
+          }
+          return;
+        }
+        const data = await res.json();
+        $car.value = data.caracteristicasGama || '';
+        $imgs.value = (data.imagenes || []).join('\n');
+        $last.textContent = data.updatedAt
+          ? new Date(data.updatedAt).toLocaleString()
+          : '—';
+        renderGaleria(data.imagenes || []);
+        setStatus('Listo ✓', false);
+      } catch (e) {
+        setStatus('Fallo de red al cargar datos', true);
+        console.error(e);
+      }
+    }
 
-function save() {
-if (!STATE.editing) return;
-el('status').textContent = 'Guardando…';
-const payload = gatherPayload();
-google.script.run
-.withSuccessHandler((next) => {
-STATE.editing = false;
-STATE.pin = null;
-setDisabled(true);
-render(next);
-el('feedback').innerHTML = '<p class="success">Cambios guardados.</p>';
-el('status').textContent = 'Guardado';
-})
-.withFailureHandler(err => {
-el('feedback').innerHTML = `<p class="error">${(err && err.message) || 'Error al guardar'}.</p>`;
-el('status').textContent = 'Error';
-})
-.saveData(STATE.pin, payload);
-}
+    function renderGaleria(urls) {
+      $gal.innerHTML = '';
+      (urls || []).forEach(u => {
+        const box = document.createElement('div');
+        box.className = 'imgbox';
+        if (u) {
+          const img = new Image();
+          img.src = u;
+          img.loading = 'lazy';
+          img.alt = 'Imagen de la gama';
+          box.appendChild(img);
+        } else {
+          box.textContent = 'Sin imagen';
+        }
+        $gal.appendChild(box);
+      });
+    }
 
+    async function guardar() {
+      const pin = ($pin.value || '').trim();
+      if (!pin) {
+        setStatus('Introduce el PIN', true);
+        $pin.focus();
+        return;
+      }
+      const payload = {
+        caracteristicasGama: $car.value || '',
+        imagenes: ($imgs.value || '')
+          .split('\n')
+          .map(s => s.trim())
+          .filter(Boolean)
+          .slice(0, 20)
+      };
 
-// Eventos
-document.addEventListener('DOMContentLoaded', () => {
-setDisabled(true);
-google.script.run.withSuccessHandler(render).getData();
-el('edit').addEventListener('click', startEdit);
-el('cancel').addEventListener('click', cancelEdit);
-el('save').addEventListener('click', save);
-el('add-image').addEventListener('click', addImageInput);
-});
-</script>
+      setStatus('Guardando…');
+      try {
+        const res = await fetch(SAVE_URL, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ pin, payload })
+        });
+        const data = await res.json().catch(()=>null);
+
+        if (!res.ok) {
+          if (res.status === 401) {
+            setStatus('PIN incorrecto', true);
+          } else if (res.status === 404) {
+            setStatus('No se encuentra la Function data-save (404). Revisa netlify/functions.', true);
+          } else {
+            setStatus('Error al guardar (' + res.status + ')', true);
+          }
+          return;
+        }
+
+        // Éxito
+        $car.value = data?.caracteristicasGama || payload.caracteristicasGama;
+        $imgs.value = (data?.imagenes || payload.imagenes).join('\n');
+        renderGaleria(data?.imagenes || payload.imagenes);
+        $last.textContent = data?.updatedAt
+          ? new Date(data.updatedAt).toLocaleString()
+          : new Date().toLocaleString();
+        setStatus('Cambios guardados ✓', false);
+      } catch (e) {
+        setStatus('Fallo de red al guardar', true);
+        console.error(e);
+      }
+    }
+
+    function setStatus(text, isError) {
+      $status.textContent = text;
+      $status.className = 'status' + (isError ? ' err' : ' ok');
+    }
+
+    byId('guardar').addEventListener('click', guardar);
+    byId('recargar').addEventListener('click', cargar);
+
+    // Carga inicial
+    cargar();
+  </script>
 </body>
 </html>
