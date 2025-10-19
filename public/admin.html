@@ -1,419 +1,106 @@
-<script>
-(() => {
-  // =========================
-  //  CONFIGURACIÓN / DATOS
-  // =========================
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Catálogo</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto; background:#f6f7f9; margin:0;}
+    .wrap{max-width:980px;margin:0 auto;padding:24px}
+    .card{background:#fff;border-radius:18px;padding:20px;box-shadow:0 6px 24px rgba(0,0,0,.06)}
+    h1{margin:0 0 8px}
+    label{display:block;font-weight:600;margin:12px 0 6px}
+    textarea,input{width:100%;box-sizing:border-box;padding:12px;border-radius:12px;border:1px solid #d0d5dd;background:#fafafa}
+    textarea{min-height:160px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+    .primary{background:#d72638;color:#fff}
+    .ghost{background:transparent;border:1px solid #d72638;color:#d72638}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+    .imgbox{background:#f2f4f7;border:1px dashed #d0d5dd;border-radius:12px;min-height:120px;display:grid;place-items:center;overflow:hidden}
+    .imgbox img{width:100%;height:100%;object-fit:cover}
+    .status{font-size:12px;color:#666}
+    .status.err{color:#b42318}
+    .status.ok{color:#027a48}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Administrador de Catálogo</h1>
+      <p class="status" id="status">Cargando…</p>
 
-  // Precios PVP (gama principal)
-  const PRICES = {
-    oro: 1991,
-    platino: 3285,
-    platino_plus: 3395,
-    diamante: 3895,
-    diamante_plus: 3995,
-  };
+      <label>PIN</label>
+      <input id="pin" type="password" inputmode="numeric" placeholder="4321" />
 
-  // Importe de 2ª pareja por gama (para "RECOMENDADO")
-  // (últimas cantidades solicitadas)
-  const SECOND_PAIR = {
-    platino: 1304,
-    platino_plus: 1404,
-    diamante: 1904,
-    diamante_plus: 2004,
-    // Si quisieras permitir Oro como upgrade:
-    // oro: 1991
-  };
+      <label>Características de gama</label>
+      <textarea id="caracteristicas" placeholder="Ej.: Bluetooth LE, 16 canales, IP68…"></textarea>
 
-  // Características por gama (texto por defecto; se puede editar y se persiste)
-  const FEATURES_DEFAULT = {
-    diamante_plus: `IP68
-Tcoil
-Bluetooth Universal
-Amplio ancho de frecuencias de programación
-ajuste en remoto
-Enfoque de la voz de hasta 4 hablantes
-Claridad de entendimiento
-Autonomía de hasta 51h de carga
-Streaming directo
-Programa Tinnitus
-led indicador de encendido
-Recargable`,
-    platino_plus: `IP68
-Tcoil
-Bluetooth Universal
-Ancho de frecuencias de programación medio avanzado
-ajuste en remoto
-Enfoque de la voz de hasta 2 hablantes
-Claridad de entendimiento
-Autonomía de hasta 51h de carga
-Streaming directo
-Programa Tinnitus
-led indicador de encendido
-Recargable`,
-    diamante: `IP68
-Tcoil
-Bluetooth
-Streaming directo con Iphone y Android con protocolo ASHA
-Amplio ancho de frecuencias de programación
-ajuste en remoto
-Claridad de entendimiento
-Programa Tinnitus
-Posibilidad de traductor
-Posibilidad de avisos de caídas
-Recargable`,
-    platino: `IP68
-Tcoil
-Bluetooth
-Streaming directo con Iphone y Android con protocolo ASHA
-Ancho de frecuencias de programación medio avanzado
-ajuste en remoto
-Claridad de entendimiento
-Programa Tinnitus
-Posibilidad de traductor
-Posibilidad de avisos de caídas
-Recargable`,
-    oro: `Funcional
-direccionalidad adaptativa básica
-reductores de ruido básicos
-Programas de programación
-Programa Tinnitus
-Pilas`
-  };
+      <label>Imágenes (URLs públicas, una por línea)</label>
+      <textarea id="imagenes" placeholder="https://...&#10;https://..."></textarea>
 
-  // Financiación: 42 meses (36 sin intereses + 6 con 7,95% TAE)
-  const TAE = 0.0795;
-  const M_TOTAL = 42;
-  const M_0 = 36;
-  const M_6 = 6;
-  const i_m = Math.pow(1 + TAE, 1 / 12) - 1; // tipo mensual
+      <div class="row" style="justify-content:flex-end;margin-top:12px">
+        <button id="recargar" class="btn ghost">Recargar</button>
+        <button id="guardar" class="btn primary">Guardar</button>
+      </div>
 
-  // =========================
-  //  SELECTORES (ajusta si lo necesitas)
-  // =========================
-  const $ = (sel) => document.querySelector(sel);
-  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+      <h3>Vista previa</h3>
+      <div id="galeria" class="grid"></div>
+      <p class="status" id="last">—</p>
+    </div>
+  </div>
 
-  // Select de gama principal
-  const elTier =
-    $('#tier') ||
-    $('#gama') ||
-    $('select[data-role="tier"]') ||
-    $$('select').find?.(s => /diamante|platino|oro/i.test(s.textContent || ''));
+  <script>
+    const GET_URL = '/.netlify/functions/data-get';
+    const SAVE_URL = '/.netlify/functions/data-save';
+    const $ = id => document.getElementById(id);
+    const setStatus = (t, err=false) => { const el=$('status'); el.textContent=t; el.className='status ' + (err?'err':'ok'); };
 
-  // Área de características (modo editor y modo vista)
-  const elFeaturesEditor =
-    $('#featuresEditor') ||
-    $('textarea[data-role="features-editor"]') ||
-    $('textarea');
-
-  const elFeaturesList =
-    $('#featuresList') ||
-    $('[data-role="features-list"]');
-
-  // Cuadros de financiación Infinity
-  const elF_Importe   = $('[data-out="importeTotal"]')   || $('[data-out="fi-importe"]');
-  const elF_C36       = $('[data-out="cuota36"]')        || $('[data-out="fi-c36"]');
-  const elF_R6        = $('[data-out="restante6"]')      || $('[data-out="fi-resto6"]');
-  const elF_C6        = $('[data-out="cuota6"]')         || $('[data-out="fi-c6"]');
-
-  // Cuadros de RECOMENDADO (misma gama por defecto)
-  const elR_Importe   = $('[data-out="rec-total"]');
-  const elR_C36       = $('[data-out="rec-c36"]');
-  const elR_R6        = $('[data-out="rec-resto6"]');
-  const elR_C6        = $('[data-out="rec-c6"]');
-
-  // Selector/botones para elegir upgrade (si existen)
-  const elUpgradeSelect =
-    $('#upgradeTier') ||
-    $('select[data-role="upgrade-tier"]');
-  const elUpgradeButtons = $$('[data-upgrade-tier]'); // botones rojos con data-upgrade-tier="diamante_plus", etc.
-
-  // Inputs de imagen (se persisten en localStorage)
-  const elImgInputs = $$('input[type="file"][data-img-slot]');
-  const elImgs      = $$('[data-img-slot][data-img-preview]'); // <img data-img-slot="1" data-img-preview>
-
-  // Botones de edición con PIN (opcional)
-  const elBtnEditar = $('#btnEdit') || $('[data-action="edit"]') || $('#editar');
-  const elBtnBloq   = $('#btnLock') || $('[data-action="lock"]') || $('#bloquear');
-
-  // =========================
-  //  UTILIDADES
-  // =========================
-  const fmt = (n) => n.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
-
-  function tierKeyFromText(txt) {
-    txt = (txt || '').toLowerCase();
-    if (txt.includes('diamante plus')) return 'diamante_plus';
-    if (txt.includes('platino plus')) return 'platino_plus';
-    if (txt.includes('diamante')) return 'diamante';
-    if (txt.includes('platino')) return 'platino';
-    if (txt.includes('oro')) return 'oro';
-    return 'diamante_plus';
-  }
-
-  function pmt(rate, nper, pv) {
-    if (rate === 0) return pv / nper;
-    const f = Math.pow(1 + rate, nper);
-    return pv * rate * f / (f - 1);
-  }
-
-  function calcFinance(price) {
-    const cuota36 = price / M_TOTAL;            // reparto lineal en 42 meses
-    const restante = price - cuota36 * M_0;     // 6/42 del principal
-    const cuota6 = pmt(i_m, M_6, restante);     // financiado a 7,95% TAE
-    const r2 = (x) => Math.round(x * 100) / 100;
-    return { cuota36: r2(cuota36), restante: r2(restante), cuota6: r2(cuota6) };
-  }
-
-  // Persistencia simple
-  const LS_KEY = 'infinity.state.v2';
-  function loadState() {
-    try {
-      const s = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
-      return s && typeof s === 'object' ? s : {};
-    } catch { return {}; }
-  }
-  function saveState(s) {
-    localStorage.setItem(LS_KEY, JSON.stringify(s));
-  }
-
-  // Guardado y carga de imágenes por slot
-  function loadImg(slot) {
-    try {
-      return localStorage.getItem('infinity.img.' + slot) || null;
-    } catch { return null; }
-  }
-  function saveImg(slot, dataURL) {
-    try {
-      localStorage.setItem('infinity.img.' + slot, dataURL);
-    } catch {}
-  }
-
-  // Guardado de características por gama
-  function getFeaturesFor(tier, state) {
-    const edited = (state.features && state.features[tier]) || '';
-    return edited || FEATURES_DEFAULT[tier] || '';
-  }
-
-  function setText(el, v) { if (el) el.textContent = v; }
-  function setHTML(el, v) { if (el) el.innerHTML = v; }
-
-  function renameRestanteLabel() {
-    // Si existe un label con "Importe restante (6m)" o "Principal restante", cámbialo
-    $$('div,span,small,button').forEach(el => {
-      const t = (el.textContent || '').trim();
-      if (/importe restante|principal restante/i.test(t)) {
-        el.textContent = 'Restante 6 meses / Ahorro';
-      }
-    });
-  }
-
-  // =========================
-  //  ESTADO INICIAL
-  // =========================
-  const state = loadState();
-  // Tier actual desde el select (si existe)
-  if (elTier) {
-    const optText = elTier.options?.[elTier.selectedIndex]?.text || elTier.value || '';
-    const key = tierKeyFromText(optText);
-    state.tier = state.tier || key;
-  }
-  state.tier = state.tier || 'diamante_plus';
-
-  // Por defecto, el upgrade recomendado = MISMA GAMA
-  state.upgradeTier = state.upgradeTier || state.tier;
-
-  // Estructura para características editadas
-  state.features = state.features || {}; // { tierKey: 'linea1\nlinea2...' }
-
-  saveState(state);
-
-  // =========================
-  //  PINTADO / LÓGICA
-  // =========================
-  function priceOf(tier) { return PRICES[tier] ?? 0; }
-  function secondPairOf(tier) { return SECOND_PAIR[tier] ?? 0; }
-
-  function refreshFeaturesUI() {
-    const txt = getFeaturesFor(state.tier, state);
-    if (elFeaturesEditor) elFeaturesEditor.value = txt;
-
-    if (elFeaturesList) {
-      const items = txt.split(/\n+/).map(s => s.trim()).filter(Boolean);
-      setHTML(elFeaturesList, '<ul style="margin:0;padding-left:1rem;">' +
-        items.map(li => `<li>${escapeHTML(li)}</li>`).join('') + '</ul>');
+    function pintarGaleria(urls){
+      const g=$('galeria'); g.innerHTML='';
+      (urls||[]).forEach(u=>{
+        const d=document.createElement('div'); d.className='imgbox';
+        if(u){ const img=new Image(); img.src=u; img.loading='lazy'; d.appendChild(img); } else { d.textContent='Sin imagen'; }
+        g.appendChild(d);
+      });
     }
-  }
 
-  function refreshFinanceInfinity() {
-    const price = priceOf(state.tier);
-    const f = calcFinance(price);
-    if (elF_Importe) setText(elF_Importe, fmt(price) + '');
-    if (elF_C36)     setText(elF_C36,     fmt(f.cuota36));
-    if (elF_R6)      setText(elF_R6,      fmt(f.restante));
-    if (elF_C6)      setText(elF_C6,      fmt(f.cuota6));
-  }
+    async function cargar(){
+      setStatus('Cargando…');
+      try{
+        const res=await fetch(GET_URL,{cache:'no-store'});
+        if(!res.ok){ setStatus('Error al cargar: ' + res.status, true); return; }
+        const data=await res.json();
+        $('caracteristicas').value=data.caracteristicasGama||'';
+        $('imagenes').value=(data.imagenes||[]).join('\n');
+        pintarGaleria(data.imagenes||[]);
+        $('last').textContent='Última actualización: '+(data.updatedAt?new Date(data.updatedAt).toLocaleString():'—');
+        setStatus('Listo ✓');
+      }catch(e){ setStatus('Fallo de red al cargar', true); console.error(e); }
+    }
 
-  function refreshRecomendado() {
-    // total = precio de la gama elegida + importe 2ª pareja (upgradeTier)
-    const total = priceOf(state.tier) + secondPairOf(state.upgradeTier);
-    const f = calcFinance(total);
-    if (elR_Importe) setText(elR_Importe, fmt(total));
-    if (elR_C36)     setText(elR_C36,     fmt(f.cuota36));
-    if (elR_R6)      setText(elR_R6,      fmt(f.restante));
-    if (elR_C6)      setText(elR_C6,      fmt(f.cuota6));
-  }
+    async function guardar(){
+      const pin=($('pin').value||'').trim();
+      if(!pin){ setStatus('Introduce el PIN', true); $('pin').focus(); return; }
+      const payload={
+        caracteristicasGama:$('caracteristicas').value||'',
+        imagenes:($('imagenes').value||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,20)
+      };
+      setStatus('Guardando…');
+      try{
+        const res=await fetch(SAVE_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pin,payload})});
+        const data=await res.json().catch(()=>null);
+        if(!res.ok){ setStatus(data?.error==='PIN_INCORRECTO'?'PIN incorrecto':('Error al guardar: '+res.status), true); return; }
+        pintarGaleria(data.imagenes||payload.imagenes);
+        $('last').textContent='Última actualización: '+new Date(data.updatedAt).toLocaleString();
+        setStatus('Cambios guardados ✓');
+      }catch(e){ setStatus('Fallo de red al guardar', true); console.error(e); }
+    }
 
-  function refreshAll() {
-    refreshFeaturesUI();
-    refreshFinanceInfinity();
-    refreshRecomendado();
-    renameRestanteLabel();
-  }
-
-  // =========================
-  //  EVENTOS
-  // =========================
-
-  // Cambio de gama (select)
-  if (elTier) {
-    elTier.addEventListener('change', () => {
-      const optText = elTier.options?.[elTier.selectedIndex]?.text || elTier.value || '';
-      state.tier = tierKeyFromText(optText);
-      // Si el usuario nunca cambió manualmente el upgrade, mantén MISMA GAMA
-      if (!state.userChoseUpgrade) state.upgradeTier = state.tier;
-      saveState(state); refreshAll();
-    });
-  }
-
-  // Upgrade: select
-  if (elUpgradeSelect) {
-    // Inicializa con el estado
-    elUpgradeSelect.value = state.upgradeTier;
-    elUpgradeSelect.addEventListener('change', () => {
-      state.upgradeTier = elUpgradeSelect.value;
-      state.userChoseUpgrade = true;
-      saveState(state); refreshRecomendado();
-    });
-  }
-
-  // Upgrade: botones
-  if (elUpgradeButtons.length) {
-    elUpgradeButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tier = btn.getAttribute('data-upgrade-tier');
-        if (tier) {
-          state.upgradeTier = tier;
-          state.userChoseUpgrade = true;
-          saveState(state); refreshRecomendado();
-          // marcar activo visualmente si tu CSS lo usa
-          elUpgradeButtons.forEach(b => b.classList.remove('is-active'));
-          btn.classList.add('is-active');
-        }
-      });
-    });
-  }
-
-  // Edición de características (persistente)
-  if (elFeaturesEditor) {
-    elFeaturesEditor.addEventListener('input', () => {
-      if (isLocked()) return;
-      state.features[state.tier] = elFeaturesEditor.value;
-      saveState(state);
-      refreshFeaturesUI();
-    });
-  }
-
-  // Imágenes: cargar preexistentes
-  if (elImgs.length) {
-    elImgs.forEach(img => {
-      const slot = img.getAttribute('data-img-slot');
-      const dataURL = loadImg(slot);
-      if (dataURL) img.src = dataURL;
-    });
-  }
-
-  // Imágenes: guardar al seleccionar archivo
-  if (elImgInputs.length) {
-    elImgInputs.forEach(inp => {
-      inp.addEventListener('change', async () => {
-        if (isLocked()) { alert('Edición bloqueada. Usa PIN para editar.'); inp.value=''; return; }
-        const slot = inp.getAttribute('data-img-slot');
-        const file = inp.files?.[0];
-        if (!file) return;
-        const dataURL = await fileToDataURL(file);
-        saveImg(slot, dataURL);
-        // pintar preview si existe
-        const img = elImgs.find(i => i.getAttribute('data-img-slot') === slot);
-        if (img) img.src = dataURL;
-      });
-    });
-  }
-
-  // Botones PIN (opcional)
-  if (elBtnEditar) {
-    elBtnEditar.addEventListener('click', () => {
-      if (!isLocked()) return; // ya desbloqueado
-      const pin = prompt('PIN de edición');
-      if (pin === '4321') setLocked(false);
-      else alert('PIN incorrecto');
-    });
-  }
-  if (elBtnBloq) {
-    elBtnBloq.addEventListener('click', () => setLocked(true));
-  }
-
-  // =========================
-  //  BLOQUEO / PIN
-  // =========================
-  function isLocked() { return !!state.locked; }
-  function setLocked(v) {
-    state.locked = !!v;
-    saveState(state);
-    applyLockUI();
-  }
-  function applyLockUI() {
-    const dis = !!state.locked;
-    // deshabilitar inputs de imagen + editor de características
-    elImgInputs.forEach(i => i.disabled = dis);
-    if (elFeaturesEditor) elFeaturesEditor.disabled = dis;
-    // texto de botones (si existen)
-    if (elBtnEditar) elBtnEditar.style.opacity = dis ? '1' : '0.6';
-    if (elBtnBloq)   elBtnBloq.style.opacity   = dis ? '0.6' : '1';
-  }
-
-  // =========================
-  //  HELPERS
-  // =========================
-  function escapeHTML(s) {
-    return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-  function fileToDataURL(file) {
-    return new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload = () => res(r.result);
-      r.onerror = rej;
-      r.readAsDataURL(file);
-    });
-  }
-
-  // Etiqueta “Restante 6 meses / Ahorro”
-  renameRestanteLabel();
-
-  // Inicializar UI (bloqueo por defecto activado)
-  if (typeof state.locked === 'undefined') setLocked(true); else applyLockUI();
-
-  // Pintar todo
-  refreshAll();
-
-  // Si existe selector de gama y su valor visual no coincide con estado, sincroniza
-  if (elTier) {
-    const want = state.tier;
-    const opt = Array.from(elTier.options || []).find(o => tierKeyFromText(o.text || o.value) === want);
-    if (opt) elTier.value = opt.value;
-  }
-  if (elUpgradeSelect) elUpgradeSelect.value = state.upgradeTier;
-})();
-</script>
+    $('recargar').addEventListener('click', cargar);
+    $('guardar').addEventListener('click', guardar);
+    cargar();
+  </script>
 </body>
 </html>
