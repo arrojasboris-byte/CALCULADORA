@@ -1,10 +1,9 @@
-// Guarda SOLO los campos permitidos si el PIN es correcto
-import { getStore } from '@netlify/blobs';
+// Guarda SOLO si el PIN es correcto (por defecto 4321)
+const { getStore } = require('@netlify/blobs');
 
-const ALLOWED = ['caracteristicasGama', 'imagenes'];
-const ADMIN_PIN = process.env.ADMIN_PIN || '4321'; // ponlo en Vars de Netlify
+const ADMIN_PIN = process.env.ADMIN_PIN || '4321';
 
-export async function handler(event) {
+exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
@@ -15,11 +14,12 @@ export async function handler(event) {
     }
 
     const store = getStore('catalogo');
-    const current = (await store.get('contenido', { type: 'json' })) || {
-      caracteristicasGama: '',
-      imagenes: [],
-      updatedAt: new Date().toISOString(),
-    };
+    const current =
+      (await store.get('contenido', { type: 'json' })) || {
+        caracteristicasGama: '',
+        imagenes: [],
+        updatedAt: new Date().toISOString(),
+      };
 
     const next = {
       caracteristicasGama:
@@ -37,4 +37,4 @@ export async function handler(event) {
   } catch (e) {
     return { statusCode: 500, body: JSON.stringify({ error: 'SAVE_FAILED', detail: String(e) }) };
   }
-}
+};
