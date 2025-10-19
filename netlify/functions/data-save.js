@@ -1,4 +1,3 @@
-// Guarda SOLO si el PIN es correcto (por defecto 4321)
 const { getStore } = require('@netlify/blobs');
 
 const ADMIN_PIN = process.env.ADMIN_PIN || '4321';
