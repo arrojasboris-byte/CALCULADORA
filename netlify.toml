@@ -1,10 +1,16 @@
 [build]
-command = "npm run build"
-publish = "dist"
+  command = "npm run build"
+  publish = "dist"
 
 [build.environment]
-NODE_VERSION = "18"
+  NODE_VERSION = "18"
 
 [functions]
-directory = "netlify/functions"
-node_bundler = "esbuild"
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# /admin → sirve public/admin.html
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
