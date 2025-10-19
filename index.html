@@ -1,146 +1,121 @@
-<!doctype html>
+<!DOCTYPE html>
+el('feedback').innerHTML = '';<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CALCULADORA INFINITY AUDIO</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: { extend: { colors: { brand: { red: '#DC2626', gray: '#6B7280' } } } }
-    }
-  </script>
-  <style>
-    html, body { background:#f6f7f9; }
-    .card { box-shadow: 0 6px 24px rgba(0,0,0,.06); }
-    .paper { background:white; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
-    .imgBox { aspect-ratio: 1/1; }
-    @media print { .no-print { display:none !important; } html, body { background:white; } }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Catálogo Compartido</title>
+<style>
+:root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji'; }
+body { margin: 0; background: #f6f7f9; }
+.container { max-width: 980px; margin: 0 auto; padding: 24px; }
+.card { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 6px 24px rgba(0,0,0,.06); }
+.row { display: flex; gap: 16px; flex-wrap: wrap; }
+.col { flex: 1 1 320px; }
+h1 { margin: 0 0 8px; font-size: 28px; }
+p.muted { color: #667085; margin: 6px 0 16px; }
+textarea, input[type="text"] { width: 100%; box-sizing: border-box; padding: 12px; border-radius: 12px; border: 1px solid #d0d5dd; background: #fafafa; font-size: 14px; }
+textarea { min-height: 160px; resize: vertical; }
+.btn { appearance: none; border: 0; border-radius: 12px; padding: 10px 14px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: #0ea5e9; color: white; }
+.btn-ghost { background: transparent; color: #0ea5e9; }
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+.toolbar { display:flex; gap: 8px; align-items:center; justify-content:flex-end; margin: 12px 0 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.imgbox { background: #f2f4f7; border: 1px dashed #d0d5dd; border-radius: 12px; min-height: 120px; display: grid; place-items: center; overflow: hidden; }
+.imgbox img { width: 100%; height: 100%; object-fit: cover; }
+.pill { display:inline-block; padding:4px 10px; border-radius: 999px; background:#eef2ff; color:#444; font-size:12px; }
+.error { color: #b42318; margin-top: 6px; }
+.success { color: #027a48; margin-top: 6px; }
+details { background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; padding:12px; }
+details summary { cursor:pointer; font-weight:600; }
+.small { font-size: 12px; color: #667085; }
+</style>
 </head>
-<body class="min-h-screen text-gray-900">
-  <div id="app"></div>
+<body>
+<div class="container">
+<div class="card">
+<h1>Catálogo Compartido</h1>
+<p class="muted">Este enlace siempre muestra la versión más reciente. Para editar, pulsa <strong>Editar</strong> e introduce el PIN.</p>
 
-  <!-- React + Babel (UMD) -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <script type="text/babel">
-    const { useState, useEffect } = React;
+<div class="row">
+<div class="col">
+<label><strong>Características de gama</strong></label>
+<textarea id="caracteristicas" disabled placeholder="Describe aquí las características de la gama (materiales, opciones, conectividad, etc.)"></textarea>
+</div>
+<div class="col">
+<label><strong>Imágenes (URLs)</strong></label>
+<div id="imagenes-list"></div>
+<button id="add-image" class="btn btn-ghost" disabled>+ Añadir imagen</button>
+<p class="small">Pega direcciones (URLs) de imágenes públicas. Se mostrarán abajo.</p>
+</div>
+</div>
 
-    // --- Config ---
-    const PUBLIC_BASE = "";            // vacío -> funciona en cualquier dominio / ruta
-    const PIN_CODE   = "4321";         // PIN para editar imágenes y características
-    const TIER_ORDER = ["oro","platino","platino_plus","diamante","diamante_plus"];
-    const TIERS = {
-      oro:            {label:"Oro",            amount:1991},
-      platino:        {label:"Platino",        amount:3285},
-      platino_plus:   {label:"Platino Plus",   amount:3395},
-      diamante:       {label:"Diamante",       amount:3895},
-      diamante_plus:  {label:"Diamante Plus",  amount:3995},
-    };
-    const IMG_CAPTIONS = ["RIC / RIC PLUS","BTE POTENTE","INTRACANAL A MEDIDA","INTRACANAL ESTÁNDAR"];
 
-    // --- Utils ---
-    const fmt = (n)=>n.toLocaleString("es-ES",{minimumFractionDigits:2, maximumFractionDigits:2});
-    // cuota de préstamo estándar (para los 6 meses con interés)
-    const monthlyPayment = (principal, months, annualRate) => {
-      const r = annualRate/12;
-      if (r === 0) return principal / months;
-      const pow = Math.pow(1+r, months);
-      return principal * (r*pow)/(pow-1);
-    };
-    const encodeState = (obj)=> btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
-    const decodeState = (s)=> { try { return JSON.parse(decodeURIComponent(escape(atob(s)))); } catch { return null; } };
+<div class="toolbar">
+<span id="status" class="pill">Cargando…</span>
+<button id="edit" class="btn">Editar</button>
+<button id="save" class="btn btn-primary" disabled>Guardar</button>
+<button id="cancel" class="btn" disabled>Cancelar</button>
+</div>
+</html>
+}
 
-    function App(){
-      // Estado
-      const [tier, setTier] = useState("diamante_plus"); // empieza arriba (mayor a menor)
-      const [features, setFeatures] = useState({
-        oro: "Incluye:\n· Función A\n· Función B",
-        platino: "Incluye:\n· Función A+\n· Función B+",
-        platino_plus: "Incluye:\n· Función avanzada P",
-        diamante: "Incluye:\n· Función D1\n· Función D2",
-        diamante_plus: "Incluye:\n· Máximo rendimiento",
-      });
-      const [images, setImages] = useState([null,null,null,null]);
-      const [locked, setLocked] = useState(true);
-      const [pinOpen, setPinOpen] = useState(false);
-      const [pin, setPin] = useState("");
-      const [includeImgs, setIncludeImgs] = useState(false);
-      const [shareUrl, setShareUrl] = useState("");
 
-      // Cargar desde hash #s=
-      useEffect(()=>{
-        const m = (window.location.hash||"").match(/#s=([^&]+)/);
-        if(m && m[1]){
-          const st = decodeState(m[1]);
-          if(st && st.tier){
-            setTier(st.tier);
-            if(st.features) setFeatures(st.features);
-            if(st.images) setImages(st.images);
-          }
-        }
-      },[]);
+function addImageInput() {
+const list = el('imagenes-list');
+const wrapper = document.createElement('div');
+wrapper.style.margin = '6px 0';
+const input = document.createElement('input');
+input.type = 'text';
+input.placeholder = 'https://…';
+input.className = 'img-input';
+input.disabled = false;
+wrapper.appendChild(input);
+list.appendChild(wrapper);
+}
 
-      // Persistencia local
-      useEffect(()=>{
-        const raw = localStorage.getItem("calc_inf_state_v2");
-        if(raw){ try{ const p=JSON.parse(raw); if(p.tier) setTier(p.tier); if(p.features) setFeatures(p.features); if(p.images) setImages(p.images);}catch{} }
-      },[]);
-      useEffect(()=>{
-        localStorage.setItem("calc_inf_state_v2", JSON.stringify({tier,features,images}));
-      },[tier,features,images]);
 
-      // Cálculos 42 meses (36m 0% + 6m al 7,95% TAE)
-      const amount = TIERS[tier].amount;
-      const principalPerMonth     = amount / 42;
-      const cuota36               = principalPerMonth;                 // 36 meses sin intereses
-      const restante6_principal   = amount - (principalPerMonth * 36); // = amount/7
-      const cuota6_795            = monthlyPayment(restante6_principal, 6, 0.0795);
+function gatherPayload() {
+const caracteristicasGama = el('caracteristicas').value || '';
+const urls = Array.from(document.querySelectorAll('.img-input'))
+.map(i => (i.value || '').trim())
+.filter(Boolean);
+return { caracteristicasGama, imagenes: urls };
+}
 
-      // RECOMENDADO: 2ª pareja = importe x2
-      const amount2               = amount * 2;
-      const principalPerMonth2    = amount2 / 42;
-      const cuota36_2             = principalPerMonth2;
-      const restante6_principal2  = amount2 - (principalPerMonth2 * 36);
-      const cuota6_795_2          = monthlyPayment(restante6_principal2, 6, 0.0795);
 
-      // Compartir (opcionalmente con imágenes)
-      const genShare = ()=>{
-        const st = {tier, features, images: includeImgs ? images : [null,null,null,null]};
-        const s = encodeState(st);
-        const href = (PUBLIC_BASE || window.location.origin+window.location.pathname) + "#s=" + s;
-        setShareUrl(href);
-        try{ navigator.clipboard.writeText(href); }catch{}
-        alert("Enlace copiado.");
-      };
+function save() {
+if (!STATE.editing) return;
+el('status').textContent = 'Guardando…';
+const payload = gatherPayload();
+google.script.run
+.withSuccessHandler((next) => {
+STATE.editing = false;
+STATE.pin = null;
+setDisabled(true);
+render(next);
+el('feedback').innerHTML = '<p class="success">Cambios guardados.</p>';
+el('status').textContent = 'Guardado';
+})
+.withFailureHandler(err => {
+el('feedback').innerHTML = `<p class="error">${(err && err.message) || 'Error al guardar'}.</p>`;
+el('status').textContent = 'Error';
+})
+.saveData(STATE.pin, payload);
+}
 
-      // PIN
-      const canEdit = !locked;
-      const askPin = ()=>{ setPin(""); setPinOpen(true); };
-      const checkPin = ()=>{ if(pin===PIN_CODE){ setLocked(false); setPinOpen(false); } else alert("PIN incorrecto"); };
 
-      // Imagen
-      const onPick = (i, file)=>{
-        if(!canEdit){ alert("Bloqueado. Pulsa 'Editar (PIN)' (4321)."); return; }
-        if(!file) return;
-        const r = new FileReader();
-        r.onload = e=>{ const next = images.slice(); next[i] = String(e.target.result); setImages(next); };
-        r.readAsDataURL(file);
-      };
-
-      return (
-        <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-6">
-          {/* Header */}
-          <header className="flex items-center justify-between gap-4">
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-red-700">CALCULADORA INFINITY AUDIO</h1>
-            <div className="no-print flex items-center gap-2">
-              <label className="flex items-center gap-2 text-sm text-gray-700">
-                <input type="checkbox" className="rounded border-gray-300" checked={includeImgs} onChange={e=>setIncludeImgs(e.target.checked)} />
-                Incluir imágenes en el enlace
-              </label>
-              <button type="button" onClick={genShare} className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium bg-red-600 text-white hover:bg-red-700">Compartir enlace</button>
-              {locked
-                ? <button type="button" onClick={ask_analysis
+// Eventos
+document.addEventListener('DOMContentLoaded', () => {
+setDisabled(true);
+google.script.run.withSuccessHandler(render).getData();
+el('edit').addEventListener('click', startEdit);
+el('cancel').addEventListener('click', cancelEdit);
+el('save').addEventListener('click', save);
+el('add-image').addEventListener('click', addImageInput);
+});
+</script>
+</body>
+</html>
