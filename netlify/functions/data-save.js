@@ -1,16 +1,12 @@
 const { getStore } = require('@netlify/blobs');
-
 const ADMIN_PIN = process.env.ADMIN_PIN || '4321';
 
 exports.handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
+  if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
+
   try {
     const { pin, payload } = JSON.parse(event.body || '{}');
-    if (!pin || pin !== ADMIN_PIN) {
-      return { statusCode: 401, body: JSON.stringify({ error: 'PIN_INCORRECTO' }) };
-    }
+    if (pin !== ADMIN_PIN) return { statusCode: 401, body: JSON.stringify({ error: 'PIN_INCORRECTO' }) };
 
     const store = getStore('catalogo');
     const current =
@@ -22,11 +18,9 @@ exports.handler = async (event) => {
 
     const next = {
       caracteristicasGama:
-        typeof payload?.caracteristicasGama === 'string'
-          ? payload.caracteristicasGama
-          : current.caracteristicasGama,
+        typeof payload?.caracteristicasGama === 'string' ? payload.caracteristicasGama : current.caracteristicasGama,
       imagenes: Array.isArray(payload?.imagenes)
-        ? payload.imagenes.filter((u) => typeof u === 'string' && u.trim()).slice(0, 20)
+        ? payload.imagenes.filter(u => typeof u === 'string' && u.trim()).slice(0, 20)
         : current.imagenes,
       updatedAt: new Date().toISOString(),
     };
