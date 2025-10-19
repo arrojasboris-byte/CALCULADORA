@@ -1,44 +1,26 @@
 {
-  "name": "calculadora-infinity-audio",
+  "name": "calculadora-infy",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.1",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview --port 5173"
+    "preview": "vite preview --port 4173"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "lz-string": "^1.5.0",
-    "pako": "^2.1.0"
+    "@netlify/blobs": "^6.4.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "vite": "^5.0.0",
-    "typescript": "^5.4.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0"
-    {
-  "dependencies": {
-    "@netlify/blobs": "^6.4.0"
-  },
-  "scripts": {
-    "build": "vite build",
-    "dev": "vite",
-    "preview": "vite preview"
-    {
-  "dependencies": {
-    "@netlify/blobs": "^6.4.0"
-  },
-  "engines": { "node": ">=18" },
-  "scripts": {
-    "build": "vite build"
-  }
-}
-
-  }
-}
-
+    "@types/react": "^18.3.8",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.3",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
   }
 }
