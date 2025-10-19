@@ -7,21 +7,12 @@
   <meta name="color-scheme" content="light" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: { red: '#DC2626', gray: '#6B7280' }
-          }
-        }
-      }
-    }
+    tailwind.config = { theme:{ extend:{ colors:{ brand:{ red:'#DC2626', gray:'#6B7280' }}}}}
   </script>
   <style>
     html, body { background:#f6f7f9; }
-    .card { box-shadow: 0 6px 24px rgba(0,0,0,.06); }
-    .paper { background:white; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
-    .imgBox { aspect-ratio: 1/1; }
+    .paper { background:white; box-shadow:0 10px 30px rgba(0,0,0,.08); }
+    .imgBox { aspect-ratio:1/1; }
     @media print { .no-print { display:none !important; } html, body { background:white; } }
   </style>
 </head>
@@ -65,9 +56,6 @@
         <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
           <div class="flex items-center gap-2">
             <label class="text-sm text-gray-700 shrink-0">Características de gamas</label>
-            <button id="btn-edit" class="ml-auto text-xs px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700 no-print">
-              Editar
-            </button>
           </div>
           <select id="sel-gama" class="w-full rounded-lg border-gray-300 text-sm px-3 py-2">
             <option value="diamante_plus">Diamante Plus</option>
@@ -78,6 +66,12 @@
           </select>
           <input id="buscador" placeholder="Buscar característica..." class="rounded-lg border-gray-300 text-sm px-3 py-2" />
         </div>
+
+        <div class="no-print ml-auto">
+          <button id="btn-edit" class="text-xs px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700">
+            Editar contenido
+          </button>
+        </div>
       </div>
 
       <!-- Texto dinámico + galería -->
@@ -86,7 +80,7 @@
         <div id="galeria" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
       </div>
 
-      <!-- Tabla (ejemplo) -->
+      <!-- Tabla (fija de ejemplo) -->
       <div class="px-4 md:px-6 pb-6">
         <div class="rounded-xl overflow-hidden border">
           <div class="bg-red-600 text-white text-xs uppercase px-4 py-2 grid grid-cols-3">
@@ -133,7 +127,7 @@
       </div>
     </section>
 
-    <!-- Upgrade (decorativo) -->
+    <!-- UPGRADE -->
     <section class="paper rounded-2xl p-4 md:p-6">
       <h3 class="text-sm font-semibold text-gray-700 mb-3">UPGRADE</h3>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -144,7 +138,7 @@
       </div>
     </section>
 
-    <!-- Comparar (colapsable simple) -->
+    <!-- Comparar -->
     <section class="paper rounded-2xl">
       <button id="btn-compara" class="w-full text-left px-4 py-3 text-sm text-gray-700 flex items-center gap-2">
         <span class="inline-block rotate-0 transition-transform" id="ico-compara">▶</span> Comparar
@@ -154,8 +148,8 @@
       </div>
     </section>
 
-    <!-- Panel de edición (modal) -->
-    <dialog id="dlg-edit" class="rounded-2xl p-0 w-full max-w-2xl">
+    <!-- MODAL: Editor de contenido (sin mostrar PIN) -->
+    <dialog id="dlg-edit" class="rounded-2xl p-0 w-full max-w-3xl">
       <form method="dialog" class="p-0 m-0">
         <div class="p-4 md:p-6 space-y-4">
           <div class="flex items-center justify-between">
@@ -163,22 +157,27 @@
             <button class="px-3 py-1.5 rounded-lg border text-sm">Cerrar</button>
           </div>
 
-          <div class="grid sm:grid-cols-2 gap-3">
-            <label class="text-sm text-gray-700">PIN
-              <input id="pin" class="mt-1 w-full rounded-lg border-gray-300 px-3 py-2" placeholder="4321" />
-            </label>
-            <div class="text-xs text-gray-500 self-end">El PIN se valida en el servidor (variable <code>ADMIN_PIN</code> de Netlify).</div>
-          </div>
-
           <label class="block text-sm text-gray-700">Características de gama
             <textarea id="txt-car" class="mt-1 w-full rounded-lg border-gray-300 px-3 py-2 h-40"
               placeholder="Ej.: Bluetooth LE, 16 canales, IP68, carga rápida, reducción de ruido…"></textarea>
           </label>
 
-          <label class="block text-sm text-gray-700">Imágenes (URLs públicas, una por línea — máx. 20)
-            <textarea id="txt-img" class="mt-1 w-full rounded-lg border-gray-300 px-3 py-2 h-40"
+          <!-- Editor de imágenes -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="text-sm text-gray-700">Imágenes (una por línea — máx. 20)</label>
+              <div class="flex items-center gap-2">
+                <button id="btn-add-url"   type="button" class="px-2 py-1.5 text-xs rounded-lg border bg-white">Añadir URL</button>
+                <label class="px-2 py-1.5 text-xs rounded-lg border bg-white cursor-pointer">
+                  Subir archivo
+                  <input id="file-add" type="file" accept="image/*" class="hidden" />
+                </label>
+              </div>
+            </div>
+            <textarea id="txt-img" class="w-full rounded-lg border-gray-300 px-3 py-2 h-40"
               placeholder="https://...\nhttps://..."></textarea>
-          </label>
+            <div class="text-[11px] text-gray-500">Consejo: usa URLs públicas (CDN, Drive público, etc.). Subir archivo lo convierte a data URL (pesa más).</div>
+          </div>
 
           <div class="flex justify-end gap-2">
             <button id="btn-reload" type="button" class="px-3 py-2 rounded-lg border bg-white text-sm">Recargar</button>
@@ -190,10 +189,27 @@
       </form>
     </dialog>
 
+    <!-- MODAL: PIN (no visible hasta guardar) -->
+    <dialog id="dlg-pin" class="rounded-2xl p-0 w-full max-w-xs">
+      <form method="dialog" class="p-0 m-0">
+        <div class="p-4 space-y-3">
+          <h3 class="text-base font-semibold">Introduce PIN</h3>
+          <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8"
+                 class="w-full rounded-lg border-gray-300 px-3 py-2 text-center tracking-widest"
+                 placeholder="••••" />
+          <div class="flex justify-end gap-2">
+            <button class="px-3 py-2 rounded-lg border text-sm">Cancelar</button>
+            <button id="btn-pin-ok" class="px-3 py-2 rounded-lg bg-red-600 text-white text-sm">Aceptar</button>
+          </div>
+          <div id="pin-msg" class="text-sm text-red-600"></div>
+        </div>
+      </form>
+    </dialog>
+
   </main>
 
   <script>
-    // ==== Config ====
+    // ==== Endpoints ====
     const GET_URL  = '/.netlify/functions/data-get';
     const SAVE_URL = '/.netlify/functions/data-save';
 
@@ -205,14 +221,12 @@
       const pow = Math.pow(1+r, meses);
       return principal * (r*pow) / (pow-1);
     };
+    const getTextareaLines = (el)=> el.value.split('\n').map(s=>s.trim()).filter(Boolean);
 
-    // ==== Estado en memoria ====
-    let state = {
-      caracteristicasGama: '',
-      imagenes: []
-    };
+    // ==== Estado ====
+    let state = { caracteristicasGama:'', imagenes:[] };
 
-    // ==== Carga inicial desde Functions ====
+    // ==== Carga inicial ====
     async function cargarDatos() {
       try {
         const r = await fetch(GET_URL, { cache:'no-store' });
@@ -224,12 +238,12 @@
         pintar();
       } catch (e) {
         console.error('Error cargando datos', e);
-        document.getElementById('caracteristicas').textContent = '';
-        document.getElementById('galeria').innerHTML = '';
+        state = { caracteristicasGama:'', imagenes:[] };
+        pintar();
       }
     }
 
-    // ==== Pintado en pantalla ====
+    // ==== Pintado ====
     function pintar() {
       // Texto
       document.getElementById('caracteristicas').textContent = state.caracteristicasGama || '';
@@ -239,16 +253,16 @@
       gal.innerHTML = '';
       (state.imagenes || []).forEach(u => {
         if (typeof u !== 'string' || !u.trim()) return;
-        const div = document.createElement('div');
-        div.className = 'bg-white border rounded-xl p-3 flex items-center justify-center imgBox';
+        const box = document.createElement('div');
+        box.className = 'bg-white border rounded-xl p-3 flex items-center justify-center imgBox';
         const img = new Image();
         img.src = u; img.loading='lazy'; img.alt='Imagen';
         img.className = 'object-cover h-full w-full rounded-lg';
-        div.appendChild(img);
-        gal.appendChild(div);
+        box.appendChild(img);
+        gal.appendChild(box);
       });
 
-      // Financiación (para 3995 €)
+      // Financiación (fijo 3995 €)
       const amount = 3995;
       const principalPerMonth   = amount / 42;
       const restante6principal  = amount - (principalPerMonth * 36);
@@ -259,47 +273,55 @@
       document.getElementById('restante6').textContent= fmtMoneda(restante6principal);
       document.getElementById('cuota6').textContent   = fmtMoneda(cuota6);
 
-      // Formatos de audífonos: si hay 4+ imágenes, las mostramos arriba
-      const imgs = [document.getElementById('f0'), document.getElementById('f1'), document.getElementById('f2'), document.getElementById('f3')];
-      for (let i=0;i<imgs.length;i++) {
-        if (state.imagenes[i]) imgs[i].src = state.imagenes[i];
-      }
+      // Formatos: primeras 4 imágenes si existen
+      const F = [ 'f0','f1','f2','f3' ].map(id=>document.getElementById(id));
+      F.forEach((el, i)=> { if (state.imagenes[i]) el.src = state.imagenes[i]; });
     }
 
-    // ==== Editor (modal) ====
+    // ==== Editor ====
     function abrirEditor() {
       const dlg = document.getElementById('dlg-edit');
-      const txtCar = document.getElementById('txt-car');
-      const txtImg = document.getElementById('txt-img');
-      const msg    = document.getElementById('msg');
-
-      txtCar.value = state.caracteristicasGama || '';
-      txtImg.value = (state.imagenes || []).join('\n');
-      msg.textContent = '';
+      document.getElementById('txt-car').value = state.caracteristicasGama || '';
+      document.getElementById('txt-img').value = (state.imagenes || []).join('\n');
+      document.getElementById('msg').textContent = '';
       dlg.showModal();
     }
 
+    // Pide PIN en modal y devuelve string (o null si cancela)
+    function pedirPin() {
+      return new Promise((resolve)=>{
+        const dlg = document.getElementById('dlg-pin');
+        const inp = document.getElementById('pin');
+        const msg = document.getElementById('pin-msg');
+        msg.textContent = ''; inp.value = ''; dlg.showModal();
+        const ok = (e)=>{ e.preventDefault(); dlg.close(); resolve(inp.value.trim() || null); };
+        const cancel = ()=>{ dlg.close(); resolve(null); };
+        document.getElementById('btn-pin-ok').onclick = ok;
+        dlg.addEventListener('close', cancel, { once:true });
+      });
+    }
+
     async function guardarEditor() {
-      const pin   = document.getElementById('pin').value.trim();
-      const car   = document.getElementById('txt-car').value;
-      const imgs  = document.getElementById('txt-img').value
-                      .split('\n').map(s=>s.trim()).filter(Boolean).slice(0,20);
+      const car  = document.getElementById('txt-car').value;
+      const imgs = getTextareaLines(document.getElementById('txt-img')).slice(0,20);
+
+      const pin = await pedirPin(); // NO visible hasta ahora
+      if (!pin) return;
 
       const msg = document.getElementById('msg');
       msg.textContent = 'Guardando…';
 
       try {
-        const r = await fetch(SAVE_URL, {
+        const r = await fetch('/.netlify/functions/data-save', {
           method:'POST',
           headers:{ 'content-type':'application/json' },
           body: JSON.stringify({ pin, payload: { caracteristicasGama: car, imagenes: imgs } })
         });
         const d = await r.json();
         if (!r.ok) {
-          msg.textContent = d && d.error==='PIN_INCORRECTO' ? 'PIN incorrecto' : 'No se pudo guardar';
+          msg.textContent = (d && d.error==='PIN_INCORRECTO') ? 'PIN incorrecto' : 'No se pudo guardar';
           return;
         }
-        // OK
         state.caracteristicasGama = d.caracteristicasGama || '';
         state.imagenes = Array.isArray(d.imagenes)? d.imagenes : [];
         pintar();
@@ -310,12 +332,34 @@
       }
     }
 
-    // ==== Listeners ====
+    // ==== Añadir imágenes ====
+    document.getElementById('btn-add-url').addEventListener('click', ()=>{
+      const t = document.getElementById('txt-img');
+      t.value = (t.value ? t.value + '\n' : '') + 'https://';
+      t.focus(); t.selectionStart = t.value.length; t.selectionEnd = t.value.length;
+    });
+
+    document.getElementById('file-add').addEventListener('change', (e)=>{
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      const rd = new FileReader();
+      rd.onload = () => {
+        const t = document.getElementById('txt-img');
+        const url = String(rd.result || '').trim();
+        if (!url) return;
+        const lines = getTextareaLines(t);
+        lines.push(url);
+        t.value = lines.slice(0,20).join('\n');
+        e.target.value = ''; // limpia
+      };
+      rd.readAsDataURL(f);
+    });
+
+    // ==== Otros controles ====
     document.getElementById('btn-edit').addEventListener('click', abrirEditor);
     document.getElementById('btn-save').addEventListener('click', guardarEditor);
     document.getElementById('btn-reload').addEventListener('click', cargarDatos);
 
-    // Comparar
     document.getElementById('btn-compara').addEventListener('click', ()=>{
       const p = document.getElementById('panel-compara');
       const i = document.getElementById('ico-compara');
@@ -324,13 +368,10 @@
       i.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
     });
 
-    // Copiar enlace (simple)
     document.getElementById('btn-copiar').addEventListener('click', async ()=>{
       try { await navigator.clipboard.writeText(location.href); alert('Enlace copiado'); }
       catch { alert('Copia manual: ' + location.href); }
     });
-
-    // Botones PDF/Excel (placeholders)
     document.getElementById('btn-pdf').addEventListener('click', ()=>window.print());
     document.getElementById('btn-excel').addEventListener('click', ()=>alert('Exportar Excel no implementado en esta versión.'));
 
