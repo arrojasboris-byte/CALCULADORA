@@ -264,6 +264,146 @@
     const saved = loadState();
 
     const controls = Array.from(document.querySelectorAll("input, textarea, select")); 
+<<script>
+(function () {
+  const KEY = "calc_infy_content_v1";
+
+  // Helpers
+  const $ = (sel, ctx=document) => ctx.querySelector(sel);
+  const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+  const getBtnByText = (txt) =>
+    $$("button, a, [role='button']").find(b => (b.textContent||"").trim().toLowerCase() === txt.toLowerCase());
+
+  function loadState(){
+    try { return JSON.parse(localStorage.getItem(KEY) || "{}"); }
+    catch(e){ return {}; }
+  }
+  function saveState(state){
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }
+
+  const state = loadState();
+
+  // Inputs del modal
+  // Ideal: <textarea data-field="caracteristicas"></textarea> y <textarea data-field="imagenes"></textarea>
+  const modal = document.body; // usa el documento; si tienes un contenedor de modal, ponlo aquí
+  const caracteristicas = $("[data-field='caracteristicas']") || $$("textarea, [contenteditable='true']").find(el => /características/i.test(el.closest("label,div,section,form")?.textContent||""));
+  const imagenes = $("[data-field='imagenes']") || $$("textarea").find(el => /im[aá]genes/i.test(el.closest("label,div,section,form")?.textContent||""));
+
+  // Botones
+  const btnGuardar = $("[data-action='guardar']") || getBtnByText("Guardar");
+  const btnRecargar = $("[data-action='recargar']") || getBtnByText("Recargar");
+
+  // Rellenar desde storage
+  if (caracteristicas && state.caracteristicas !== undefined) {
+    if ("value" in caracteristicas) caracteristicas.value = state.caracteristicas;
+    else caracteristicas.innerHTML = state.caracteristicas;
+  }
+  if (imagenes && state.imagenes !== undefined) {
+    if ("value" in imagenes) imagenes.value = state.imagenes;
+    else imagenes.textContent = state.imagenes;
+  }
+
+  // Auto-guardado al escribir
+  const persist = () => {
+    const s = loadState();
+    if (caracteristicas) s.caracteristicas = ("value" in caracteristicas) ? caracteristicas.value : caracteristicas.innerHTML;
+    if (imagenes) s.imagenes = ("value" in imagenes) ? imagenes.value : imagenes.textContent;
+    saveState(s);
+  };
+
+  [caracteristicas, imagenes].filter(Boolean).forEach(el => {
+    el.addEventListener("input", persist);
+    el.addEventListener("change", persist);
+  });
+
+  // Guardar (confirma y refresca la vista fuera del modal)
+  function applyToView(){
+    // Ajusta estos selectores a tu UI real:
+    // 1) Características visibles (ej. en la tabla “Ver características”)
+    const contCaracteristicas = document.querySelector(".js-caracteristicas, [data-bind='caracteristicas']");
+    if (contCaracteristicas && state.caracteristicas) {
+      contCaracteristicas.innerHTML = state.caracteristicas
+        .split(/\n+/).map(l => l.trim()).filter(Boolean).map(l => `<li>${l}</li>`).join("") || state.caracteristicas;
+    }
+
+    // 2) Galería de imágenes (una URL por línea)
+    const contImagenes = document.querySelector(".js-galeria, [data-bind='imagenes']");
+    if (contImagenes && state.imagenes) {
+      const urls = state.imagenes.split(/\n+/).map(s => s.trim()).filter(Boolean);
+      contImagenes.innerHTML = urls.map(u => `<img src="${u}" alt="" loading="lazy" style="max-width:120px;max-height:80px;margin:6px;border-radius:8px;border:1px solid #eee">`).join("");
+    }
+  }
+
+  if (btnGuardar) {
+    btnGuardar.addEventListener("click", (e) => {
+      e.preventDefault();
+      persist();
+      // Feedback visual
+      const n = document.createElement("div");
+      n.textContent = "Guardado localmente ✅";
+      Object.assign(n.style, {position:"fixed",right:"16px",bottom:"16px",padding:"10px 12px",background:"#16a34a",color:"#fff",borderRadius:"10px",fontSize:"14px",zIndex:9999});
+      document.body.appendChild(n);
+      setTimeout(()=>n.remove(), 1800);
+
+      applyToView();
+    });
+  }
+
+  if (btnRecargar) {
+    btnRecargar.addEventListener("click", (e) => {
+      e.preventDefault();
+      const s = loadState();
+      if (caracteristicas && s.caracteristicas !== undefined) {
+        if ("value" in caracteristicas) caracteristicas.value = s.caracteristicas;
+        else caracteristicas.innerHTML = s.caracteristicas;
+      }
+      if (imagenes && s.imagenes !== undefined) {
+        if ("value" in imagenes) imagenes.value = s.imagenes;
+        else imagenes.textContent = s.imagenes;
+      }
+    });
+  }
+
+  // Exportar/Importar (opcional): añade botones con data-action
+  const btnExport = document.querySelector("[data-action='exportar-json']");
+  const btnImport = document.querySelector("[data-action='importar-json']");
+
+  if (btnExport) {
+    btnExport.addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(loadState(), null, 2)], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "calculadora_infy_contenido.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+  }
+
+  if (btnImport) {
+    btnImport.addEventListener("click", () => {
+      const inp = document.createElement("input");
+      inp.type = "file"; inp.accept = "application/json";
+      inp.onchange = () => {
+        const file = inp.files?.[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            saveState(data);
+            location.reload();
+          } catch(e){ alert("JSON inválido"); }
+        };
+        reader.readAsText(file);
+      };
+      inp.click();
+    });
+  }
+
+  // Primera aplicación a la vista al cargar
+  applyToView();
+})();
 </script>
+/script>
 </body>
 </html>
