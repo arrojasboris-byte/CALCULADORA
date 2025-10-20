@@ -104,7 +104,8 @@
   </main>
 
   <script>
-    const WEB_APP_URL = 'PEGA_AQUI_TU_WEB_APP_URL'; // <<<<<< pega la URL del despliegue de Apps Script
+    // Pega aquí la URL de tu Apps Script Web App:
+    const WEB_APP_URL = 'https://script.google.com/macros/s/TU_ID/exec'; // <--- CAMBIA ESTO
     const MAX_IMGS = 20;
     const $ = (s,ctx=document)=>ctx.querySelector(s);
     const fmtMoneda=(n)=>n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
@@ -133,6 +134,7 @@
       $('#cuota6').textContent=fmtMoneda(cuota6);
     }
 
+    // Drag & drop imágenes (se envían como dataURL y el servidor las guarda en Drive)
     const drop=$('#drop-zone'), fileInp=$('#file-add'), preview=$('#preview');
     drop.addEventListener('click',()=>fileInp.click());
     drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('dragover');});
