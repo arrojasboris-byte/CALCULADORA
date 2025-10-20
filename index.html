@@ -232,6 +232,38 @@
 
     document.getElementById('btn-reload').addEventListener('click',cargarDatos);
     cargarDatos();
-  </script>
+  <script>
+/* ====== Auto-guardado local para tu editor ======
+   - Guarda automáticamente al escribir.
+   - Restaura al cargar la página.
+   - Botones opcionales: #btnGuardar y #btnRecargar
+   - Cambia NAMESPACE si quieres separar páginas/versiones.
+*/
+(function () {
+  const NAMESPACE = "calculadora_infy_editor_v1";
+  const KEY = `${NAMESPACE}:state`;
+
+  // Util: ID estable para cada control
+  function getStableId(el, idx) {
+    return el.id || el.name || el.getAttribute("data-key") || el.placeholder || el.ariaLabel || `ctrl_${idx}`;
+  }
+
+  // Cargar estado
+  function loadState() {
+    try { return JSON.parse(localStorage.getItem(KEY) || "{}"); }
+    catch { return {}; }
+  }
+
+  // Guardar estado
+  function saveState(state) {
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }
+
+  // Restaurar valores en la UI
+  function restoreAll() {
+    const saved = loadState();
+
+    const controls = Array.from(document.querySelectorAll("input, textarea, select")); 
+</script>
 </body>
 </html>
