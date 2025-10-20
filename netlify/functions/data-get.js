@@ -1,25 +1,23 @@
-// Robust GET: nunca revienta; si no hay datos, devuelve un objeto por defecto
-const { getStore } = require('@netlify/blobs');
+import { readFileSync, existsSync } from "fs";
 
-exports.handler = async () => {
+const DATA_FILE = "/tmp/catalogo.json";
+
+export default async () => {
   try {
-    const store = getStore('catalogo');
-    // Si el blob no existe aún, get(...) puede lanzar o devolver null: lo cubrimos
-    let current = null;
-    try {
-      current = await store.get('contenido', { type: 'json' });
-    } catch (_) { /* ignore */ }
-    if (!current || typeof current !== 'object') {
-      current = { caracteristicasGama: '', imagenes: [], updatedAt: new Date().toISOString() };
-    }
-    return {
-      statusCode: 200,
-      headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
-      body: JSON.stringify(current),
-    };
+    if (!existsSync(DATA_FILE))
+      return new Response(JSON.stringify({ caracteristicasGama: "", imagenes: [] }), {
+        headers: { "content-type": "application/json" },
+      });
+
+    const data = readFileSync(DATA_FILE, "utf-8");
+    return new Response(data, {
+      headers: { "content-type": "application/json" },
+    });
   } catch (e) {
-    // No filtramos el error al cliente; devolvemos default para que el admin cargue
-    const fallback = { caracteristicasGama: '', imagenes: [], updatedAt: new Date().toISOString() };
-    return { statusCode: 200, body: JSON.stringify(fallback) };
+    console.error("Error leyendo datos", e);
+    return new Response(
+      JSON.stringify({ error: "SERVER_ERROR", details: e.message }),
+      { status: 500, headers: { "content-type": "application/json" } }
+    );
   }
 };
