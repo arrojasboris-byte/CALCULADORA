@@ -1,39 +1,44 @@
-// Guarda solo con PIN; valida tipos y limita imágenes
-const { getStore } = require('@netlify/blobs');
-const ADMIN_PIN = process.env.ADMIN_PIN || '4321';
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
 
-exports.handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
+const DATA_DIR = "/tmp";
+const DATA_FILE = DATA_DIR + "/catalogo.json";
 
+export default async (req, context) => {
   try {
-    const { pin, payload } = JSON.parse(event.body || '{}');
+    if (req.method !== "POST")
+      return new Response("Method Not Allowed", { status: 405 });
 
-    if (!pin || String(pin) !== String(ADMIN_PIN)) {
-      return { statusCode: 401, body: JSON.stringify({ error: 'PIN_INCORRECTO' }) };
+    const { pin, payload } = await req.json();
+
+    // Validar PIN del entorno
+    const realPin = process.env.ADMIN_PIN;
+    if (!realPin || pin !== realPin) {
+      return new Response(JSON.stringify({ error: "PIN_INCORRECTO" }), {
+        status: 401,
+        headers: { "content-type": "application/json" },
+      });
     }
 
-    const safeText = (v) => (typeof v === 'string' ? v : '');
-    const safeImages = (arr) =>
-      Array.isArray(arr)
-        ? arr
-            .map((u) => (typeof u === 'string' ? u.trim() : ''))
-            .filter(Boolean)
-            .slice(0, 20)
-        : [];
+    // Crear directorio temporal si no existe
+    if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
 
-    const next = {
-      caracteristicasGama: safeText(payload?.caracteristicasGama),
-      imagenes: safeImages(payload?.imagenes),
+    // Guardar archivo
+    const data = {
+      caracteristicasGama: payload.caracteristicasGama || "",
+      imagenes: payload.imagenes || [],
       updatedAt: new Date().toISOString(),
     };
+    writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 
-    const store = getStore('catalogo');
-    await store.setJSON('contenido', next);
-
-    return { statusCode: 200, body: JSON.stringify(next) };
+    return new Response(JSON.stringify(data), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
   } catch (e) {
-    return { statusCode: 500, body: JSON.stringify({ error: 'SAVE_FAILED' }) };
+    console.error("Error guardando datos", e);
+    return new Response(
+      JSON.stringify({ error: "SERVER_ERROR", details: e.message }),
+      { status: 500, headers: { "content-type": "application/json" } }
+    );
   }
 };
