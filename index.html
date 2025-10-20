@@ -13,20 +13,21 @@
     html, body { background:#f6f7f9; }
     .paper { background:white; box-shadow:0 10px 30px rgba(0,0,0,.08); }
     .imgBox { aspect-ratio:1/1; }
-    @media print { .no-print { display:none !important; } html, body { background:white; } }
     .drop-zone {
       border: 2px dashed #ccc;
       border-radius: 1rem;
       padding: 1rem;
       text-align: center;
       color: #888;
-      transition: background .2s;
+      transition: background .2s, border .2s;
+      cursor: pointer;
     }
     .drop-zone.dragover {
       background: #fef2f2;
       border-color: #dc2626;
       color: #dc2626;
     }
+    @media print { .no-print { display:none !important; } html, body { background:white; } }
   </style>
 </head>
 <body class="min-h-screen text-gray-900">
@@ -39,31 +40,10 @@
       <p class="text-sm text-gray-600">36 meses sin intereses · 6 meses con 7,95% TAE</p>
     </header>
 
-    <!-- Formatos -->
-    <section class="paper rounded-2xl p-4 md:p-6">
-      <h2 class="text-sm font-semibold text-gray-700 mb-3">Formatos de audífonos</h2>
-      <div id="formatos" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="bg-white border rounded-xl p-3 flex items-center justify-center imgBox">
-          <img id="f0" src="https://images.unsplash.com/photo-1587825140400-5fc71f3143f1?w=600&q=80" class="object-contain h-full w-full">
-        </div>
-        <div class="bg-white border rounded-xl p-3 flex items-center justify-center imgBox">
-          <img id="f1" src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=600&q=80" class="object-contain h-full w-full">
-        </div>
-        <div class="bg-white border rounded-xl p-3 flex items-center justify-center imgBox">
-          <img id="f2" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80" class="object-contain h-full w-full">
-        </div>
-        <div class="bg-white border rounded-xl p-3 flex items-center justify-center imgBox">
-          <img id="f3" src="https://images.unsplash.com/photo-1520975922284-9d1a8ddc7a5b?w=600&q=80" class="object-contain h-full w-full">
-        </div>
-      </div>
-    </section>
-
     <!-- Características -->
     <section class="paper rounded-2xl overflow-hidden">
       <div class="p-4 md:p-6 border-b flex items-center justify-between">
-        <div>
-          <h2 class="text-sm font-semibold text-gray-700">Características de gamas</h2>
-        </div>
+        <h2 class="text-sm font-semibold text-gray-700">Características de gamas</h2>
         <button id="btn-edit" class="text-xs px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700 no-print">
           Editar contenido
         </button>
@@ -90,7 +70,7 @@
       </div>
     </section>
 
-    <!-- Editor -->
+    <!-- Modal editor -->
     <dialog id="dlg-edit" class="rounded-2xl p-0 w-full max-w-3xl">
       <form method="dialog" class="p-0 m-0">
         <div class="p-4 md:p-6 space-y-4">
@@ -105,6 +85,7 @@
               placeholder="Ej.: Bluetooth LE, 16 canales, IP68, carga rápida, reducción de ruido…"></textarea>
           </label>
 
+          <!-- Zona de imágenes -->
           <div class="space-y-2">
             <label class="text-sm text-gray-700">Imágenes (máx. 20)</label>
             <div id="drop-zone" class="drop-zone">Arrastra aquí tus imágenes o haz clic para seleccionarlas</div>
@@ -127,7 +108,7 @@
       <form method="dialog" class="p-0 m-0">
         <div class="p-4 space-y-3">
           <h3 class="text-base font-semibold">Introduce PIN</h3>
-          <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8"
+          <input id="pin" type="password" inputmode="numeric" maxlength="8"
                  class="w-full rounded-lg border-gray-300 px-3 py-2 text-center tracking-widest"
                  placeholder="••••" />
           <div class="flex justify-end gap-2">
@@ -147,6 +128,7 @@
     const fmtMoneda = (n)=> n.toLocaleString('es-ES',{ minimumFractionDigits:2, maximumFractionDigits:2 })+' €';
     const mensualidad=(p,m,t)=>{const r=t/12;if(!r)return p/m;const pow=Math.pow(1+r,m);return p*(r*pow)/(pow-1);};
     let state={caracteristicasGama:'',imagenes:[]};
+    let newImages=[];
 
     async function cargarDatos(){
       try{
@@ -164,11 +146,11 @@
       (state.imagenes||[]).forEach(u=>{
         const div=document.createElement('div');
         div.className='bg-white border rounded-xl p-3 flex items-center justify-center imgBox';
-        const img=new Image();img.src=u;img.className='object-cover h-full w-full rounded-lg';
-        div.appendChild(img);gal.appendChild(div);
+        const img=new Image();
+        img.src=u;img.className='object-cover h-full w-full rounded-lg';
+        div.appendChild(img);
+        gal.appendChild(div);
       });
-      const imgs=['f0','f1','f2','f3'].map(id=>document.getElementById(id));
-      imgs.forEach((el,i)=>{if(state.imagenes[i])el.src=state.imagenes[i];});
       const amount=3995,principal=amount/42,rest=amount-(principal*36),cuota6=mensualidad(rest,6,0.0795);
       document.getElementById('importe').textContent=fmtMoneda(amount);
       document.getElementById('cuota36').textContent=fmtMoneda(principal);
@@ -176,11 +158,10 @@
       document.getElementById('cuota6').textContent=fmtMoneda(cuota6);
     }
 
-    // Drag & drop
+    // === DRAG & DROP ===
     const drop=document.getElementById('drop-zone');
     const fileInput=document.getElementById('file-add');
     const preview=document.getElementById('preview');
-    let newImages=[];
     drop.addEventListener('click',()=>fileInput.click());
     drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('dragover');});
     drop.addEventListener('dragleave',()=>drop.classList.remove('dragover'));
@@ -189,6 +170,7 @@
       handleFiles(e.dataTransfer.files);
     });
     fileInput.addEventListener('change',e=>handleFiles(e.target.files));
+
     function handleFiles(files){
       [...files].forEach(f=>{
         const r=new FileReader();
@@ -196,19 +178,26 @@
         r.readAsDataURL(f);
       });
     }
+
     function renderPreview(){
       preview.innerHTML='';
-      newImages.forEach(u=>{
+      newImages.forEach((u,i)=>{
         const div=document.createElement('div');
         div.className='relative';
         const img=new Image();
-        img.src=u;img.className='rounded-xl object-cover w-full h-24';
+        img.src=u;
+        img.className='rounded-xl object-cover w-full h-24';
+        const btn=document.createElement('button');
+        btn.textContent='❌';
+        btn.className='absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 hover:bg-red-700';
+        btn.onclick=()=>{newImages.splice(i,1);renderPreview();};
         div.appendChild(img);
+        div.appendChild(btn);
         preview.appendChild(div);
       });
     }
 
-    // Editor
+    // === EDITOR ===
     document.getElementById('btn-edit').addEventListener('click',()=>{
       document.getElementById('txt-car').value=state.caracteristicasGama||'';
       newImages=[...state.imagenes];
