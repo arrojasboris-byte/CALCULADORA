@@ -10,7 +10,7 @@ export default async (req, context) => {
 
     const { pin, payload } = await req.json();
 
-    // Validar PIN del entorno
+    // Validar PIN desde Netlify env
     const realPin = process.env.ADMIN_PIN;
     if (!realPin || pin !== realPin) {
       return new Response(JSON.stringify({ error: "PIN_INCORRECTO" }), {
@@ -19,10 +19,10 @@ export default async (req, context) => {
       });
     }
 
-    // Crear directorio temporal si no existe
+    // Crear carpeta temporal si no existe
     if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
 
-    // Guardar archivo
+    // Guardar datos
     const data = {
       caracteristicasGama: payload.caracteristicasGama || "",
       imagenes: payload.imagenes || [],
