@@ -5,9 +5,10 @@ const DATA_FILE = "/tmp/catalogo.json";
 export default async () => {
   try {
     if (!existsSync(DATA_FILE))
-      return new Response(JSON.stringify({ caracteristicasGama: "", imagenes: [] }), {
-        headers: { "content-type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ caracteristicasGama: "", imagenes: [] }),
+        { headers: { "content-type": "application/json" } }
+      );
 
     const data = readFileSync(DATA_FILE, "utf-8");
     return new Response(data, {
