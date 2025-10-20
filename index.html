@@ -55,7 +55,7 @@
       </div>
     </section>
 
-    <!-- Financiación -->
+    <!-- Financiación (cálculo fijo) -->
     <section class="paper rounded-2xl p-4 md:p-6 space-y-4">
       <h3 class="text-sm font-semibold text-gray-700">Financiación Infinity</h3>
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -146,10 +146,8 @@
       (state.imagenes||[]).forEach(u=>{
         const div=document.createElement('div');
         div.className='bg-white border rounded-xl p-3 flex items-center justify-center imgBox';
-        const img=new Image();
-        img.src=u;img.className='object-cover h-full w-full rounded-lg';
-        div.appendChild(img);
-        gal.appendChild(div);
+        const img=new Image(); img.src=u; img.className='object-cover h-full w-full rounded-lg';
+        div.appendChild(img); gal.appendChild(div);
       });
       const amount=3995,principal=amount/42,rest=amount-(principal*36),cuota6=mensualidad(rest,6,0.0795);
       document.getElementById('importe').textContent=fmtMoneda(amount);
@@ -158,15 +156,16 @@
       document.getElementById('cuota6').textContent=fmtMoneda(cuota6);
     }
 
-    // === DRAG & DROP ===
+    // === DRAG & DROP + PREVIEW ===
     const drop=document.getElementById('drop-zone');
     const fileInput=document.getElementById('file-add');
     const preview=document.getElementById('preview');
+
     drop.addEventListener('click',()=>fileInput.click());
     drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('dragover');});
     drop.addEventListener('dragleave',()=>drop.classList.remove('dragover'));
     drop.addEventListener('drop',e=>{
-      e.preventDefault();drop.classList.remove('dragover');
+      e.preventDefault(); drop.classList.remove('dragover');
       handleFiles(e.dataTransfer.files);
     });
     fileInput.addEventListener('change',e=>handleFiles(e.target.files));
@@ -174,65 +173,61 @@
     function handleFiles(files){
       [...files].forEach(f=>{
         const r=new FileReader();
-        r.onload=()=>{newImages.push(r.result);renderPreview();};
+        r.onload=()=>{ newImages.push(r.result); renderPreview(); };
         r.readAsDataURL(f);
       });
     }
-
     function renderPreview(){
       preview.innerHTML='';
       newImages.forEach((u,i)=>{
-        const div=document.createElement('div');
-        div.className='relative';
-        const img=new Image();
-        img.src=u;
-        img.className='rounded-xl object-cover w-full h-24';
-        const btn=document.createElement('button');
-        btn.textContent='❌';
-        btn.className='absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 hover:bg-red-700';
-        btn.onclick=()=>{newImages.splice(i,1);renderPreview();};
-        div.appendChild(img);
-        div.appendChild(btn);
-        preview.appendChild(div);
+        const card=document.createElement('div'); card.className='relative';
+        const img=new Image(); img.src=u; img.className='rounded-xl object-cover w-full h-24';
+        const del=document.createElement('button');
+        del.textContent='❌';
+        del.className='absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 hover:bg-red-700';
+        del.onclick=()=>{ newImages.splice(i,1); renderPreview(); };
+        card.appendChild(img); card.appendChild(del); preview.appendChild(card);
       });
     }
 
     // === EDITOR ===
     document.getElementById('btn-edit').addEventListener('click',()=>{
       document.getElementById('txt-car').value=state.caracteristicasGama||'';
-      newImages=[...state.imagenes];
-      renderPreview();
+      newImages=[...state.imagenes]; renderPreview();
       document.getElementById('msg').textContent='';
       document.getElementById('dlg-edit').showModal();
     });
 
+    // PIN modal
     async function pedirPin(){
       return new Promise(res=>{
         const dlg=document.getElementById('dlg-pin');
         const inp=document.getElementById('pin');
-        const ok=()=>{dlg.close();res(inp.value.trim()||null);};
-        const cancel=()=>{dlg.close();res(null);};
+        const ok = ()=>{ dlg.close(); res(inp.value.trim()||null); };
+        const cancel = ()=>{ dlg.close(); res(null); };
         document.getElementById('btn-pin-ok').onclick=ok;
         dlg.addEventListener('close',cancel,{once:true});
-        inp.value='';dlg.showModal();
+        inp.value=''; dlg.showModal();
       });
     }
 
+    // Guardar
     document.getElementById('btn-save').addEventListener('click',async()=>{
       const car=document.getElementById('txt-car').value;
-      const pin=await pedirPin();
-      if(!pin)return;
-      const msg=document.getElementById('msg');
-      msg.textContent='Guardando…';
+      const pin=await pedirPin(); if(!pin) return;
+      const msg=document.getElementById('msg'); msg.textContent='Guardando…';
       try{
         const r=await fetch(SAVE_URL,{
-          method:'POST',headers:{'content-type':'application/json'},
-          body:JSON.stringify({pin,payload:{caracteristicasGama:car,imagenes:newImages.slice(0,20)}})
+          method:'POST', headers:{'content-type':'application/json'},
+          body:JSON.stringify({ pin, payload:{ caracteristicasGama:car, imagenes:newImages.slice(0,20) }})
         });
         const d=await r.json();
-        if(!r.ok){msg.textContent=d.error==='PIN_INCORRECTO'?'PIN incorrecto':'No se pudo guardar';return;}
-        state=d;pintar();msg.textContent='Guardado ✓';
-      }catch(e){msg.textContent='Error guardando';console.error(e);}
+        if(!r.ok){
+          msg.textContent = d?.error==='PIN_INCORRECTO' ? 'PIN incorrecto' : 'No se pudo guardar';
+          return;
+        }
+        state=d; pintar(); msg.textContent='Guardado ✓';
+      }catch(e){ msg.textContent='Error guardando'; console.error(e); }
     });
 
     document.getElementById('btn-reload').addEventListener('click',cargarDatos);
