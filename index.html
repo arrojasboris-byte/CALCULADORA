@@ -22,11 +22,7 @@
       transition: background .2s, border .2s;
       cursor: pointer;
     }
-    .drop-zone.dragover {
-      background: #fef2f2;
-      border-color: #dc2626;
-      color: #dc2626;
-    }
+    .drop-zone.dragover { background:#fef2f2; border-color:#dc2626; color:#dc2626; }
     @media print { .no-print { display:none !important; } html, body { background:white; } }
   </style>
 </head>
@@ -98,7 +94,7 @@
             <button id="btn-save" type="button" class="px-3 py-2 rounded-lg bg-red-600 text-white text-sm">Guardar</button>
           </div>
 
-          <div id="msg" class="text-sm text-red-600"></div>
+          <div id="msg" class="text-sm"></div>
         </div>
       </form>
     </dialog>
@@ -122,288 +118,263 @@
 
   </main>
 
-  <script>
-    const GET_URL  = '/.netlify/functions/data-get';
-    const SAVE_URL = '/.netlify/functions/data-save';
-    const fmtMoneda = (n)=> n.toLocaleString('es-ES',{ minimumFractionDigits:2, maximumFractionDigits:2 })+' €';
-    const mensualidad=(p,m,t)=>{const r=t/12;if(!r)return p/m;const pow=Math.pow(1+r,m);return p*(r*pow)/(pow-1);};
-    let state={caracteristicasGama:'',imagenes:[]};
-    let newImages=[];
+  <!-- ======= SCRIPT ÚNICO (Firebase + localStorage + PIN + preview) ======= -->
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    async function cargarDatos(){
-      try{
-        const r=await fetch(GET_URL,{cache:'no-store'});
-        const d=await r.json();
-        state={caracteristicasGama:d.caracteristicasGama||'',imagenes:Array.isArray(d.imagenes)?d.imagenes:[]};
-        pintar();
-      }catch(e){console.error(e);}
-    }
-
-    function pintar(){
-      document.getElementById('caracteristicas').textContent=state.caracteristicasGama||'';
-      const gal=document.getElementById('galeria');
-      gal.innerHTML='';
-      (state.imagenes||[]).forEach(u=>{
-        const div=document.createElement('div');
-        div.className='bg-white border rounded-xl p-3 flex items-center justify-center imgBox';
-        const img=new Image(); img.src=u; img.className='object-cover h-full w-full rounded-lg';
-        div.appendChild(img); gal.appendChild(div);
-      });
-      const amount=3995,principal=amount/42,rest=amount-(principal*36),cuota6=mensualidad(rest,6,0.0795);
-      document.getElementById('importe').textContent=fmtMoneda(amount);
-      document.getElementById('cuota36').textContent=fmtMoneda(principal);
-      document.getElementById('restante6').textContent=fmtMoneda(rest);
-      document.getElementById('cuota6').textContent=fmtMoneda(cuota6);
-    }
-
-    // === DRAG & DROP + PREVIEW ===
-    const drop=document.getElementById('drop-zone');
-    const fileInput=document.getElementById('file-add');
-    const preview=document.getElementById('preview');
-
-    drop.addEventListener('click',()=>fileInput.click());
-    drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('dragover');});
-    drop.addEventListener('dragleave',()=>drop.classList.remove('dragover'));
-    drop.addEventListener('drop',e=>{
-      e.preventDefault(); drop.classList.remove('dragover');
-      handleFiles(e.dataTransfer.files);
-    });
-    fileInput.addEventListener('change',e=>handleFiles(e.target.files));
-
-    function handleFiles(files){
-      [...files].forEach(f=>{
-        const r=new FileReader();
-        r.onload=()=>{ newImages.push(r.result); renderPreview(); };
-        r.readAsDataURL(f);
-      });
-    }
-    function renderPreview(){
-      preview.innerHTML='';
-      newImages.forEach((u,i)=>{
-        const card=document.createElement('div'); card.className='relative';
-        const img=new Image(); img.src=u; img.className='rounded-xl object-cover w-full h-24';
-        const del=document.createElement('button');
-        del.textContent='❌';
-        del.className='absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 hover:bg-red-700';
-        del.onclick=()=>{ newImages.splice(i,1); renderPreview(); };
-        card.appendChild(img); card.appendChild(del); preview.appendChild(card);
-      });
-    }
-
-    // === EDITOR ===
-    document.getElementById('btn-edit').addEventListener('click',()=>{
-      document.getElementById('txt-car').value=state.caracteristicasGama||'';
-      newImages=[...state.imagenes]; renderPreview();
-      document.getElementById('msg').textContent='';
-      document.getElementById('dlg-edit').showModal();
-    });
-
-    // PIN modal
-    async function pedirPin(){
-      return new Promise(res=>{
-        const dlg=document.getElementById('dlg-pin');
-        const inp=document.getElementById('pin');
-        const ok = ()=>{ dlg.close(); res(inp.value.trim()||null); };
-        const cancel = ()=>{ dlg.close(); res(null); };
-        document.getElementById('btn-pin-ok').onclick=ok;
-        dlg.addEventListener('close',cancel,{once:true});
-        inp.value=''; dlg.showModal();
-      });
-    }
-
-    // Guardar
-    document.getElementById('btn-save').addEventListener('click',async()=>{
-      const car=document.getElementById('txt-car').value;
-      const pin=await pedirPin(); if(!pin) return;
-      const msg=document.getElementById('msg'); msg.textContent='Guardando…';
-      try{
-        const r=await fetch(SAVE_URL,{
-          method:'POST', headers:{'content-type':'application/json'},
-          body:JSON.stringify({ pin, payload:{ caracteristicasGama:car, imagenes:newImages.slice(0,20) }})
-        });
-        const d=await r.json();
-        if(!r.ok){
-          msg.textContent = d?.error==='PIN_INCORRECTO' ? 'PIN incorrecto' : 'No se pudo guardar';
-          return;
-        }
-        state=d; pintar(); msg.textContent='Guardado ✓';
-      }catch(e){ msg.textContent='Error guardando'; console.error(e); }
-    });
-
-    document.getElementById('btn-reload').addEventListener('click',cargarDatos);
-    cargarDatos();
-  <script>
-/* ====== Auto-guardado local para tu editor ======
-   - Guarda automáticamente al escribir.
-   - Restaura al cargar la página.
-   - Botones opcionales: #btnGuardar y #btnRecargar
-   - Cambia NAMESPACE si quieres separar páginas/versiones.
-*/
-(function () {
-  const NAMESPACE = "calculadora_infy_editor_v1";
-  const KEY = `${NAMESPACE}:state`;
-
-  // Util: ID estable para cada control
-  function getStableId(el, idx) {
-    return el.id || el.name || el.getAttribute("data-key") || el.placeholder || el.ariaLabel || `ctrl_${idx}`;
-  }
-
-  // Cargar estado
-  function loadState() {
-    try { return JSON.parse(localStorage.getItem(KEY) || "{}"); }
-    catch { return {}; }
-  }
-
-  // Guardar estado
-  function saveState(state) {
-    localStorage.setItem(KEY, JSON.stringify(state));
-  }
-
-  // Restaurar valores en la UI
-  function restoreAll() {
-    const saved = loadState();
-
-    const controls = Array.from(document.querySelectorAll("input, textarea, select")); 
-<<script>
-(function () {
-  const KEY = "calc_infy_content_v1";
-
-  // Helpers
-  const $ = (sel, ctx=document) => ctx.querySelector(sel);
-  const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
-  const getBtnByText = (txt) =>
-    $$("button, a, [role='button']").find(b => (b.textContent||"").trim().toLowerCase() === txt.toLowerCase());
-
-  function loadState(){
-    try { return JSON.parse(localStorage.getItem(KEY) || "{}"); }
-    catch(e){ return {}; }
-  }
-  function saveState(state){
-    localStorage.setItem(KEY, JSON.stringify(state));
-  }
-
-  const state = loadState();
-
-  // Inputs del modal
-  // Ideal: <textarea data-field="caracteristicas"></textarea> y <textarea data-field="imagenes"></textarea>
-  const modal = document.body; // usa el documento; si tienes un contenedor de modal, ponlo aquí
-  const caracteristicas = $("[data-field='caracteristicas']") || $$("textarea, [contenteditable='true']").find(el => /características/i.test(el.closest("label,div,section,form")?.textContent||""));
-  const imagenes = $("[data-field='imagenes']") || $$("textarea").find(el => /im[aá]genes/i.test(el.closest("label,div,section,form")?.textContent||""));
-
-  // Botones
-  const btnGuardar = $("[data-action='guardar']") || getBtnByText("Guardar");
-  const btnRecargar = $("[data-action='recargar']") || getBtnByText("Recargar");
-
-  // Rellenar desde storage
-  if (caracteristicas && state.caracteristicas !== undefined) {
-    if ("value" in caracteristicas) caracteristicas.value = state.caracteristicas;
-    else caracteristicas.innerHTML = state.caracteristicas;
-  }
-  if (imagenes && state.imagenes !== undefined) {
-    if ("value" in imagenes) imagenes.value = state.imagenes;
-    else imagenes.textContent = state.imagenes;
-  }
-
-  // Auto-guardado al escribir
-  const persist = () => {
-    const s = loadState();
-    if (caracteristicas) s.caracteristicas = ("value" in caracteristicas) ? caracteristicas.value : caracteristicas.innerHTML;
-    if (imagenes) s.imagenes = ("value" in imagenes) ? imagenes.value : imagenes.textContent;
-    saveState(s);
+  // 1) RELLENA TU CONFIG AQUÍ
+  const firebaseConfig = {
+    // apiKey: "TU_API_KEY",
+    // authDomain: "TU_DOMINIO.firebaseapp.com",
+    // projectId: "TU_PROJECT_ID",
+    // storageBucket: "TU_BUCKET.appspot.com",
+    // messagingSenderId: "......",
+    // appId: "......"
   };
 
-  [caracteristicas, imagenes].filter(Boolean).forEach(el => {
-    el.addEventListener("input", persist);
-    el.addEventListener("change", persist);
+  // ========= Utilidades generales =========
+  const $  = (sel, ctx=document) => ctx.querySelector(sel);
+  const fmtMoneda=(n)=> n.toLocaleString('es-ES',{ minimumFractionDigits:2, maximumFractionDigits:2 })+' €';
+  const mensualidad=(p,m,t)=>{const r=t/12;if(!r)return p/m;const pow=Math.pow(1+r,m);return p*(r*pow)/(pow-1);};
+  const sleep = (ms)=> new Promise(r=>setTimeout(r,ms));
+
+  // ========= Storage local + PIN =========
+  const STORAGE_KEY = "calc_infy_content_v1";
+  const PIN_KEY     = "calc_infy_pin_v1";
+  const LOCAL_TS_KEY = "calc_infy_updated_at";
+
+  function hashPIN(pin){ let h=0; for(let i=0;i<pin.length;i++){ h=(h<<5)-h + pin.charCodeAt(i); h|=0; } return String(h); }
+  function getPINHash(){ return localStorage.getItem(PIN_KEY) || null; }
+  function setPIN(pin){ localStorage.setItem(PIN_KEY, hashPIN(pin)); }
+  function verifyPIN(pin){ const s=getPINHash(); return s && s===hashPIN(pin); }
+
+  function loadLocal(){
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+    catch { return {}; }
+  }
+  function saveLocal(data, ts=Date.now()){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data||{}));
+    localStorage.setItem(LOCAL_TS_KEY, String(ts));
+  }
+  function getLocalTS(){ return Number(localStorage.getItem(LOCAL_TS_KEY) || "0"); }
+
+  // ========= Estado =========
+  let state = { caracteristicasGama:"", imagenes:[], updated_at: 0 };
+  let uploads = []; // dataURL en el editor
+  let cloudReady = false;
+
+  // ========= UI refs =========
+  const elCar  = $("#caracteristicas");
+  const elGal  = $("#galeria");
+  const btnEdit = $("#btn-edit");
+
+  const dlgEdit = $("#dlg-edit");
+  const txtCar  = $("#txt-car");
+  const drop    = $("#drop-zone");
+  const fileInp = $("#file-add");
+  const preview = $("#preview");
+  const btnReload = $("#btn-reload");
+  const btnSave   = $("#btn-save");
+  const msgEdit   = $("#msg");
+
+  const dlgPIN   = $("#dlg-pin");
+  const pinInput = $("#pin");
+  const btnPINOk = $("#btn-pin-ok");
+  const pinMsg   = $("#pin-msg");
+
+  // ========= Pintar =========
+  function pintar(){
+    elCar.textContent = state.caracteristicasGama || "";
+    elGal.innerHTML = "";
+    (state.imagenes||[]).forEach(u=>{
+      const box=document.createElement('div');
+      box.className='bg-white border rounded-xl p-3 flex items-center justify-center imgBox';
+      const img=new Image(); img.src=u; img.className='object-cover h-full w-full rounded-lg';
+      box.appendChild(img); elGal.appendChild(box);
+    });
+
+    const amount=3995, principal=amount/42, rest=amount-(principal*36), cuota6=mensualidad(rest,6,0.0795);
+    $("#importe").textContent   = fmtMoneda(amount);
+    $("#cuota36").textContent   = fmtMoneda(principal);
+    $("#restante6").textContent = fmtMoneda(rest);
+    $("#cuota6").textContent    = fmtMoneda(cuota6);
+  }
+
+  // ========= Preview imágenes =========
+  function renderPreview(){
+    preview.innerHTML="";
+    uploads.forEach((u,i)=>{
+      const card=document.createElement('div'); card.className='relative';
+      const img=new Image(); img.src=u; img.className='rounded-xl object-cover w-full h-24';
+      const del=document.createElement('button'); del.type='button'; del.textContent='❌';
+      del.className='absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 hover:bg-red-700';
+      del.onclick=()=>{ uploads.splice(i,1); renderPreview(); };
+      card.appendChild(img); card.appendChild(del); preview.appendChild(card);
+    });
+  }
+  function handleFiles(files){
+    [...files].forEach(f=>{
+      const r=new FileReader();
+      r.onload=()=>{ uploads.push(r.result); renderPreview(); };
+      r.readAsDataURL(f);
+    });
+  }
+  drop.addEventListener('click',()=>fileInp.click());
+  drop.addEventListener('dragover',e=>{e.preventDefault(); drop.classList.add('dragover');});
+  drop.addEventListener('dragleave',()=>drop.classList.remove('dragover'));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+  fileInp.addEventListener('change',e=>handleFiles(e.target.files));
+
+  // ========= PIN =========
+  function pedirPIN({mode}={mode:"verify"}){
+    return new Promise(resolve=>{
+      pinMsg.textContent=""; pinInput.value=""; dlgPIN.showModal();
+
+      function cleanup(ok,val){ dlgPIN.close(); btnPINOk.removeEventListener('click',onOk); dlgPIN.removeEventListener('close',onCancel); resolve(ok?val:null); }
+      function onOk(e){
+        e.preventDefault();
+        const val=(pinInput.value||"").trim();
+        if(!val){ pinMsg.textContent="Introduce un PIN."; return; }
+        if(mode==="set"){ setPIN(val); cleanup(true,val); }
+        else { if(verifyPIN(val)) cleanup(true,val); else pinMsg.textContent="PIN incorrecto."; }
+      }
+      function onCancel(){ cleanup(false,null); }
+
+      btnPINOk.addEventListener('click',onOk);
+      dlgPIN.addEventListener('close',onCancel,{once:true});
+    });
+  }
+
+  // ========= Firebase (pull/push) =========
+  let app, db, docRef;
+
+  async function initFirebase(){
+    try{
+      if (!firebaseConfig || !firebaseConfig.projectId) {
+        // Config vacío: solo local
+        cloudReady = false;
+        return;
+      }
+      app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+      docRef = doc(db, "calculadoraInfy", "contenido"); // cambia IDs si quieres varios documentos
+      cloudReady = true;
+    } catch(err){
+      console.warn("Firebase no inicializado:", err);
+      cloudReady = false;
+    }
+  }
+
+  async function pullCloud(){
+    if(!cloudReady) return null;
+    try{
+      const snap = await getDoc(docRef);
+      if(!snap.exists()) return null;
+      return snap.data();
+    }catch(err){
+      console.warn("No se pudo leer Firestore:", err);
+      return null;
+    }
+  }
+
+  async function pushCloud(data){
+    if(!cloudReady) return false;
+    try{
+      await setDoc(docRef, data, { merge:true });
+      return true;
+    }catch(err){
+      console.warn("No se pudo guardar en Firestore:", err);
+      return false;
+    }
+  }
+
+  // ========= Sincronización inicial (elige la fuente más reciente) =========
+  async function cargarInicial(){
+    // Carga local
+    const local = loadLocal();
+    const localTS = getLocalTS();
+
+    // Intenta nube
+    const cloud = await pullCloud();
+    const cloudTS = (cloud && typeof cloud.updated_at==='number') ? cloud.updated_at : 0;
+
+    // Decide la fuente
+    if (cloud && cloudTS > localTS) {
+      state = {
+        caracteristicasGama: cloud.caracteristicasGama || "",
+        imagenes: Array.isArray(cloud.imagenes) ? cloud.imagenes : [],
+        updated_at: cloudTS
+      };
+      // también actualiza local con lo de la nube
+      saveLocal({ caracteristicasGama: state.caracteristicasGama, imagenes: state.imagenes }, cloudTS);
+    } else {
+      state = {
+        caracteristicasGama: local.caracteristicasGama || "",
+        imagenes: Array.isArray(local.imagenes) ? local.imagenes : [],
+        updated_at: localTS || 0
+      };
+      // si nube está lista y lo local es más nuevo, empuja
+      if (cloudReady && localTS && localTS > cloudTS) {
+        await pushCloud({ ...state });
+      }
+    }
+
+    pintar();
+  }
+
+  // ========= Eventos de editor =========
+  btnEdit.addEventListener('click',()=>{
+    txtCar.value = state.caracteristicasGama || "";
+    uploads = [...state.imagenes];
+    renderPreview();
+    msgEdit.className = "text-sm";
+    msgEdit.textContent="";
+    pinMsg.textContent="";
+    dlgEdit.showModal();
   });
 
-  // Guardar (confirma y refresca la vista fuera del modal)
-  function applyToView(){
-    // Ajusta estos selectores a tu UI real:
-    // 1) Características visibles (ej. en la tabla “Ver características”)
-    const contCaracteristicas = document.querySelector(".js-caracteristicas, [data-bind='caracteristicas']");
-    if (contCaracteristicas && state.caracteristicas) {
-      contCaracteristicas.innerHTML = state.caracteristicas
-        .split(/\n+/).map(l => l.trim()).filter(Boolean).map(l => `<li>${l}</li>`).join("") || state.caracteristicas;
+  btnReload.addEventListener('click', async ()=>{
+    msgEdit.className="text-sm";
+    msgEdit.textContent="Recargando…";
+    await cargarInicial();
+    txtCar.value = state.caracteristicasGama || "";
+    uploads = [...state.imagenes];
+    renderPreview();
+    msgEdit.className="text-sm text-green-700";
+    msgEdit.textContent="Contenido sincronizado.";
+  });
+
+  btnSave.addEventListener('click', async ()=>{
+    msgEdit.className="text-sm";
+    msgEdit.textContent = "Guardando…";
+    const hasPIN = !!getPINHash();
+    const pin = await pedirPIN({ mode: hasPIN ? "verify" : "set" });
+    if(!pin){ msgEdit.textContent = hasPIN ? "Guardado cancelado." : "PIN no establecido."; return; }
+
+    // Actualiza estado
+    state.caracteristicasGama = txtCar.value || "";
+    state.imagenes = uploads.slice(0,20);
+    state.updated_at = Date.now();
+
+    // Guarda local
+    saveLocal({ caracteristicasGama: state.caracteristicasGama, imagenes: state.imagenes }, state.updated_at);
+
+    // Sube a la nube si está disponible
+    let cloudOk = false;
+    if (cloudReady) {
+      cloudOk = await pushCloud({ ...state });
     }
 
-    // 2) Galería de imágenes (una URL por línea)
-    const contImagenes = document.querySelector(".js-galeria, [data-bind='imagenes']");
-    if (contImagenes && state.imagenes) {
-      const urls = state.imagenes.split(/\n+/).map(s => s.trim()).filter(Boolean);
-      contImagenes.innerHTML = urls.map(u => `<img src="${u}" alt="" loading="lazy" style="max-width:120px;max-height:80px;margin:6px;border-radius:8px;border:1px solid #eee">`).join("");
-    }
-  }
+    pintar();
+    msgEdit.className = "text-sm " + (cloudOk || !cloudReady ? "text-green-700" : "text-yellow-700");
+    msgEdit.textContent = cloudOk ? "Guardado en la nube ✓" : (!cloudReady ? "Guardado local ✓ (sin nube)" : "Guardado local ✓ (nube no disponible)");
+  });
 
-  if (btnGuardar) {
-    btnGuardar.addEventListener("click", (e) => {
-      e.preventDefault();
-      persist();
-      // Feedback visual
-      const n = document.createElement("div");
-      n.textContent = "Guardado localmente ✅";
-      Object.assign(n.style, {position:"fixed",right:"16px",bottom:"16px",padding:"10px 12px",background:"#16a34a",color:"#fff",borderRadius:"10px",fontSize:"14px",zIndex:9999});
-      document.body.appendChild(n);
-      setTimeout(()=>n.remove(), 1800);
+  // ========= Inicio =========
+  await initFirebase();
+  await cargarInicial();
 
-      applyToView();
-    });
-  }
-
-  if (btnRecargar) {
-    btnRecargar.addEventListener("click", (e) => {
-      e.preventDefault();
-      const s = loadState();
-      if (caracteristicas && s.caracteristicas !== undefined) {
-        if ("value" in caracteristicas) caracteristicas.value = s.caracteristicas;
-        else caracteristicas.innerHTML = s.caracteristicas;
-      }
-      if (imagenes && s.imagenes !== undefined) {
-        if ("value" in imagenes) imagenes.value = s.imagenes;
-        else imagenes.textContent = s.imagenes;
-      }
-    });
-  }
-
-  // Exportar/Importar (opcional): añade botones con data-action
-  const btnExport = document.querySelector("[data-action='exportar-json']");
-  const btnImport = document.querySelector("[data-action='importar-json']");
-
-  if (btnExport) {
-    btnExport.addEventListener("click", () => {
-      const blob = new Blob([JSON.stringify(loadState(), null, 2)], {type:"application/json"});
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "calculadora_infy_contenido.json";
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
-  }
-
-  if (btnImport) {
-    btnImport.addEventListener("click", () => {
-      const inp = document.createElement("input");
-      inp.type = "file"; inp.accept = "application/json";
-      inp.onchange = () => {
-        const file = inp.files?.[0]; if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const data = JSON.parse(reader.result);
-            saveState(data);
-            location.reload();
-          } catch(e){ alert("JSON inválido"); }
-        };
-        reader.readAsText(file);
-      };
-      inp.click();
-    });
-  }
-
-  // Primera aplicación a la vista al cargar
-  applyToView();
-})();
-</script>
-/script>
+  </script>
 </body>
 </html>
