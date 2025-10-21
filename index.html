@@ -16,20 +16,20 @@ html,body{margin:0;background:var(--soft);color:var(--text);font-family:system-u
 .h1{margin:0;line-height:1.1;font-weight:900;color:var(--brand);font-size:44px}
 .sub{color:var(--muted);font-size:13px;margin-top:6px}
 
+/* Paper / cards */
 .paper{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.06);overflow:hidden}
 .paper .hd{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
 .paper .bd{padding:18px}
-
 .row{display:grid;gap:12px}
 .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
-.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.card{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.card{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
 .card .img{height:140px;background:#F9FAFB;display:flex;align-items:center;justify-content:center}
 .card .img img{max-width:100%;max-height:100%;object-fit:contain}
 .card .cap{padding:8px 10px;color:var(--muted);font-size:12px;text-align:center}
 .card.sel{outline:2px solid var(--brand)}
 
-.controls{display:flex;gap:8px;align-items:center}
+/* Inputs / buttons */
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 select,input,textarea{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px}
 textarea{width:100%}
 .btn{background:var(--brand);border:0;color:#fff;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
@@ -39,6 +39,7 @@ textarea{width:100%}
 .btn.ghost:hover{background:#fafafa}
 .note{color:var(--muted);font-size:12px}
 
+/* Tabla de gamas */
 .table{width:100%;border-collapse:separate;border-spacing:0 8px}
 .thead{background:var(--brand);color:#fff}
 .thead th{padding:10px 12px;text-align:left;font-weight:700}
@@ -46,6 +47,7 @@ tr.item td{padding:10px 12px;background:#fff;border:1px solid var(--line)}
 tr.item td:first-child{border-radius:10px 0 0 10px}
 tr.item td:last-child{border-radius:0 10px 10px 0}
 
+/* KPIs financiación */
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
 .kpi .t{font-size:12px;color:var(--muted)}
@@ -54,13 +56,17 @@ tr.item td:last-child{border-radius:0 10px 10px 0}
 .kpi.red .t{color:#fff;opacity:.9}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 
+/* Upgrade */
 .upg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .pill{background:var(--brand);color:#fff;border-radius:12px;padding:14px 12px;text-align:center;cursor:pointer;font-weight:700}
 .pill.dim{background:#F3F4F6;color:#6B7280;cursor:not-allowed}
 .pill.active{box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(220,38,38,.25)}
-
 .badge{display:inline-flex;align-items:center;gap:6px;color:#6B7280}
 .badge:before{content:"•";color:var(--brand);font-weight:900}
+
+/* Editor */
+.drop{border:2px dashed #e5e7eb;border-radius:12px;padding:10px;text-align:center;color:#6b7280;cursor:pointer}
+.drop.drag{background:#fff0f0;border-color:#DC2626;color:#DC2626}
 
 @media print{
   .no-print{display:none!important}
@@ -71,18 +77,15 @@ tr.item td:last-child{border-radius:0 10px 10px 0}
 </head>
 <body>
 <div class="container">
-
   <header class="header">
     <h1 class="h1">CALCULADORA INFINITY<br/>AUDIO</h1>
-    <div class="sub">36 meses sin intereses · 6 meses con 7,95% TAE</div>
+    <div class="sub">36 MESES 0% TAE + 6 MESES 7,95% TAE</div>
   </header>
 
   <!-- FORMATOS -->
   <section class="paper">
     <div class="hd">
-      <div class="controls">
-        <strong>Formatos de audífonos</strong>
-      </div>
+      <strong>Formatos de audífonos</strong>
       <div class="controls no-print">
         <button id="btnEdit" class="btn s">Editar</button>
         <button id="btnSave" class="btn s" style="display:none">Guardar</button>
@@ -90,10 +93,20 @@ tr.item td:last-child{border-radius:0 10px 10px 0}
     </div>
     <div class="bd">
       <div id="formatos" class="row grid-4"></div>
+      <!-- editor de imágenes -->
+      <div id="imgEditor" class="no-print" style="display:none;margin-top:12px">
+        <div class="controls">
+          <div class="drop" id="dropZone" title="Clic o arrastra imágenes (4 formatos)">
+            Arrastra o haz clic para subir imágenes (RIC, BTE, Intracanal estándar, Intracanal a medida)
+          </div>
+          <input type="file" id="filePick" accept="image/*" multiple style="display:none"/>
+        </div>
+        <div class="note" style="margin-top:6px">Las imágenes se guardan embebidas (base64) y podrán compartirse en el HTML exportado.</div>
+      </div>
     </div>
   </section>
 
-  <!-- CARACTERÍSTICAS + BUSCADOR -->
+  <!-- CARACTERÍSTICAS -->
   <section class="paper" style="margin-top:12px">
     <div class="hd"><strong>Características de gamas</strong></div>
     <div class="bd">
@@ -103,7 +116,7 @@ tr.item td:last-child{border-radius:0 10px 10px 0}
       </div>
       <div style="margin-top:10px">
         <textarea id="txtCar" rows="5" class="editable" disabled></textarea>
-        <div class="note" style="margin-top:6px">Edición protegida con PIN 4321. Guardado local (sin Internet).</div>
+        <div class="note" style="margin-top:6px">Edición protegida con PIN 4321. Guardado local y “Descargar HTML con datos”.</div>
       </div>
     </div>
   </section>
@@ -138,9 +151,9 @@ tr.item td:last-child{border-radius:0 10px 10px 0}
       </div>
 
       <div class="actions no-print">
-        <button class="btn ghost" onclick="copyLink()">Copiar enlace</button>
         <button class="btn ghost" onclick="window.print()">Guardar PDF</button>
-        <button class="btn ghost" onclick="exportCSV()">Exportar Excel</button>
+        <button class="btn ghost" id="btnExportHtml">Descargar HTML con datos</button>
+        <button class="btn ghost" id="btnExportCsv">Exportar Excel</button>
       </div>
     </div>
   </section>
@@ -150,30 +163,33 @@ tr.item td:last-child{border-radius:0 10px 10px 0}
     <div class="hd"><strong>UPGRADE</strong></div>
     <div class="bd"><div id="upgrades" class="upg"></div></div>
   </section>
-
 </div>
 
 <script>
-/* ================== DATA ================== */
+/* ====== DATOS INCRUSTADOS (se actualiza al exportar) ======
+   ¡NO BORRAR!  (Marcadores para el exportador)             */
+<!--DATA_START-->
+window.__EMBEDDED_STATE = null;
+<!--DATA_END-->
+
+/* ================== CONFIG ================== */
 const PIN = '4321';
 const LS_KEY = 'infinity_calc_v1';
 
+/* ================== DATA ================== */
 const FORMATOS = [
   {id:'ric',  nombre:'RIC / RIC Premium'},
   {id:'bte',  nombre:'BTE'},
   {id:'cic',  nombre:'Intracanal estándar'},
   {id:'ite',  nombre:'Intracanal a medida'}
 ];
-// SVG placeholder (sin internet)
-const svg = t => "data:image/svg+xml;utf8," + encodeURIComponent(
- `<svg xmlns='http://www.w3.org/2000/svg' width='600' height='420'>
-    <rect x='10' y='10' width='580' height='400' rx='16' ry='16'
-      fill='#F9FAFB' stroke='#E5E7EB' stroke-width='3'/>
-    <text x='300' y='220' font-family='Arial' font-size='26' fill='#9CA3AF'
-      text-anchor='middle'>${t}</text>
-  </svg>`
+
+// SVG de reserva (si aún no hay imágenes cargadas)
+const placeholder = t => "data:image/svg+xml;utf8," + encodeURIComponent(
+  "<svg xmlns='http://www.w3.org/2000/svg' width='600' height='420'>"
+ + "<rect x='10' y='10' width='580' height='400' rx='16' ry='16' fill='#F9FAFB' stroke='#E5E7EB' stroke-width='3'/>"
+ + "<text x='300' y='220' font-family='Arial' font-size='26' fill='#9CA3AF' text-anchor='middle'>"+t+"</text></svg>"
 );
-FORMATOS.forEach(f=>f.img = svg(f.nombre));
 
 const GAMAS = [
   {id:'diamante_plus', nombre:'Diamante Plus', precio:3995, upgNombre:'Diamante Plus (+2004)', upgImporte:2004},
@@ -184,12 +200,15 @@ const GAMAS = [
 ];
 
 /* ================== STATE ================== */
-let state = {
+let stateDefault = {
   formato:'ric',
   gamaId:'diamante_plus',
   pinOk:false,
-  upgradeId:'diamante_plus',  // recomendado por defecto (misma gama)
+  upgradeId:'diamante_plus',  // recomendado por defecto
   upgradeActivo:true,
+  imagenes:{                  // se rellenan con tus imágenes
+    ric:null,bte:null,cic:null,ite:null
+  },
   caracteristicas:{
     diamante_plus:'• Prestaciones máximas\n• 16 canales\n• Reducción de ruido avanzada\n• Bluetooth LE',
     diamante:'• Gran rendimiento\n• 14 canales\n• Control inteligencia ambiental',
@@ -198,6 +217,11 @@ let state = {
     oro:'• 6 canales\n• Esencial'
   }
 };
+
+// 1) Si viene HTML con datos incrustados, usarlo
+let state = window.__EMBEDDED_STATE ? window.__EMBEDDED_STATE : stateDefault;
+
+// 2) Si hay localStorage, tiene prioridad (para seguir editando)
 try{
   const s=JSON.parse(localStorage.getItem(LS_KEY)||'{}');
   if(s && Object.keys(s).length){ state={...state,...s}; }
@@ -208,8 +232,8 @@ const $=(q,c=document)=>c.querySelector(q);
 const $$=(q,c=document)=>Array.from(c.querySelectorAll(q));
 const money=n=> n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
 const mensualidad=(p,m,t)=>{const r=t/12;if(!r)return p/m;const pow=Math.pow(1+r,m);return p*(r*pow)/(pow-1)};
-function save(){localStorage.setItem(LS_KEY, JSON.stringify(state));}
-function gamaById(id){return GAMAS.find(g=>g.id===id);}
+const save=()=>localStorage.setItem(LS_KEY, JSON.stringify(state));
+const gamaById=id=>GAMAS.find(g=>g.id===id);
 
 /* ================== RENDER ================== */
 function renderFormatos(){
@@ -217,7 +241,8 @@ function renderFormatos(){
   FORMATOS.forEach(f=>{
     const c=document.createElement('div');
     c.className='card'+(state.formato===f.id?' sel':'');
-    c.innerHTML=`<div class="img"><img src="${f.img}" alt=""></div><div class="cap">${f.nombre}</div>`;
+    const src = state.imagenes[f.id] || placeholder(f.nombre);
+    c.innerHTML=`<div class="img"><img src="${src}" alt=""></div><div class="cap">${f.nombre}</div>`;
     c.onclick=()=>{state.formato=f.id; save(); renderFormatos();}
     wrap.appendChild(c);
   });
@@ -241,13 +266,10 @@ function renderTablaGamas(){
         </label>
       </td>
       <td style="width:130px">${money(g.precio)}</td>
-      <td>
-        <span class="badge">Ver características (${mini.length})</span>
-      </td>`;
+      <td><span class="badge">Ver características (${mini.length})</span></td>`;
     tr.querySelector('input').onchange=()=>{
       state.gamaId=g.id;
-      // upgrade recomendado = misma gama
-      state.upgradeId=g.id; state.upgradeActivo=true;
+      state.upgradeId=g.id; state.upgradeActivo=true; // recomendado
       save(); renderSelectGama(); renderUpgrades(); calc();
     };
     tr.querySelector('.badge').onclick=()=>alert(`${g.nombre}\n\n${state.caracteristicas[g.id]||'Sin características'}`);
@@ -257,23 +279,19 @@ function renderTablaGamas(){
 function renderUpgrades(){
   const box=$("#upgrades"); box.innerHTML='';
   const idx=GAMAS.findIndex(g=>g.id===state.gamaId);
-  const permitidos=GAMAS.slice(idx); // misma o inferior
-  GAMAS.forEach((g,i)=>{
-    // si es superior al índice seleccionado => deshabilitado
-    const superior = (GAMAS.indexOf(g)<idx);
+  GAMAS.forEach(g=>{
+    const superior = (GAMAS.indexOf(g) < idx); // superiores deshabilitadas
+    const active = state.upgradeActivo && (state.upgradeId===g.id);
     const div=document.createElement('div');
-    const active = state.upgradeActivo && state.upgradeId===g.id;
     div.className='pill '+(superior?'dim':(active?'active':'')); 
     div.textContent=g.upgNombre;
     div.title= superior ? 'Solo misma gama o inferior' : '';
     div.onclick=()=>{
       if(superior) return;
       if(g.id===state.gamaId){
-        // recomendado: toggle
-        state.upgradeActivo=!state.upgradeActivo;
+        state.upgradeActivo=!state.upgradeActivo; // toggle recomendado
       }else{
-        // inferior: selecciona ese upgrade (siempre activo)
-        state.upgradeId=g.id; state.upgradeActivo=true;
+        state.upgradeId=g.id; state.upgradeActivo=true; // elegir inferior
       }
       save(); renderUpgrades(); calc();
     };
@@ -284,6 +302,7 @@ function toggleEdit(){
   const on=state.pinOk;
   $$('.editable').forEach(el=>el.disabled=!on);
   $('#btnSave').style.display=on?'inline-flex':'none';
+  $('#imgEditor').style.display=on?'block':'none';
 }
 function calc(){
   const g=gamaById(state.gamaId);
@@ -305,20 +324,19 @@ function calc(){
   $('#c6Upg').textContent=money(c6u);
 }
 
-/* ================== EVENTS ================== */
+/* ================== EDITAR ================== */
 function bindEdit(){
   $('#btnEdit').onclick=()=>{
     const p=prompt('Introduce PIN');
     if(p===PIN){ state.pinOk=true; save(); toggleEdit(); }
     else alert('PIN incorrecto');
   };
-  $('#btnSave').onclick=()=>{
-    save(); alert('Guardado ✅');
-  };
+  $('#btnSave').onclick=()=>{ save(); alert('Guardado ✅'); };
+
   $('#selGama').onchange=e=>{
-    state.gamaId=e.target.value; // también mueve el recomendado
-    state.upgradeId=state.gamaId; state.upgradeActivo=true;
+    state.gamaId=e.target.value; state.upgradeId=state.gamaId; state.upgradeActivo=true;
     save(); renderTablaGamas(); renderUpgrades(); calc();
+    $('#txtCar').value=state.caracteristicas[state.gamaId]||'';
   };
   $('#txtCar').oninput=e=>{
     state.caracteristicas[$('#selGama').value]=e.target.value;
@@ -326,35 +344,63 @@ function bindEdit(){
   $('#search').oninput=e=>{
     const v=e.target.value.toLowerCase();
     const key=$('#selGama').value;
-    const txt=(state.caracteristicas[key]||'').split('\n').filter(Boolean).filter(x=>x.toLowerCase().includes(v)).join('\n');
-    $('#txtCar').value=v?txt:(state.caracteristicas[key]||'');
+    const src=(state.caracteristicas[key]||'').split('\n').filter(Boolean);
+    $('#txtCar').value = v ? src.filter(x=>x.toLowerCase().includes(v)).join('\n') : (state.caracteristicas[key]||'');
   };
+
+  // Subida de imágenes
+  const dz = $('#dropZone'), fp = $('#filePick');
+  const handleFiles = files=>{
+    [...files].forEach(f=>{
+      const r=new FileReader();
+      r.onload=()=>{
+        // orden: ric,bte,cic,ite – rellenamos el primero que falte
+        for(const id of ['ric','bte','cic','ite']){
+          if(!state.imagenes[id]){ state.imagenes[id]=r.result; break; }
+        }
+        save(); renderFormatos();
+      };
+      r.readAsDataURL(f);
+    });
+  };
+  dz.onclick=()=>fp.click();
+  dz.ondragover=e=>{e.preventDefault();dz.classList.add('drag');};
+  dz.ondragleave=()=>dz.classList.remove('drag');
+  dz.ondrop=e=>{e.preventDefault();dz.classList.remove('drag'); handleFiles(e.dataTransfer.files);};
+  fp.onchange=e=>handleFiles(e.target.files);
 }
 
-/* ================== UTIL ================== */
-function copyLink(){
-  try{
-    navigator.clipboard.writeText(location.href);
-    alert('Enlace copiado.');
-  }catch{ alert('No se pudo copiar el enlace.'); }
+/* ================== EXPORTAR ================== */
+function download(filename, text){
+  const blob=new Blob([text],{type:'text/html;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();
+}
+function exportHtmlWithData(){
+  // Clonar estado y quitar flags volátiles
+  const data = JSON.parse(JSON.stringify(state));
+  data.pinOk = false; // no exportamos sesión abierta
+
+  // Insertar JSON dentro de esta misma página (entre DATA_START / DATA_END)
+  let html = document.documentElement.outerHTML;
+  const json = "window.__EMBEDDED_STATE = " + JSON.stringify(data) + ";";
+  html = html.replace(/<!--DATA_START-->[\\s\\S]*?<!--DATA_END-->/,
+                      "<!--DATA_START-->\n"+json+"\n<!--DATA_END-->");
+  download("calculadora_infinity_con_datos.html", html);
 }
 function exportCSV(){
   const g=gamaById(state.gamaId);
-  const rows=[
-    ['Gama','Precio','Cuota36','Restante6m','Cuota6m','UpgradeNombre','UpgradeImporte','TotalConUpgrade','Cuota36Upg','Restante6mUpg','Cuota6mUpg']
-  ];
   const imp=g.precio, c36=imp/42, rest=imp-c36*36, c6=mensualidad(rest,6,0.0795);
   const ug=gamaById(state.upgradeId);
   const upgVal=state.upgradeActivo?(ug.upgImporte||0):0, upgNom=state.upgradeActivo?ug.upgNombre:'—';
   const tot=imp+upgVal, c36u=tot/42, restu=tot-c36u*36, c6u=mensualidad(restu,6,0.0795);
-  rows.push([g.nombre,imp,c36,rest,c6,upgNom,upgVal,tot,c36u,restu,c6u]);
 
-  const csv=rows.map(r=>r.join(';')).join('\n');
-  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const rows=[['Gama','Precio','Cuota36','Restante6m','Cuota6m','Upgrade','ImporteUpg','Total','Cuota36Upg','Restante6mUpg','Cuota6mUpg'],
+              [g.nombre,imp,c36,rest,c6,upgNom,upgVal,tot,c36u,restu,c6u]];
+  const csv=rows.map(r=>r.join(';')).join('\\n');
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='calculadora_infinity.csv';
-  document.body.appendChild(a); a.click(); a.remove();
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='calculadora_infinity.csv';a.click();
 }
 
 /* ================== INIT ================== */
@@ -365,11 +411,13 @@ function init(){
   renderUpgrades();
   toggleEdit();
   bindEdit();
-  // editor
   $('#txtCar').value=state.caracteristicas[state.gamaId]||'';
   calc();
+
+  $('#btnExportHtml').onclick=exportHtmlWithData;
+  $('#btnExportCsv').onclick=exportCSV;
 }
-document.addEventListener('DOMContentLoaded',init);
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
