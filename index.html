@@ -1,117 +1,264 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Visor datos Calculadora Infinity</title>
-<style>
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f6f7f9;margin:0;padding:24px;color:#111}
-  .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.08);padding:20px;max-width:1000px;margin:0 auto}
-  h1{margin:0 0 12px;font-size:20px}
-  .muted{color:#6b7280;font-size:13px}
-  textarea{width:100%;min-height:160px;border:1px solid #e5e7eb;border-radius:10px;padding:10px;font:inherit;background:#fff}
-  .row{display:flex;gap:16px;flex-wrap:wrap}
-  .thumb{border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;width:160px;height:120px;display:flex;align-items:center;justify-content:center;background:#fff}
-  .thumb img{max-width:100%;max-height:100%;display:block}
-  .actions{display:flex;gap:8px;margin-top:12px}
-  button{padding:8px 12px;border-radius:10px;border:1px solid #e5e7eb;background:#111;color:#fff;cursor:pointer}
-  button.secondary{background:#fff;color:#111}
-  code{background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:2px 6px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CALCULADORA INFINITY AUDIO — Nube (Drive)</title>
+  <meta name="color-scheme" content="light" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme:{ extend:{ colors:{ brand:{ red:'#DC2626', gray:'#6B7280' }}}}}
+  </script>
+  <style>
+    html,body{background:#f6f7f9}
+    .paper{background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+    .imgBox{aspect-ratio:1/1}
+    .drop-zone{border:2px dashed #ccc;border-radius:1rem;padding:1rem;text-align:center;color:#888;cursor:pointer}
+    .drop-zone.dragover{background:#fef2f2;border-color:#dc2626;color:#dc2626}
+    .help{font-size:11px;color:#6b7280}
+    @media print {.no-print{display:none!important} html,body{background:#fff}}
+  </style>
 </head>
-<body>
-  <div class="card">
-    <h1>Visor datos — Calculadora Infinity</h1>
-    <div class="muted">Lee el contenido guardado en tu nube (Drive vía Apps Script). No requiere PIN.</div>
+<body class="min-h-screen text-gray-900">
+  <main class="max-w-6xl mx-auto p-4 md:p-8 space-y-6">
 
-    <div style="margin-top:10px">
-      <div class="muted">WEB_APP_URL actual:</div>
-      <code id="url"></code>
-    </div>
+    <header class="space-y-1">
+      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-red-700 leading-tight">
+        CALCULADORA INFINITY<br/>AUDIO
+      </h1>
+      <p class="text-sm text-gray-600">36 meses sin intereses · 6 meses con 7,95% TAE</p>
+    </header>
 
-    <div class="actions">
-      <button id="btn-cargar">Cargar</button>
-      <button id="btn-descargar" class="secondary" disabled>Descargar JSON</button>
-      <button id="btn-copiar" class="secondary" disabled>Copiar JSON</button>
-    </div>
+    <!-- CARACTERÍSTICAS + GALERÍA -->
+    <section class="paper rounded-2xl overflow-hidden">
+      <div class="p-4 md:p-6 border-b flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-gray-700">Características de gamas</h2>
+        <div class="flex items-center gap-2 no-print">
+          <button id="btn-edit" class="text-xs px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700">
+            Editar contenido
+          </button>
+          <button id="btn-reload-top" class="text-xs px-3 py-1.5 rounded-lg border hover:bg-gray-50">
+            Recargar
+          </button>
+        </div>
+      </div>
+      <div class="p-4 md:p-6 space-y-4">
+        <div id="caracteristicas" class="whitespace-pre-wrap text-sm text-gray-800"></div>
+        <div id="galeria" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+      </div>
+    </section>
 
-    <h2 style="margin-top:18px;font-size:16px">Características</h2>
-    <textarea id="txt" readonly placeholder="(vacío)"></textarea>
+    <!-- FINANCIACIÓN (FORMULACIÓN + RESULTADOS) -->
+    <section class="paper rounded-2xl p-4 md:p-6 space-y-5">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-gray-700">Financiación Infinity</h3>
+        <button id="btn-info" class="text-xs underline no-print">ver fórmula</button>
+      </div>
 
-    <h2 style="margin-top:18px;font-size:16px">Imágenes</h2>
-    <div id="imgs" class="row"></div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-red-600 text-white rounded-xl p-4">
+          <div class="text-xs opacity-90 mb-1">Importe total (Diamante Plus)</div>
+          <div class="text-3xl font-extrabold"><span id="importe">3995,00 €</span></div>
+          <div class="text-[11px] opacity-90 mt-1">sin intereses</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 border"><div class="text-xs text-gray-600 mb-1">Cuota 36 meses (0% TAE)</div><div id="cuota36" class="text-xl font-bold">95,12 €</div></div>
+        <div class="bg-white rounded-xl p-4 border"><div class="text-xs text-gray-600 mb-1">Importe restante tras 36m</div><div id="restante6" class="text-xl font-bold">570,71 €</div></div>
+        <div class="bg-white rounded-xl p-4 border"><div class="text-xs text-gray-600 mb-1">Cuota 6 meses (7,95% TAE)</div><div id="cuota6" class="text-xl font-bold">97,26 €</div></div>
+      </div>
 
-    <div class="muted" style="margin-top:12px">Actualizado: <span id="ts">—</span></div>
-  </div>
+      <div id="formula" class="rounded-xl border bg-white p-4 hidden">
+        <div class="text-sm font-semibold mb-2">Formulación</div>
+        <p class="help mb-2">
+          Para 36 meses al 0% TAE: <code>cuota_36 = importe / 42</code> (según tu configuración original).<br/>
+          Importe restante tras 36 meses: <code>restante = importe − cuota_36 × 36</code>.<br/>
+          Para 6 meses al 7,95% TAE (tipo nominal mensual <code>r = 0,0795 / 12</code>):<br/>
+          <code>cuota_6 = restante × ( r × (1+r)^6 ) / ( (1+r)^6 − 1 )</code>.
+        </p>
+      </div>
+    </section>
 
-<script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzFxez1KdhM34wU9xhpk_otJuAzXl6e98QNfaJB_P_73VCyM9ufjA-T8vYvlEL9nAvE/exec";
-document.getElementById('url').textContent = WEB_APP_URL;
+    <!-- MODAL EDITOR -->
+    <dialog id="dlg-edit" class="rounded-2xl p-0 w-full max-w-3xl">
+      <form method="dialog" class="p-0 m-0">
+        <div class="p-4 md:p-6 space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-semibold">Editar contenido</h3>
+            <button class="px-3 py-1.5 rounded-lg border text-sm no-print">Cerrar</button>
+          </div>
 
-let lastData = null;
+          <label class="block text-sm text-gray-700">
+            Características de gama
+            <textarea id="txt-car" class="mt-1 w-full rounded-lg border-gray-300 px-3 py-2 h-40"
+              placeholder="Ej.: Bluetooth LE, 16 canales, IP68, carga rápida, reducción de ruido…"></textarea>
+          </label>
 
-async function cargar(){
-  const btn = document.getElementById('btn-cargar');
-  btn.disabled = true; btn.textContent = 'Cargando…';
-  try{
-    const r = await fetch(WEB_APP_URL, { cache:'no-store' });
-    const d = await r.json();
-    lastData = d;
+          <div class="space-y-2">
+            <label class="text-sm text-gray-700">Imágenes (máx. 20)</label>
 
-    // Características
-    document.getElementById('txt').value = d?.caracteristicasGama || '';
+            <div class="grid md:grid-cols-2 gap-3">
+              <div>
+                <div id="drop-zone" class="drop-zone">Arrastra aquí tus imágenes o haz clic para seleccionarlas</div>
+                <input id="file-add" type="file" accept="image/*" multiple class="hidden" />
+                <div class="help mt-1">Se suben al guardar. Puedes borrar miniaturas antes de guardar.</div>
+              </div>
 
-    // Imágenes
-    const cont = document.getElementById('imgs');
-    cont.innerHTML = '';
-    (Array.isArray(d?.imagenes) ? d.imagenes : []).forEach(u=>{
-      const wrap = document.createElement('a');
-      wrap.href = u; wrap.target = '_blank'; wrap.rel='noopener';
-      wrap.className = 'thumb';
-      const img = new Image(); img.src = u; img.loading='lazy';
-      wrap.appendChild(img); cont.appendChild(wrap);
+              <div>
+                <div class="flex gap-2">
+                  <input id="url-img" type="url" placeholder="Pega URL https://…"
+                    class="flex-1 rounded-lg border-gray-300 px-3 py-2" />
+                  <button id="btn-add-url" type="button" class="px-3 py-2 rounded-lg border">Añadir URL</button>
+                </div>
+                <div class="help mt-1">Puedes mezclar imágenes locales y URLs públicas.</div>
+              </div>
+            </div>
+
+            <div id="preview" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mt-2"></div>
+          </div>
+
+          <div class="flex justify-end gap-2">
+            <button id="btn-reload" type="button" class="px-3 py-2 rounded-lg border bg-white text-sm no-print">Recargar</button>
+            <button id="btn-save"   type="button" class="px-3 py-2 rounded-lg bg-red-600 text-white text-sm no-print">Guardar</button>
+          </div>
+
+          <div id="msg" class="text-sm"></div>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- MODAL PIN -->
+    <dialog id="dlg-pin" class="rounded-2xl p-0 w-full max-w-xs">
+      <form method="dialog" class="p-0 m-0">
+        <div class="p-4 space-y-3">
+          <h3 class="text-base font-semibold">Introduce PIN</h3>
+          <input id="pin" type="password" inputmode="numeric" maxlength="8"
+                 class="w-full rounded-lg border-gray-300 px-3 py-2 text-center tracking-widest"
+                 placeholder="••••" />
+          <div class="flex justify-end gap-2">
+            <button class="px-3 py-2 rounded-lg border text-sm">Cancelar</button>
+            <button id="btn-pin-ok" class="px-3 py-2 rounded-lg bg-red-600 text-white text-sm">Aceptar</button>
+          </div>
+          <div id="pin-msg" class="text-sm text-red-600"></div>
+        </div>
+      </form>
+    </dialog>
+
+  </main>
+
+  <script>
+    // URL del propio Web App (la pasa el servidor al template)
+    const WEB_APP_URL = '<?= webAppUrl ?>';
+    const MAX_IMGS = 20;
+
+    const $ = (s,ctx=document)=>ctx.querySelector(s);
+    const fmtMoneda=(n)=>n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+    const mensualidad=(p,m,t)=>{const r=t/12;if(!r)return p/m;const pow=Math.pow(1+r,m);return p*(r*pow)/(pow-1);};
+
+    let state={ caracteristicasGama:'', imagenes:[], updated_at:0 };
+    let uploads=[];
+
+    async function cargar(){
+      const r = await fetch(WEB_APP_URL, { cache:'no-store' });
+      const d = await r.json();
+      state = d || state; pintar();
+    }
+    function pintar(){
+      $('#caracteristicas').textContent = state.caracteristicasGama||'';
+      const g=$('#galeria'); g.innerHTML='';
+      (state.imagenes||[]).forEach(u=>{
+        const box=document.createElement('div'); box.className='bg-white border rounded-xl p-3 flex items-center justify-center imgBox';
+        const img=new Image(); img.src=u; img.loading='lazy'; img.alt='';
+        img.className='object-cover h-full w-full rounded-lg';
+        box.appendChild(img); g.appendChild(box);
+      });
+      const amount=3995, principal=amount/42, rest=amount-(principal*36), cuota6=mensualidad(rest,6,0.0795);
+      $('#importe').textContent=fmtMoneda(amount);
+      $('#cuota36').textContent=fmtMoneda(principal);
+      $('#restante6').textContent=fmtMoneda(rest);
+      $('#cuota6').textContent=fmtMoneda(cuota6);
+    }
+
+    // Drag & drop / files
+    const drop=$('#drop-zone'), fileInput=$('#file-add'), preview=$('#preview');
+    drop?.addEventListener('click',()=>fileInput.click());
+    drop?.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('dragover');});
+    drop?.addEventListener('dragleave',()=>drop.classList.remove('dragover'));
+    drop?.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('dragover');handleFiles(e.dataTransfer.files);});
+    fileInput?.addEventListener('change',e=>handleFiles(e.target.files));
+
+    function handleFiles(files){
+      [...files].forEach(f=>{
+        const r=new FileReader();
+        r.onload=()=>{ if(uploads.length<MAX_IMGS){ uploads.push(r.result); renderPreview(); } };
+        r.readAsDataURL(f);
+      });
+    }
+    function renderPreview(){
+      preview.innerHTML='';
+      uploads.forEach((u,i)=>{
+        const card=document.createElement('div'); card.className='relative';
+        const img=new Image(); img.src=u; img.className='rounded-xl object-cover w-full h-24';
+        const del=document.createElement('button'); del.textContent='❌'; del.className='absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5';
+        del.onclick=()=>{ uploads.splice(i,1); renderPreview(); };
+        card.appendChild(img); card.appendChild(del); preview.appendChild(card);
+      });
+    }
+
+    // Añadir URL de imagen
+    const urlInput=$('#url-img'); const btnAddUrl=$('#btn-add-url');
+    btnAddUrl?.addEventListener('click', ()=>{
+      const v=(urlInput.value||'').trim(); if(!v) return;
+      try{
+        const u = new URL(v);
+        if(['http:','https:'].includes(u.protocol)){
+          if(uploads.length<MAX_IMGS){ uploads.push(u.href); renderPreview(); urlInput.value=''; }
+        }
+      }catch(_){}
     });
 
-    // Timestamp
-    const ts = d?.updated_at ? new Date(d.updated_at) : null;
-    document.getElementById('ts').textContent = ts ? ts.toLocaleString('es-ES') : '—';
+    // Editor & PIN
+    $('#btn-edit').addEventListener('click',()=>{
+      $('#txt-car').value = state.caracteristicasGama||'';
+      uploads = [...(state.imagenes||[])];
+      renderPreview(); $('#msg').textContent=''; $('#dlg-edit').showModal();
+    });
+    $('#btn-reload').addEventListener('click',cargar);
+    $('#btn-reload-top').addEventListener('click',cargar);
 
-    // Acciones
-    document.getElementById('btn-descargar').disabled = false;
-    document.getElementById('btn-copiar').disabled = false;
-  }catch(e){
-    alert('No se pudo cargar: ' + e);
-  }finally{
-    btn.disabled = false; btn.textContent = 'Cargar';
-  }
-}
+    function pedirPin(){
+      return new Promise(res=>{
+        $('#pin').value=''; $('#pin-msg').textContent='';
+        const dlg=$('#dlg-pin'); dlg.showModal();
+        const ok=(e)=>{e.preventDefault(); const v=$('#pin').value.trim(); if(!v){$('#pin-msg').textContent='Introduce un PIN.';return;}
+          dlg.close(); b.removeEventListener('click',ok); res(v);};
+        const b=$('#btn-pin-ok'); b.addEventListener('click',ok);
+        dlg.addEventListener('close',()=>{b.removeEventListener('click',ok);});
+      });
+    }
 
-function descargar(){
-  if(!lastData){ return; }
-  const blob = new Blob([JSON.stringify(lastData, null, 2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'calculadora_infy_datos.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
+    async function guardar(){
+      const msg=$('#msg'); msg.className='text-sm'; msg.textContent='Guardando…';
+      const pin=await pedirPin(); if(!pin){ msg.textContent='Cancelado.'; return; }
+      try{
+        const payload = { caracteristicasGama:$('#txt-car').value, imagenes:uploads.slice(0,MAX_IMGS) };
+        const r=await fetch(WEB_APP_URL,{
+          method:'POST', headers:{'content-type':'application/json'},
+          body:JSON.stringify({ pin, payload })
+        });
+        const d=await r.json();
+        if(!r.ok || d?.ok===false){
+          msg.className='text-sm text-red-700';
+          msg.textContent = d?.error==='PIN_INCORRECTO' ? 'PIN incorrecto' : 'No se pudo guardar';
+          return;
+        }
+        state=d; pintar(); msg.className='text-sm text-green-700'; msg.textContent='Guardado ✓';
+      }catch(e){ msg.className='text-sm text-red-700'; msg.textContent='Error guardando'; }
+    }
 
-async function copiar(){
-  if(!lastData){ return; }
-  try{
-    await navigator.clipboard.writeText(JSON.stringify(lastData, null, 2));
-    alert('JSON copiado al portapapeles.');
-  }catch{
-    alert('No se pudo copiar. Descarga el JSON y abrelo con un editor.');
-  }
-}
+    $('#btn-save').addEventListener('click', guardar);
+    $('#btn-info').addEventListener('click', ()=>{ $('#formula').classList.toggle('hidden'); });
 
-document.getElementById('btn-cargar').addEventListener('click', cargar);
-document.getElementById('btn-descargar').addEventListener('click', descargar);
-document.getElementById('btn-copiar').addEventListener('click', copiar);
-
-// Carga directa al abrir
-cargar();
-</script>
+    // Inicio
+    cargar();
+  </script>
 </body>
 </html>
