@@ -1,382 +1,375 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>CALCULADORA INFINITY AUDIO</title>
 <style>
 :root{
-  --brand:#C71F2D;        /* rojo Infinity */
-  --brand-dark:#a41724;
-  --text:#1f2937;         /* gris oscuro */
-  --muted:#6b7280;        /* gris medio  */
-  --bg:#ffffff;
-  --soft:#f6f7f9;
-  --border:#e5e7eb;
+  --brand:#DC2626; --brand-700:#B91C1C; --bg:#fff; --soft:#f6f7f9;
+  --text:#111827; --muted:#6B7280; --line:#E5E7EB; --card:#ffffff;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--soft);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial}
-.container{max-width:1024px;margin:0 auto;padding:20px}
+.container{max-width:1100px;margin:0 auto;padding:20px}
 .header{margin-bottom:14px}
-.h1{font-weight:900;letter-spacing:.5px;color:var(--brand);font-size:44px;line-height:1.1;margin:0}
+.h1{margin:0;line-height:1.1;font-weight:900;color:var(--brand);font-size:44px}
 .sub{color:var(--muted);font-size:13px;margin-top:6px}
 
-.paper{background:var(--bg);border-radius:16px;border:1px solid var(--border);box-shadow:0 4px 24px rgba(0,0,0,.04)}
-.paper .hd{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.paper{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.06);overflow:hidden}
+.paper .hd{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
 .paper .bd{padding:18px}
 
-.btn{background:var(--brand);color:#fff;border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
-.btn:hover{background:var(--brand-dark)}
-.btn.out{background:#fff;color:var(--text);border:1px solid var(--border)}
-.btn.small{padding:6px 10px;border-radius:8px;font-size:13px}
 .row{display:grid;gap:12px}
-.row.grid4{grid-template-columns:repeat(4,minmax(0,1fr))}
-.row.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:10px;cursor:pointer}
-.imgbox{height:140px;border-radius:12px;overflow:hidden;background:#f9fafb;display:flex;align-items:center;justify-content:center}
-.imgbox img{max-width:100%;max-height:100%;object-fit:contain}
-.label{font-size:12px;color:var(--muted);margin-top:6px;text-align:center}
+.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.card .img{height:140px;background:#F9FAFB;display:flex;align-items:center;justify-content:center}
+.card .img img{max-width:100%;max-height:100%;object-fit:contain}
+.card .cap{padding:8px 10px;color:var(--muted);font-size:12px;text-align:center}
+.card.sel{outline:2px solid var(--brand)}
+
+.controls{display:flex;gap:8px;align-items:center}
+select,input,textarea{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px}
+textarea{width:100%}
+.btn{background:var(--brand);border:0;color:#fff;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--brand-700)}
+.btn.s{padding:6px 10px;border-radius:8px;font-size:13px}
+.btn.ghost{background:#fff;color:var(--text);border:1px solid var(--line)}
+.btn.ghost:hover{background:#fafafa}
+.note{color:var(--muted);font-size:12px}
 
 .table{width:100%;border-collapse:separate;border-spacing:0 8px}
-th,td{font-size:14px}
-th{color:var(--muted);font-weight:600;text-align:left}
-tr.item{background:#fff}
-tr.item td{padding:10px 12px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-tr.item td:first-child{border-left:1px solid var(--border);border-radius:12px 0 0 12px}
-tr.item td:last-child{border-right:1px solid var(--border);border-radius:0 12px 12px 0}
+.thead{background:var(--brand);color:#fff}
+.thead th{padding:10px 12px;text-align:left;font-weight:700}
+tr.item td{padding:10px 12px;background:#fff;border:1px solid var(--line)}
+tr.item td:first-child{border-radius:10px 0 0 10px}
+tr.item td:last-child{border-radius:0 10px 10px 0}
 
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.kpi{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px}
-.kpi .tt{font-size:12px;color:var(--muted)}
-.kpi .val{font-size:22px;font-weight:800;margin-top:4px}
-.kpi.red{background:var(--brand);color:#fff;border-color:transparent}
-.kpi.red .tt{color:#fff;opacity:.9}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
+.kpi .t{font-size:12px;color:var(--muted)}
+.kpi .v{font-size:22px;font-weight:900;margin-top:4px}
+.kpi.red{background:var(--brand);border-color:transparent;color:#fff}
+.kpi.red .t{color:#fff;opacity:.9}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 
 .upg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.upg .opt{border:1px solid var(--border);border-radius:12px;padding:12px;background:#fff;cursor:pointer}
-.upg .opt.active{border-color:var(--brand);box-shadow:0 0 0 2px rgba(199,16,46,.15)}
-.opt .nm{font-weight:700}
-.opt .inf{font-size:12px;color:var(--muted);margin-top:4px}
+.pill{background:var(--brand);color:#fff;border-radius:12px;padding:14px 12px;text-align:center;cursor:pointer;font-weight:700}
+.pill.dim{background:#F3F4F6;color:#6B7280;cursor:not-allowed}
+.pill.active{box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(220,38,38,.25)}
 
-.tools{display:flex;gap:8px;flex-wrap:wrap}
-.toolbar{display:flex;gap:8px;align-items:center}
-
-input,select,textarea{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px}
-input[disabled],textarea[disabled]{background:#f9fafb;color:#6b7280}
-.search{display:flex;gap:8px}
-.search input{flex:1}
-
-.note{font-size:12px;color:var(--muted)}
-.footer-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+.badge{display:inline-flex;align-items:center;gap:6px;color:#6B7280}
+.badge:before{content:"•";color:var(--brand);font-weight:900}
 
 @media print{
   .no-print{display:none!important}
+  .container{max-width:none;padding:0 16px}
   body{background:#fff}
-  .container{max-width:none}
 }
 </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1 class="h1">CALCULADORA INFINITY<br/>AUDIO</h1>
-      <div class="sub">36 MESES 0% TAE + 6 MESES 7,95% TAE</div>
+<div class="container">
+
+  <header class="header">
+    <h1 class="h1">CALCULADORA INFINITY<br/>AUDIO</h1>
+    <div class="sub">36 meses sin intereses · 6 meses con 7,95% TAE</div>
+  </header>
+
+  <!-- FORMATOS -->
+  <section class="paper">
+    <div class="hd">
+      <div class="controls">
+        <strong>Formatos de audífonos</strong>
+      </div>
+      <div class="controls no-print">
+        <button id="btnEdit" class="btn s">Editar</button>
+        <button id="btnSave" class="btn s" style="display:none">Guardar</button>
+      </div>
     </div>
+    <div class="bd">
+      <div id="formatos" class="row grid-4"></div>
+    </div>
+  </section>
 
-    <!-- Formatos -->
-    <section class="paper">
-      <div class="hd">
-        <div class="ttl">Formatos de audífonos</div>
-        <div class="toolbar no-print">
-          <button id="btnEditar" class="btn small">Editar</button>
-          <button id="btnGuardar" class="btn small" style="display:none">Guardar</button>
-        </div>
+  <!-- CARACTERÍSTICAS + BUSCADOR -->
+  <section class="paper" style="margin-top:12px">
+    <div class="hd"><strong>Características de gamas</strong></div>
+    <div class="bd">
+      <div class="controls">
+        <select id="selGama" class="editable" disabled></select>
+        <input id="search" class="editable" disabled placeholder="Buscar característica…" style="flex:1"/>
       </div>
-      <div class="bd">
-        <div id="formatos" class="row grid4"></div>
+      <div style="margin-top:10px">
+        <textarea id="txtCar" rows="5" class="editable" disabled></textarea>
+        <div class="note" style="margin-top:6px">Edición protegida con PIN 4321. Guardado local (sin Internet).</div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Características -->
-    <section class="paper">
-      <div class="hd">
-        <div class="ttl">Características de gamas</div>
-      </div>
-      <div class="bd">
-        <div class="search">
-          <select id="selGama" class="editable" disabled></select>
-          <input type="text" placeholder="Buscar característica…" disabled class="editable">
-        </div>
-        <div style="margin-top:10px">
-          <textarea id="txtCar" rows="5" class="editable" disabled></textarea>
-          <div class="note" style="margin-top:6px">Edición protegida con PIN 4321. Al guardar, se mantiene en este archivo (local).</div>
-        </div>
-      </div>
-    </section>
+  <!-- LISTA GAMAS -->
+  <section class="paper" style="margin-top:12px">
+    <div class="hd"><strong>Gamas</strong></div>
+    <div class="bd">
+      <table class="table">
+        <thead class="thead"><tr><th>Gama</th><th>Precio</th><th>Características</th></tr></thead>
+        <tbody id="tblGamas"></tbody>
+      </table>
+    </div>
+  </section>
 
-    <!-- Gamas -->
-    <section class="paper">
-      <div class="hd"><div class="ttl">Gamas</div></div>
-      <div class="bd">
-        <table class="table">
-          <thead>
-            <tr><th>Gama</th><th>Precio</th><th>Características</th></tr>
-          </thead>
-          <tbody id="tbl-gamas"></tbody>
-        </table>
+  <!-- FINANCIACIÓN -->
+  <section class="paper" style="margin-top:12px">
+    <div class="hd"><strong>Financiación Infinity</strong></div>
+    <div class="bd">
+      <div class="kpis">
+        <div class="kpi red"><div class="t">Importe base</div><div class="v" id="impBase">—</div></div>
+        <div class="kpi"><div class="t">Cuota 36 meses</div><div class="v" id="c36Base">—</div></div>
+        <div class="kpi"><div class="t">Importe restante (6m)</div><div class="v" id="restBase">—</div></div>
+        <div class="kpi"><div class="t">Financiación 6m (7,95% TAE)</div><div class="v" id="c6Base">—</div></div>
       </div>
-    </section>
-
-    <!-- Financiación -->
-    <section class="paper">
-      <div class="hd"><div class="ttl">Financiación Infinity</div></div>
-      <div class="bd">
-        <div class="kpis">
-          <div class="kpi red"><div class="tt">Importe base</div><div id="impBase" class="val">—</div></div>
-          <div class="kpi"><div class="tt">Cuota 36m</div><div id="c36Base" class="val">—</div></div>
-          <div class="kpi"><div class="tt">Restante (6m)</div><div id="restBase" class="val">—</div></div>
-          <div class="kpi"><div class="tt">Cuota 6m (7,95% TAE)</div><div id="c6Base" class="val">—</div></div>
-        </div>
-        <div style="height:10px"></div>
-        <div class="kpis">
-          <div class="kpi red"><div class="tt">Importe con upgrade</div><div id="impUpg" class="val">—</div></div>
-          <div class="kpi"><div class="tt">Cuota 36m</div><div id="c36Upg" class="val">—</div></div>
-          <div class="kpi"><div class="tt">Restante (6m)</div><div id="restUpg" class="val">—</div></div>
-          <div class="kpi"><div class="tt">Cuota 6m (7,95% TAE)</div><div id="c6Upg" class="val">—</div></div>
-        </div>
-        <div class="footer-actions no-print">
-          <button class="btn out" onclick="window.print()">Guardar PDF</button>
-        </div>
+      <div style="height:10px"></div>
+      <div class="kpis">
+        <div class="kpi red"><div class="t">Importe con upgrade</div><div class="v" id="impUpg">—</div></div>
+        <div class="kpi"><div class="t">Cuota 36 meses</div><div class="v" id="c36Upg">—</div></div>
+        <div class="kpi"><div class="t">Importe restante (6m)</div><div class="v" id="restUpg">—</div></div>
+        <div class="kpi"><div class="t">Financiación 6m (7,95% TAE)</div><div class="v" id="c6Upg">—</div></div>
       </div>
-    </section>
 
-    <!-- Upgrade -->
-    <section class="paper">
-      <div class="hd"><div class="ttl">UPGRADE</div></div>
-      <div class="bd">
-        <div id="upgrades" class="upg"></div>
+      <div class="actions no-print">
+        <button class="btn ghost" onclick="copyLink()">Copiar enlace</button>
+        <button class="btn ghost" onclick="window.print()">Guardar PDF</button>
+        <button class="btn ghost" onclick="exportCSV()">Exportar Excel</button>
       </div>
-    </section>
+    </div>
+  </section>
 
-  </div>
+  <!-- UPGRADE -->
+  <section class="paper" style="margin-top:12px">
+    <div class="hd"><strong>UPGRADE</strong></div>
+    <div class="bd"><div id="upgrades" class="upg"></div></div>
+  </section>
+
+</div>
 
 <script>
-/* ========= CONFIG ========= */
-const STORAGE_KEY = 'calc_infy_local_v1';
+/* ================== DATA ================== */
 const PIN = '4321';
-
-const imgSvg = (label)=>`data:image/svg+xml;utf8,` + encodeURIComponent(
-  \`<svg xmlns='http://www.w3.org/2000/svg' width='600' height='450'>
-     <rect x='10' y='10' width='580' height='430' rx='16' ry='16' fill='%23f9fafb' stroke='%23e5e7eb' stroke-width='3'/>
-     <text x='300' y='235' font-family='Arial, sans-serif' font-size='28' fill='%23999' text-anchor='middle'>${label}</text>
-   </svg>\`
-);
+const LS_KEY = 'infinity_calc_v1';
 
 const FORMATOS = [
-  { id:'ric',  nombre:'RIC / RIC Premium', img: imgSvg('RIC / RIC Premium') },
-  { id:'bte',  nombre:'BTE',                img: imgSvg('BTE') },
-  { id:'cic',  nombre:'Intracanal estándar',img: imgSvg('Intracanal estándar') },
-  { id:'ite',  nombre:'Intracanal a medida',img: imgSvg('Intracanal a medida') },
+  {id:'ric',  nombre:'RIC / RIC Premium'},
+  {id:'bte',  nombre:'BTE'},
+  {id:'cic',  nombre:'Intracanal estándar'},
+  {id:'ite',  nombre:'Intracanal a medida'}
 ];
+// SVG placeholder (sin internet)
+const svg = t => "data:image/svg+xml;utf8," + encodeURIComponent(
+ `<svg xmlns='http://www.w3.org/2000/svg' width='600' height='420'>
+    <rect x='10' y='10' width='580' height='400' rx='16' ry='16'
+      fill='#F9FAFB' stroke='#E5E7EB' stroke-width='3'/>
+    <text x='300' y='220' font-family='Arial' font-size='26' fill='#9CA3AF'
+      text-anchor='middle'>${t}</text>
+  </svg>`
+);
+FORMATOS.forEach(f=>f.img = svg(f.nombre));
 
 const GAMAS = [
-  { id:'diamante_plus', nombre:'Diamante Plus', precio:3995, recomendado:'Diamante Plus (+2004)', upgImporte:2004 },
-  { id:'diamante',      nombre:'Diamante',      precio:3895, recomendado:'Diamante (+1904)',      upgImporte:1904 },
-  { id:'platino_plus',  nombre:'Platino Plus',  precio:3395, recomendado:'Platino Plus (+1404)',  upgImporte:1404 },
-  { id:'platino',       nombre:'Platino',       precio:3295, recomendado:'Platino (+1294)',       upgImporte:1294 },
-  { id:'oro',           nombre:'Oro',           precio:1991, recomendado:'—',                     upgImporte:0    },
+  {id:'diamante_plus', nombre:'Diamante Plus', precio:3995, upgNombre:'Diamante Plus (+2004)', upgImporte:2004},
+  {id:'diamante',      nombre:'Diamante',      precio:3895, upgNombre:'Diamante (+1904)',      upgImporte:1904},
+  {id:'platino_plus',  nombre:'Platino Plus',  precio:3395, upgNombre:'Platino Plus (+1404)',  upgImporte:1404},
+  {id:'platino',       nombre:'Platino',       precio:3295, upgNombre:'Platino (+1294)',       upgImporte:1294},
+  {id:'oro',           nombre:'Oro',           precio:1991, upgNombre:'—',                     upgImporte:0   },
 ];
 
-/* ========= STATE ========= */
+/* ================== STATE ================== */
 let state = {
-  selectedFormato: 'ric',
-  selectedGamaId: 'diamante_plus', // por defecto
-  upgradeActivo: true,
-  pinOk: false,
-  caracteristicas: {
-    diamante_plus: '• Prestaciones máximas\\n• 16 canales\\n• Reducción de ruido avanzada\\n• Bluetooth LE',
-    diamante:      '• Gran rendimiento\\n• 14 canales\\n• Control inteligencia ambiental',
-    platino_plus:  '• 12 canales\\n• IP67\\n• Carga rápida',
-    platino:       '• 10 canales\\n• Control básico de ruido',
-    oro:           '• 6 canales\\n• Esencial',
+  formato:'ric',
+  gamaId:'diamante_plus',
+  pinOk:false,
+  upgradeId:'diamante_plus',  // recomendado por defecto (misma gama)
+  upgradeActivo:true,
+  caracteristicas:{
+    diamante_plus:'• Prestaciones máximas\n• 16 canales\n• Reducción de ruido avanzada\n• Bluetooth LE',
+    diamante:'• Gran rendimiento\n• 14 canales\n• Control inteligencia ambiental',
+    platino_plus:'• 12 canales\n• IP67\n• Carga rápida',
+    platino:'• 10 canales\n• Control básico de ruido',
+    oro:'• 6 canales\n• Esencial'
   }
 };
-
-// Cargar guardado local si existe
 try{
-  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-  if (saved && Object.keys(saved).length) state = { ...state, ...saved };
-}catch(e){}
+  const s=JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+  if(s && Object.keys(s).length){ state={...state,...s}; }
+}catch{}
 
-/* ========= Helpers ========= */
-const $ = (s,ctx=document)=>ctx.querySelector(s);
-const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
-const fmt = n => n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
-const mensualidad=(p,m,t)=>{ const r=t/12; if(!r) return p/m; const pow=Math.pow(1+r,m); return p*(r*pow)/(pow-1); };
-const persist = ()=> localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+/* ================== HELPERS ================== */
+const $=(q,c=document)=>c.querySelector(q);
+const $$=(q,c=document)=>Array.from(c.querySelectorAll(q));
+const money=n=> n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+const mensualidad=(p,m,t)=>{const r=t/12;if(!r)return p/m;const pow=Math.pow(1+r,m);return p*(r*pow)/(pow-1)};
+function save(){localStorage.setItem(LS_KEY, JSON.stringify(state));}
+function gamaById(id){return GAMAS.find(g=>g.id===id);}
 
-/* ========= UI ========= */
+/* ================== RENDER ================== */
 function renderFormatos(){
-  const wrap = $('#formatos'); wrap.innerHTML='';
+  const wrap=$("#formatos"); wrap.innerHTML='';
   FORMATOS.forEach(f=>{
-    const card = document.createElement('div');
-    card.className='card';
-    card.innerHTML = \`
-      <div class="imgbox"><img src="\${f.img}" alt=""></div>
-      <div class="label">\${f.nombre}</div>\`;
-    card.addEventListener('click', ()=>{ state.selectedFormato=f.id; persist(); highlightFormatos(); });
-    wrap.appendChild(card);
-  });
-  highlightFormatos();
-}
-function highlightFormatos(){
-  $$('#formatos .card').forEach((el,i)=>{
-    const f = FORMATOS[i];
-    el.style.outline = (state.selectedFormato === f.id) ? '2px solid var(--brand)' : 'none';
+    const c=document.createElement('div');
+    c.className='card'+(state.formato===f.id?' sel':'');
+    c.innerHTML=`<div class="img"><img src="${f.img}" alt=""></div><div class="cap">${f.nombre}</div>`;
+    c.onclick=()=>{state.formato=f.id; save(); renderFormatos();}
+    wrap.appendChild(c);
   });
 }
-
-function renderGamas(){
-  const body = $('#tbl-gamas'); body.innerHTML='';
+function renderSelectGama(){
+  const sel=$("#selGama");
+  sel.innerHTML=GAMAS.map(g=>`<option value="${g.id}">${g.nombre}</option>`).join('');
+  sel.value=state.gamaId;
+}
+function renderTablaGamas(){
+  const tb=$("#tblGamas"); tb.innerHTML='';
   GAMAS.forEach(g=>{
-    const tr = document.createElement('tr');
-    tr.className='item';
-    tr.innerHTML = \`
-      <td style="width:220px">
-        <label style="display:flex;gap:8px;align-items:center">
-          <input type="radio" name="gama" value="\${g.id}" \${state.selectedGamaId===g.id?'checked':''}>
-          <strong>\${g.nombre}</strong>
+    const tr=document.createElement('tr'); tr.className='item';
+    const checked=(state.gamaId===g.id)?'checked':'';
+    const mini=(state.caracteristicas[g.id]||'').split('\n').filter(Boolean);
+    tr.innerHTML=`
+      <td style="width:250px">
+        <label style="display:flex;gap:8px;align-items:center;cursor:pointer">
+          <input type="radio" name="rg" value="${g.id}" ${checked}/>
+          <strong>${g.nombre}</strong>
         </label>
       </td>
-      <td style="width:120px">\${fmt(g.precio)}</td>
+      <td style="width:130px">${money(g.precio)}</td>
       <td>
-        <div class="note">\${(state.caracteristicas[g.id]||'').split('\\n').slice(0,1)}</div>
-        <button class="btn small out no-print" data-cf="\${g.id}">Ver características</button>
-      </td>\`;
-    tr.querySelector('input').addEventListener('change', ()=>{
-      state.selectedGamaId = g.id;
-      state.upgradeActivo = true;            // recomendado por defecto
-      persist();
-      renderUpgrade();
-      calcular();
-    });
-    tr.querySelector('[data-cf]').addEventListener('click', ()=> verCaracteristicas(g.id));
-    body.appendChild(tr);
+        <span class="badge">Ver características (${mini.length})</span>
+      </td>`;
+    tr.querySelector('input').onchange=()=>{
+      state.gamaId=g.id;
+      // upgrade recomendado = misma gama
+      state.upgradeId=g.id; state.upgradeActivo=true;
+      save(); renderSelectGama(); renderUpgrades(); calc();
+    };
+    tr.querySelector('.badge').onclick=()=>alert(`${g.nombre}\n\n${state.caracteristicas[g.id]||'Sin características'}`);
+    tb.appendChild(tr);
   });
 }
-function verCaracteristicas(gid){
-  const txt = state.caracteristicas[gid] || 'Sin características.';
-  alert(\`\${GAMAS.find(x=>x.id===gid).nombre}\\n\\n\${txt}\`);
-}
-
-function renderUpgrade(){
-  const container = $('#upgrades'); container.innerHTML='';
-  const idx = GAMAS.findIndex(g=>g.id===state.selectedGamaId);
-  const permitidos = GAMAS.slice(idx); // misma o inferior
-  permitidos.forEach((g,i)=>{
-    const active = (state.upgradeActivo && i===0);
-    const opt = document.createElement('div');
-    opt.className = 'opt'+(active?' active':'');
-    opt.innerHTML = \`
-      <div class="nm">\${g.nombre} \${g.upgImporte?`(+\${fmt(g.upgImporte)})`:''}</div>
-      <div class="inf">\${i===0?'Recomendado':''}</div>\`;
-    opt.addEventListener('click', ()=>{
-      if (i===0){
-        state.upgradeActivo = !state.upgradeActivo; // activar/desactivar recomendado
+function renderUpgrades(){
+  const box=$("#upgrades"); box.innerHTML='';
+  const idx=GAMAS.findIndex(g=>g.id===state.gamaId);
+  const permitidos=GAMAS.slice(idx); // misma o inferior
+  GAMAS.forEach((g,i)=>{
+    // si es superior al índice seleccionado => deshabilitado
+    const superior = (GAMAS.indexOf(g)<idx);
+    const div=document.createElement('div');
+    const active = state.upgradeActivo && state.upgradeId===g.id;
+    div.className='pill '+(superior?'dim':(active?'active':'')); 
+    div.textContent=g.upgNombre;
+    div.title= superior ? 'Solo misma gama o inferior' : '';
+    div.onclick=()=>{
+      if(superior) return;
+      if(g.id===state.gamaId){
+        // recomendado: toggle
+        state.upgradeActivo=!state.upgradeActivo;
       }else{
-        // Si pulsa una inferior: cambia la base a esa gama y activa su recomendado
-        state.selectedGamaId = g.id;
-        state.upgradeActivo = true;
+        // inferior: selecciona ese upgrade (siempre activo)
+        state.upgradeId=g.id; state.upgradeActivo=true;
       }
-      persist();
-      renderGamas();
-      renderUpgrade();
-      calcular();
-    });
-    container.appendChild(opt);
+      save(); renderUpgrades(); calc();
+    };
+    box.appendChild(div);
   });
 }
-
-function calcular(){
-  const g = GAMAS.find(x=>x.id===state.selectedGamaId);
-  const importeBase = g.precio;
-  const cuotaBase36 = importeBase/42;
-  const restanteBase = importeBase - cuotaBase36*36;
-  const cuotaBase6 = mensualidad(restanteBase,6,0.0795);
-
-  $('#impBase').textContent = fmt(importeBase);
-  $('#c36Base').textContent = fmt(cuotaBase36);
-  $('#restBase').textContent = fmt(restanteBase);
-  $('#c6Base').textContent = fmt(cuotaBase6);
-
-  const totalUpg = state.upgradeActivo ? (importeBase + (g.upgImporte||0)) : importeBase;
-  const cuotaUpg36 = totalUpg/42;
-  const restanteUpg = totalUpg - cuotaUpg36*36;
-  const cuotaUpg6 = mensualidad(restanteUpg,6,0.0795);
-
-  $('#impUpg').textContent = fmt(totalUpg);
-  $('#c36Upg').textContent = fmt(cuotaUpg36);
-  $('#restUpg').textContent = fmt(restanteUpg);
-  $('#c6Upg').textContent = fmt(cuotaUpg6);
+function toggleEdit(){
+  const on=state.pinOk;
+  $$('.editable').forEach(el=>el.disabled=!on);
+  $('#btnSave').style.display=on?'inline-flex':'none';
 }
+function calc(){
+  const g=gamaById(state.gamaId);
+  const imp=g.precio, c36=imp/42, rest=imp-c36*36, c6=mensualidad(rest,6,0.0795);
+  $('#impBase').textContent=money(imp);
+  $('#c36Base').textContent=money(c36);
+  $('#restBase').textContent=money(rest);
+  $('#c6Base').textContent=money(c6);
 
-/* ========= Edición (PIN) ========= */
-function pedirPin(){
-  const p = prompt('Introduce el PIN:');
-  if (p===PIN){
-    state.pinOk = true;
-    persist();
-    toggleEdicion(true);
-  } else {
-    alert('PIN incorrecto');
+  let upg=0;
+  if(state.upgradeActivo){
+    const ug=gamaById(state.upgradeId);
+    upg = ug ? (ug.upgImporte||0) : 0;
   }
-}
-function toggleEdicion(){
-  const ed = !!state.pinOk;
-  $$('.editable').forEach(el=> el.disabled = !ed);
-  $('#btnGuardar').style.display = ed ? 'inline-flex' : 'none';
-}
-function guardar(){
-  persist();
-  alert('✅ Cambios guardados en este archivo.');
+  const tot=imp+upg, c36u=tot/42, restu=tot-c36u*36, c6u=mensualidad(restu,6,0.0795);
+  $('#impUpg').textContent=money(tot);
+  $('#c36Upg').textContent=money(c36u);
+  $('#restUpg').textContent=money(restu);
+  $('#c6Upg').textContent=money(c6u);
 }
 
-// Editor de características
-function bindCaracteristicas(){
-  const sel = $('#selGama');
-  sel.innerHTML = GAMAS.map(g=>`<option value="${g.id}">${g.nombre}</option>`).join('');
-  sel.value = state.selectedGamaId;
-
-  $('#txtCar').value = state.caracteristicas[state.selectedGamaId] || '';
-  sel.addEventListener('change', ()=>{
-    $('#txtCar').value = state.caracteristicas[sel.value] || '';
-  });
-  $('#txtCar').addEventListener('input', (e)=>{
-    state.caracteristicas[sel.value] = e.target.value;
-  });
+/* ================== EVENTS ================== */
+function bindEdit(){
+  $('#btnEdit').onclick=()=>{
+    const p=prompt('Introduce PIN');
+    if(p===PIN){ state.pinOk=true; save(); toggleEdit(); }
+    else alert('PIN incorrecto');
+  };
+  $('#btnSave').onclick=()=>{
+    save(); alert('Guardado ✅');
+  };
+  $('#selGama').onchange=e=>{
+    state.gamaId=e.target.value; // también mueve el recomendado
+    state.upgradeId=state.gamaId; state.upgradeActivo=true;
+    save(); renderTablaGamas(); renderUpgrades(); calc();
+  };
+  $('#txtCar').oninput=e=>{
+    state.caracteristicas[$('#selGama').value]=e.target.value;
+  };
+  $('#search').oninput=e=>{
+    const v=e.target.value.toLowerCase();
+    const key=$('#selGama').value;
+    const txt=(state.caracteristicas[key]||'').split('\n').filter(Boolean).filter(x=>x.toLowerCase().includes(v)).join('\n');
+    $('#txtCar').value=v?txt:(state.caracteristicas[key]||'');
+  };
 }
 
-/* ========= Init ========= */
+/* ================== UTIL ================== */
+function copyLink(){
+  try{
+    navigator.clipboard.writeText(location.href);
+    alert('Enlace copiado.');
+  }catch{ alert('No se pudo copiar el enlace.'); }
+}
+function exportCSV(){
+  const g=gamaById(state.gamaId);
+  const rows=[
+    ['Gama','Precio','Cuota36','Restante6m','Cuota6m','UpgradeNombre','UpgradeImporte','TotalConUpgrade','Cuota36Upg','Restante6mUpg','Cuota6mUpg']
+  ];
+  const imp=g.precio, c36=imp/42, rest=imp-c36*36, c6=mensualidad(rest,6,0.0795);
+  const ug=gamaById(state.upgradeId);
+  const upgVal=state.upgradeActivo?(ug.upgImporte||0):0, upgNom=state.upgradeActivo?ug.upgNombre:'—';
+  const tot=imp+upgVal, c36u=tot/42, restu=tot-c36u*36, c6u=mensualidad(restu,6,0.0795);
+  rows.push([g.nombre,imp,c36,rest,c6,upgNom,upgVal,tot,c36u,restu,c6u]);
+
+  const csv=rows.map(r=>r.join(';')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='calculadora_infinity.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ================== INIT ================== */
 function init(){
   renderFormatos();
-  renderGamas();
-  renderUpgrade();
-  bindCaracteristicas();
-  toggleEdicion(false);
-  calcular();
-
-  // eventos
-  $('#btnEditar').addEventListener('click', pedirPin);
-  $('#btnGuardar').addEventListener('click', guardar);
-  $('#selGama').addEventListener('change', e=>{
-    state.selectedGamaId = e.target.value;
-    persist();
-    renderGamas();
-    renderUpgrade();
-    calcular();
-  });
+  renderSelectGama();
+  renderTablaGamas();
+  renderUpgrades();
+  toggleEdit();
+  bindEdit();
+  // editor
+  $('#txtCar').value=state.caracteristicas[state.gamaId]||'';
+  calc();
 }
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
 </html>
