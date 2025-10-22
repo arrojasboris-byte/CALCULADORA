@@ -1,319 +1,197 @@
 <script>
-/* ================== Estado y utilidades ================== */
-const LS_KEY = 'calc_infy_state_v1';
-const fmt = n=> (Number(n)||0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
-const tna = 0.0795; // 7,95% TAE
+/* ===== Config ===== */
+const GAMAS=[
+  {id:"diamantePlus", nombre:"Diamante Plus", precio:3995, upg:2004},
+  {id:"diamante",     nombre:"Diamante",      precio:3895, upg:1904},
+  {id:"platinoPlus",  nombre:"Platino Plus",  precio:3395, upg:1404},
+  {id:"platino",      nombre:"Platino",       precio:3295, upg:1304},
+  {id:"oro",          nombre:"Oro",           precio:1991, upg:0}
+];
+// Orden inferior → superior
+const ORDER=["oro","platino","platinoPlus","diamante","diamantePlus"];
+const $=s=>document.querySelector(s);
+const fmt=n=>n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+const mensualidad=(p,m,t)=>{const r=t/12;if(!r)return p/m;const pow=Math.pow(1+r,m);return p*(r*pow)/(pow-1);} ;
 
-const precios = {
-  diamantePlus: 3995,
-  diamante: 3895,
-  platinoPlus: 3395,
-  platino: 3295,
-  oro: 1991
-};
-
-// Importes de “2º pareja recomendada”
-const upgradeImporte = {
-  diamantePlus: 2004,
-  diamante: 1904,
-  platinoPlus: 1404,
-  platino: 1304
-};
-
-// Orden de gamas de inferior -> superior (para comparar)
-const ORDER = ['oro','platino','platinoPlus','diamante','diamantePlus'];
-
-let state = load() || {
-  imagenes: [null,null,null,null],
-  gama: 'diamantePlus',
-  car: {
-    diamantePlus: 'Gran rendimiento\n16 canales\nControl inteligencia ambiental',
-    diamante: 'Gran rendimiento\n14 canales\nControl inteligencia ambiental',
-    platinoPlus: 'Rendimiento alto\n12 canales\nReducción de ruido',
-    platino: 'Buen rendimiento\n10 canales\nBluetooth',
-    oro: 'Funcional para todas las pérdidas auditivas\nConfort en ambiente silencioso\nPilas\nPrograma de Tinnitus'
+/* ===== Estado ===== */
+const DEFAULT={
+  gamaId:"diamantePlus",
+  car:{
+    diamantePlus:'Gran rendimiento\n16 canales\nControl inteligencia ambiental',
+    diamante:'Gran rendimiento\n14 canales\nControl inteligencia ambiental',
+    platinoPlus:'Rendimiento alto\n12 canales\nReducción de ruido',
+    platino:'Buen rendimiento\n10 canales\nBluetooth',
+    oro:'Funcional para todas las pérdidas auditivas\nConfort en ambiente silencioso\nPilas\nPrograma de Tinnitus'
   },
-  compromisos: '• Compromiso 1\n• Compromiso 2',
-  // por defecto, recomendación = misma gama
-  upgradeSel: 'diamantePlus'
+  compromisos:"• Compromiso 1\n• Compromiso 2",
+  imagenes:[null,null,null,null],
+  upgradeSel:"diamantePlus"
 };
-let pinOk = false;
+let state=DEFAULT;
+try{const s=JSON.parse(localStorage.getItem("calc_infy_state")||"{}");state={...DEFAULT,...s};}catch{}
 
-/* ================== Cargar/guardar ================== */
-function load(){
-  try{const raw=localStorage.getItem(LS_KEY); if(raw) return JSON.parse(raw);}catch(e){}
-  return null;
+/* ===== Helpers ===== */
+const gamaById=id=>GAMAS.find(g=>g.id===id);
+
+/* ===== Gamas ===== */
+function renderGamas(){
+  const box=$("#gamas"); box.innerHTML="";
+  GAMAS.forEach(g=>{
+    const pill=document.createElement("div");
+    pill.className="pill "+(state.gamaId===g.id?"sel":"");
+    pill.innerHTML=`<span>${g.nombre}</span><span class="price">${fmt(g.precio)}</span>`;
+    pill.onclick=()=>{ state.gamaId=g.id; ensureUpgradeRange(true); save(); renderAll(); };
+    box.appendChild(pill);
+  });
+  $("#carTitle").textContent=gamaById(state.gamaId).nombre;
 }
-function saveAll(){
-  try{localStorage.setItem(LS_KEY, JSON.stringify(state));}catch(e){}
+
+/* ===== Control de 2º pareja recomendada ===== */
+function ensureUpgradeRange(resetSame=false){
+  const idxSel=ORDER.indexOf(state.gamaId);
+  // si la recomendación actual es superior, se fuerza a la misma
+  if(ORDER.indexOf(state.upgradeSel)>idxSel || resetSame){
+    state.upgradeSel=state.gamaId;
+  }
 }
 
-/* ================== Utiles UI ================== */
-function $(s,ctx=document){return ctx.querySelector(s)}
-function $all(s,ctx=document){return Array.from(ctx.querySelectorAll(s))}
+function renderUpgrades(){
+  const box=$("#upBox"); box.innerHTML="";
+  const idxSel=ORDER.indexOf(state.gamaId);
+  GAMAS.filter(g=>g.id!=="oro").forEach(g=>{
+    const idxG=ORDER.indexOf(g.id);
+    const isSuperior=idxG>idxSel; // superior si índice mayor
+    const btn=document.createElement("button");
+    btn.className="up"+(isSuperior?" disabled":(state.upgradeSel===g.id?" red":""));
+    btn.textContent=`${g.nombre} (+${g.upg.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}€)`;
+    if(!isSuperior){
+      btn.onclick=()=>{ state.upgradeSel=g.id; save(); renderUpgrades(); calc(); };
+    }
+    box.appendChild(btn);
+  });
+  // asegura que la recomendación nunca quede superior
+  if(ORDER.indexOf(state.upgradeSel)>idxSel){ state.upgradeSel=state.gamaId; }
+}
 
-/* ================== Imágenes ================== */
-function pintarImgs(){
+/* ===== Textos ===== */
+function fill(){
+  $("#txtCar").value=(state.car[state.gamaId]||"").replace(/\r?\n/g,"\n");
+  $("#txtComp").value=(state.compromisos||"").replace(/\r?\n/g,"\n");
+}
+
+/* ===== Imágenes ===== */
+function renderImgs(){
   state.imagenes.forEach((u,i)=>{
-    const el = document.getElementById('img'+(i+1));
-    if(!el) return;
-    if(u){ el.src=u; el.style.opacity=1; }
-    else { el.removeAttribute('src'); el.style.opacity=.3; el.alt='Formato '+(i+1); }
+    const im=$("#img"+i);
+    if(im){ im.src=u||""; im.style.opacity=u?1:.35; }
   });
 }
-function bindFormats(){
-  $all('#formatos .imgBox, #formatos .imgbox').forEach((box,idx)=>{
-    const i = Number(box.dataset.i ?? idx);
-    box.addEventListener('click',()=>{
-      if(!pinOk) return;
-      const input = document.createElement('input');
-      input.type='file'; input.accept='image/*';
-      input.onchange=()=>{
-        const f=input.files?.[0]; if(!f) return;
-        const r=new FileReader();
-        r.onload=()=>{ state.imagenes[i]=r.result; saveAll(); pintarImgs(); };
-        r.readAsDataURL(f);
-      };
-      input.click();
-    });
+function bindImgEditors(on){
+  document.querySelectorAll(".img-edit").forEach(x=>x.classList.toggle("hidden",!on));
+  $("#tipImgs").classList.toggle("hidden",!on);
+  document.querySelectorAll(".card img").forEach((img,i)=>{
+    img.style.cursor=on?"pointer":"default";
+    img.onclick=on?()=>chooseImage(i):null;
   });
-}
-
-/* ================== Precios y gama ================== */
-function pintarPrecios(){
-  document.querySelectorAll('[data-precio]').forEach(s=>{
-    const key=s.getAttribute('data-precio');
-    if(precios[key]!=null) s.textContent = fmt(precios[key]);
-  });
-  const selGama = document.getElementById('selGama');
-  if(selGama) selGama.value = state.gama;
-}
-
-/* ================== Características ================== */
-function pintarCar(){
-  const ta = document.getElementById('txtCar') || document.getElementById('taCar');
-  const g = state.gama;
-  if(ta){ ta.value = state.car[g] || ''; ta.readOnly = !pinOk; }
-  const carTit = document.getElementById('carTitle') || document.getElementById('carTit');
-  if(carTit){
-    carTit.innerHTML = (carTit.id==='carTit')
-      ? 'Características – <b>'+nombreGama(g)+'</b>'
-      : nombreGama(g);
-  }
-}
-function nombreGama(id){
-  return ({
-    diamantePlus:'Diamante Plus',
-    diamante:'Diamante',
-    platinoPlus:'Platino Plus',
-    platino:'Platino',
-    oro:'Oro'
-  })[id] || id;
-}
-
-/* ================== Cálculos ================== */
-function mensualidad(p,m,t){ const r=t/12; if(!r) return p/m; const pow=Math.pow(1+r,m); return p*(r*pow)/(pow-1); }
-
-function calcular(){
-  const g = state.gama;
-  const base = precios[g];
-
-  // base 42m => cuota 36m (0%) = base/42; restante= base - 36*cuota; 6m al 7,95%
-  const cuota36 = base/42;
-  const restante = base - (36*cuota36);
-  const cuota6 = mensualidad(restante,6,tna);
-
-  const impBase = $('#importeBase') || $('#impBase');
-  const q36 = $('#cuota36') || $('#q36');
-  const n36 = $('#mini36') || $('#n36');
-  const rest6 = $('#restante') || $('#rest6');
-  const q6 = $('#cuota6') || $('#q6');
-
-  if(impBase) impBase.textContent = fmt(base)+' €';
-  if(q36) q36.textContent = fmt(cuenta(cuota36))+' €';
-  if(n36) n36.textContent = fmt(base)+' € / 42';
-  if(rest6) rest6.textContent = fmt(restante)+' €';
-  if(q6) q6.textContent = fmt(cuota6)+' €';
-
-  // 2º pareja recomendada: **misma o inferior**, NUNCA superior
-  ensureUpgradeWithinRange();
-
-  const upId = state.upgradeSel;            // elegida (válida)
-  const upImp = upgradeImporte[upId] || 0;  // importe adicional por la segunda pareja
-  const total = base + upImp;
-
-  const cuota36u = total/42;
-  const restanteU = total - (36*cuota36u);
-  const cuota6u = mensualidad(restanteU,6,tna);
-
-  const impUp = $('#importeUpgrade') || $('#impUp');
-  const q36u = $('#cuota36Up') || $('#q36u');
-  const n36u = $('#mini36Up') || $('#n36u');
-  const rest6u = $('#restanteUp') || $('#rest6u');
-  const q6u = $('#cuota6Up') || $('#q6u');
-
-  if(impUp) impUp.textContent = fmt(total)+' €';
-  if(q36u) q36u.textContent = fmt(cuenta(cuota36u))+' €';
-  if(n36u) n36u.textContent = fmt(total)+' € / 42';
-  if(rest6u) rest6u.textContent = fmt(restanteU)+' €';
-  if(q6u) q6u.textContent = fmt(cuota6u)+' €';
-}
-
-// redondeo visual consistente (opcional)
-function cuenta(x){ return Number(x); }
-
-/* ================== Botones de upgrade ================== */
-function pintarUpgradeButtons(){
-  const g = state.gama;
-  const idxSel = ORDER.indexOf(g);
-
-  // si la recomendación actual es superior, la corrigimos a la misma gama
-  if(ORDER.indexOf(state.upgradeSel) > idxSel){
-    state.upgradeSel = g;
-  }
-
-  // pinta botones y bloquea los superiores
-  const mapId = {
-    'Diamante Plus':'diamantePlus',
-    'Diamante':'diamante',
-    'Platino Plus':'platinoPlus',
-    'Platino':'platino'
-  };
-
-  document.querySelectorAll('[data-up]').forEach(btn=>{
-    const label = btn.getAttribute('data-up');         // ej. "Diamante Plus"
-    const k = mapId[label];                            // ej. "diamantePlus"
-    const isSuperior = ORDER.indexOf(k) > idxSel;      // superior si su índice es MAYOR (orden: oro -> ... -> diamantePlus)
-    btn.disabled = isSuperior;                         // <- bloquea superiores
-    btn.className = 'btn w-full ' + (state.upgradeSel===k ? 'btn-red' : 'btn-line');
-    btn.onclick = ()=>{
-      if(isSuperior) return;                           // no permite superiores
-      state.upgradeSel = k;                            // permite misma o inferior
-      saveAll();
-      pintarUpgradeButtons();
-      calcular();
-    };
-  });
-}
-
-/* ================== Eventos ================== */
-const selGama = document.getElementById('selGama');
-if(selGama){
-  selGama.addEventListener('change', e=>{
-    state.gama = e.target.value;
-    // Si la recomendación queda superior, la forzamos a la misma gama
-    ensureUpgradeWithinRange(true);
-    saveAll();
-    pintarCar(); pintarUpgradeButtons(); calcular();
-  });
-}
-
-// Alternativa cuando las gamas son filas clicables
-document.querySelectorAll('#tblGamas .rowd').forEach(row=>{
-  row.addEventListener('click', ()=>{
-    const name = row.getAttribute('data-g'); // ej. "Diamante Plus"
-    const id = ({
-      'Diamante Plus':'diamantePlus',
-      'Diamante':'diamante',
-      'Platino Plus':'platinoPlus',
-      'Platino':'platino',
-      'Oro':'oro'
-    })[name];
-    if(!id) return;
-    state.gama = id;
-    ensureUpgradeWithinRange(true);
-    saveAll();
-    // resaltar fila
-    document.querySelectorAll('#tblGamas .rowd').forEach(r=>r.style.background='#fff');
-    row.style.background = 'rgba(216,42,42,.08)';
-    pintarCar(); pintarUpgradeButtons(); calcular();
-  });
-});
-
-/* ================== Lógica de rango (misma o inferior) ================== */
-function ensureUpgradeWithinRange(resetToSame=false){
-  const idxSel = ORDER.indexOf(state.gama);
-  const isSuperior = ORDER.indexOf(state.upgradeSel) > idxSel;
-  if(isSuperior || resetToSame){
-    state.upgradeSel = state.gama; // misma gama por defecto
-  }
-}
-
-/* ================== Editar / PIN ================== */
-function toggleEditUI(){
-  const car = document.getElementById('txtCar') || document.getElementById('taCar');
-  const comp = document.getElementById('txtComp') || document.getElementById('taComp');
-  if(car) car.readOnly = !pinOk;
-  if(comp) comp.readOnly = !pinOk;
-
-  const btnEdit = document.getElementById('btnEdit');
-  const btnSave = document.getElementById('btnSave');
-  if(btnEdit) btnEdit.style.display = pinOk ? 'none':'inline-block';
-  if(btnSave) btnSave.style.display = pinOk ? 'inline-block':'none';
-}
-
-// Botón Editar
-const btnEdit = document.getElementById('btnEdit');
-if(btnEdit){
-  btnEdit.addEventListener('click', ()=>{
-    const p = prompt('Introduce PIN');
-    if(p==='4321'){
-      pinOk = true; toggleEditUI();
-      // activar subida de imágenes en modo edición
-      bindFormats();
-      alert('Edición activada');
-    }else if(p!==null){
-      alert('PIN incorrecto');
+  document.querySelectorAll(".img-edit button").forEach(btn=>{
+    const idx=+btn.getAttribute("data-idx");
+    if(btn.textContent==="Borrar"){
+      btn.onclick=on?()=>{state.imagenes[idx]=null;save();renderImgs();}:null;
+    }else{
+      btn.onclick=on?()=>chooseImage(idx):null;
     }
   });
 }
+function chooseImage(i){
+  const picker=$("#filePicker");
+  picker.onchange=()=>{
+    const f=picker.files&&picker.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=()=>{state.imagenes[i]=r.result;save();renderImgs();picker.value="";};
+    r.readAsDataURL(f);
+  };
+  picker.click();
+}
 
-// Botón Guardar
-const btnSave = document.getElementById('btnSave');
-if(btnSave){
-  btnSave.addEventListener('click', ()=>{
-    const car = document.getElementById('txtCar') || document.getElementById('taCar');
-    const comp = document.getElementById('txtComp') || document.getElementById('taComp');
-    if(car){ state.car[state.gama] = car.value; }
-    if(comp){ state.compromisos = comp.value; }
-    saveAll();
-    pinOk=false; toggleEditUI();
-    alert('Guardado ✓');
+/* ===== Cálculos ===== */
+function calc(){
+  const g=gamaById(state.gamaId);
+  const base=g.precio;
+  const c36=base/42;
+  const rest=base-36*c36;
+  const c6=mensualidad(rest,6,0.0795);
+  $("#impBase").textContent=fmt(base);
+  $("#c36").textContent=fmt(c36);
+  $("#c36det").textContent=`${fmt(base)} / 42`;
+  $("#res6").textContent=fmt(rest);
+  $("#c6").textContent=fmt(c6);
+
+  ensureUpgradeRange();
+  const ug=gamaById(state.upgradeSel);
+  const tot=base+(ug?.upg||0);
+  const c36u=tot/42;
+  const restu=tot-36*c36u;
+  const c6u=mensualidad(restu,6,0.0795);
+  $("#impUp").textContent=fmt(tot);
+  $("#c36u").textContent=fmt(c36u);
+  $("#c36udet").textContent=`${fmt(tot)} / 42`;
+  $("#res6u").textContent=fmt(restu);
+  $("#c6u").textContent=fmt(c6u);
+}
+
+/* ===== PIN / edición ===== */
+let pinOk=false;
+function toggleEditUI(){
+  const on=pinOk;
+  $("#btnEdit").classList.toggle("hidden",on);
+  $("#btnSave").classList.toggle("hidden",!on);
+  $("#txtCar").readOnly=!on;
+  $("#txtComp").readOnly=!on;
+  bindImgEditors(on);
+}
+function askPin(){
+  const dlg=$("#dlg");
+  return new Promise((res)=>{
+    if(dlg&&dlg.showModal){
+      const pin=$("#pin"),ok=$("#okPin"),msg=$("#pinMsg");msg.textContent="";pin.value="";
+      dlg.showModal();
+      ok.onclick=(ev)=>{ev.preventDefault();
+        const v=(pin&&pin.value||"").trim();
+        if(v==="4321"){dlg.close();res(true);}else{msg.textContent="PIN incorrecto";}
+      };
+      dlg.addEventListener("close",()=>res(false),{once:true});
+    }else{
+      const v=(prompt("Introduce PIN")||"").trim();res(v==="4321");
+    }
   });
 }
+$("#btnEdit").onclick=async()=>{const ok=await askPin();if(ok){pinOk=true;toggleEditUI();}};
+$("#btnSave").onclick=()=>{
+  const g=state.gamaId;
+  state.car[g]=$("#txtCar").value;
+  state.compromisos=$("#txtComp").value;
+  save();pinOk=false;toggleEditUI();alert("Guardado ✓");
+};
 
-/* ================== Export HTML y PDF ================== */
-const btnPdf = document.getElementById('btnPDF');
-if(btnPdf){ btnPdf.onclick = ()=>window.print(); }
+/* ===== Guardado ===== */
+function save(){localStorage.setItem("calc_infy_state",JSON.stringify(state));}
 
-const btnHtml = document.getElementById('btnGuardar') || document.getElementById('btnExportHtml');
-if(btnHtml){
-  btnHtml.onclick = ()=>{
-    // Empaqueta el DOM actual tal cual
-    const html = document.documentElement.outerHTML;
-    const blob = new Blob([html],{type:'text/html'});
-    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-    a.download='calculadora_infinity_audio.html'; a.click(); URL.revokeObjectURL(a.href);
-  };
-}
+/* ===== Export / PDF ===== */
+$("#btnHtml").onclick=()=>{
+  const html=document.documentElement.outerHTML
+  .replace("</head>","<script>window.__EMBEDDED_STATE="+JSON.stringify(state)+"</script></head>");
+  const blob=new Blob([html],{type:"text/html"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="calculadora_infinity_audio.html";
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+$("#btnPDF").onclick=()=>window.print();
 
-/* ================== COMPROMISOS glue ================== */
+/* ===== Boot ===== */
 (function(){
-  const comp = document.getElementById('txtComp') || document.getElementById('taComp');
-  if(!comp) return;
-  comp.value = (typeof state.compromisos==='string') ? state.compromisos : '• Compromiso 1\n• Compromiso 2';
-  comp.addEventListener('change', ()=>{ if(pinOk){ state.compromisos=comp.value; saveAll(); }});
-})();
-
-/* ================== Init ================== */
-(function init(){
-  // si la recomendación por defecto es superior, corrígela a la misma
-  ensureUpgradeWithinRange(true);
-  pintarPrecios();
-  pintarImgs();
-  pintarCar();
-  pintarUpgradeButtons();
-  calcular();
-  toggleEditUI();
+  if(window.__EMBEDDED_STATE){state={...DEFAULT,...window.__EMBEDDED_STATE};}
+  renderGamas();renderUpgrades();fill();renderImgs();calc();toggleEditUI();
 })();
 </script>
