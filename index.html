@@ -14,6 +14,7 @@ h1{margin:16px 0 0;font-size:44px;line-height:1.05;font-weight:900;letter-spacin
 h1 small{display:block;color:var(--muted);font-weight:700;font-size:13px;margin-top:2px}
 .wrapper{max-width:1100px;margin:0 auto;padding:16px 16px 40px}
 
+/* tarjetas */
 .paper{background:var(--card);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08);margin:12px 0;overflow:hidden}
 .hd{padding:10px 14px;font-weight:900;color:#fff;background:var(--brand);display:flex;align-items:center;justify-content:space-between}
 .bd{padding:14px}
@@ -23,18 +24,22 @@ h1 small{display:block;color:var(--muted);font-weight:700;font-size:13px;margin-
 .g2{grid-template-columns:330px 1fr}
 
 .card{border:1px solid var(--line);border-radius:12px;min-height:116px;display:flex;align-items:center;justify-content:center;padding:8px;background:#fff}
+.card img{max-width:100%;max-height:92px;object-fit:contain;opacity:.95}
+.card small{display:block;margin-top:6px;color:var(--muted);font-weight:700}
 
+/* gamas */
 .tab{display:flex;flex-direction:column;gap:8px}
-.tab .row{display:flex;gap:8px;align-items:center}
-.tab .btn{flex:1;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;cursor:pointer}
+.tab .btn{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;cursor:pointer}
 .tab .btn.sel{outline:2px solid var(--brand)}
 .tab .btn small{color:var(--muted)}
 .price{font-weight:900}
 
+/* textarea */
 .area{width:100%;min-height:160px;border:1px solid var(--line);border-radius:12px;padding:10px;resize:vertical}
 .area[readonly]{background:#FAFAFA}
 .note{color:var(--muted);font-size:12px;margin-top:6px}
 
+/* kpis */
 .kpis{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:10px}
 .box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
 .big{font-size:32px;font-weight:900;color:var(--brand)}   /* Cuota 36m en rojo */
@@ -71,10 +76,10 @@ details summary{cursor:pointer;font-weight:800;color:#374151;margin-bottom:8px}
     </div>
     <div class="bd">
       <div class="grid g4">
-        <div class="card">RIC / RIC Premium</div>
-        <div class="card">BTE</div>
-        <div class="card">Intracanal estándar</div>
-        <div class="card">Intracanal a medida</div>
+        <div class="card"><div><img src="" alt=""><small>RIC / RIC Premium</small></div></div>
+        <div class="card"><div><img src="" alt=""><small>BTE</small></div></div>
+        <div class="card"><div><img src="" alt=""><small>Intracanal estándar</small></div></div>
+        <div class="card"><div><img src="" alt=""><small>Intracanal a medida</small></div></div>
       </div>
     </div>
   </section>
@@ -168,13 +173,13 @@ details summary{cursor:pointer;font-weight:800;color:#374151;margin-bottom:8px}
 </dialog>
 
 <script>
-/* ===== Datos de gamas ===== */
+/* ===== Datos base ===== */
 const GAMAS=[
-  {id:"diamantePlus",nombre:"Diamante Plus",precio:3995, upgNombre:"Diamante Plus (+2004€)", upgImporte:2004},
-  {id:"diamante",    nombre:"Diamante",     precio:3895, upgNombre:"Diamante (+1904€)",     upgImporte:1904},
-  {id:"platinoPlus", nombre:"Platino Plus", precio:3395, upgNombre:"Platino Plus (+1404€)", upgImporte:1404},
-  {id:"platino",     nombre:"Platino",      precio:3295, upgNombre:"Platino (+1304€)",      upgImporte:1304},
-  {id:"oro",         nombre:"Oro",          precio:1991, upgNombre:"",                      upgImporte:0}
+  {id:"diamantePlus", nombre:"Diamante Plus", precio:3995, upgNombre:"Diamante Plus (+2004€)", upgImporte:2004},
+  {id:"diamante",     nombre:"Diamante",      precio:3895, upgNombre:"Diamante (+1904€)",     upgImporte:1904},
+  {id:"platinoPlus",  nombre:"Platino Plus",  precio:3395, upgNombre:"Platino Plus (+1404€)", upgImporte:1404},
+  {id:"platino",      nombre:"Platino",       precio:3295, upgNombre:"Platino (+1304€)",      upgImporte:1304},
+  {id:"oro",          nombre:"Oro",           precio:1991, upgNombre:"",                      upgImporte:0}
 ];
 
 const $=s=>document.querySelector(s);
@@ -184,20 +189,31 @@ const mensualidad=(p,m,t)=>{const r=t/12;if(!r)return p/m;const pow=Math.pow(1+r
 /* ===== Estado ===== */
 const DEFAULT={
   gamaId:"diamantePlus",
-  caracteristicas:"• Gran rendimiento\n• 14 canales\n• Control inteligencia ambiental",
+  caracteristicas:
+`• Amplio ancho de bandas-canales de programación.
+• Bluetooth universal
+• Streaming de audio directo
+• Recargable
+• Multifoco, detecta hasta 4 hablantes para mayor entendimiento en ruido.
+• Autonomía de la batería hasta 5h (ejemplo)
+• Ajuste en remoto
+• Programa Tinnitus`,
   compromisos:"• Revisiones trimestrales\n• Mantenimiento preventivo\n• Sustitución de filtros incluida",
   compromisosAAA:"• Compromiso AAA 1\n• Compromiso AAA 2",
   upgradeFixedId:"diamantePlus",
-  upgradeChosenId:null
+  upgradeChosenId:null         // si es null, calcula con la recomendada (Diamante Plus)
 };
+
 let state=DEFAULT;
 try{
   const s=JSON.parse(localStorage.getItem("calc_infy_state")||"{}");
   state={...DEFAULT,...s};
 }catch{}
 
-/* ===== Render ===== */
+/* ===== Util ===== */
 function gamaById(id){return GAMAS.find(g=>g.id===id);}
+
+/* ===== Render gamas ===== */
 function renderGamas(){
   const box=$("#gamas"); box.innerHTML="";
   GAMAS.forEach(g=>{
@@ -208,10 +224,10 @@ function renderGamas(){
     btn.innerHTML=`<span>${g.nombre}</span><span class="price">${fmt(g.precio)}</span>`;
     btn.onclick=()=>{
       state.gamaId=g.id;
-      // Si hay elegida una superior, se deselecciona
+      // Si había seleccionada una superior, se deselecciona
       if(state.upgradeChosenId){
         const idxSel=GAMAS.findIndex(x=>x.id===state.gamaId);
-        const idxCh=GAMAS.findIndex(x=>x.id===state.upgradeChosenId);
+        const idxCh =GAMAS.findIndex(x=>x.id===state.upgradeChosenId);
         if(idxCh<idxSel) state.upgradeChosenId=null;
       }
       save(); renderGamas(); renderUpgrades(); fill(); calc();
@@ -220,6 +236,8 @@ function renderGamas(){
   });
   $("#carTitle").textContent=gamaById(state.gamaId).nombre;
 }
+
+/* ===== Render upgrades ===== */
 function renderUpgrades(){
   const box=$("#upBox"); box.innerHTML="";
   const idxSel=GAMAS.findIndex(g=>g.id===state.gamaId);
@@ -232,20 +250,25 @@ function renderUpgrades(){
     pill.className="pill "+(isFixed?"red":(isSuperior?"dim":(isChosen?"sel":"")));
     pill.textContent=g.upgNombre||g.nombre;
     pill.onclick=()=>{
-      if(isFixed){ state.upgradeChosenId=null; }   // recomendado no “se quita”; si lo pulsas, deselecciona otros
-      else{ if(isSuperior) return; state.upgradeChosenId=(isChosen?null:g.id); }
+      if(isFixed){ state.upgradeChosenId=null; } // recomendado “ancla”; si lo pulsas quita otros
+      else{
+        if(isSuperior) return;
+        state.upgradeChosenId = isChosen ? null : g.id;
+      }
       save(); renderUpgrades(); calc();
     };
     box.appendChild(pill);
   });
 }
+
+/* ===== Pinta textos ===== */
 function fill(){
   $("#txtCar").value=state.caracteristicas||"";
   $("#txtComp").value=state.compromisos||"";
   $("#txtComp2").value=state.compromisosAAA||"";
 }
 
-/* ===== Cálculo ===== */
+/* ===== Cálculos ===== */
 function calc(){
   const g=gamaById(state.gamaId);
   const base=g.precio;
@@ -260,10 +283,11 @@ function calc(){
   $("#res6").textContent=fmt(rest);
   $("#c6").textContent=fmt(c6);
 
-  const upId= state.upgradeChosenId || "diamantePlus"; // por defecto, la recomendada
-  const ug=gamaById(upId);
-  const up= ug ? ug.upgImporte||0 : 0;
-  const tot= base + up;
+  // 2ª pareja: por defecto Diamante Plus siempre
+  const upId= state.upgradeChosenId || "diamantePlus";
+  const ug  = gamaById(upId);
+  const up  = ug ? ug.upgImporte||0 : 0;
+  const tot = base + up;
 
   const c36u = tot/42;
   const restu= tot - 36*c36u;
@@ -276,7 +300,7 @@ function calc(){
   $("#c6u").textContent=fmt(c6u);
 }
 
-/* ===== Edición / PIN ===== */
+/* ===== PIN / edición ===== */
 let pinOk=false;
 function toggleEditUI(){
   const on=pinOk;
@@ -306,6 +330,7 @@ function save(fromEditor=false){
   }
   localStorage.setItem("calc_infy_state",JSON.stringify(state));
 }
+
 /* ===== Exportar HTML con datos embebidos ===== */
 $("#btnHtml").onclick=()=>{
   const html=document.documentElement.outerHTML
@@ -314,15 +339,13 @@ $("#btnHtml").onclick=()=>{
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
   a.download="calculadora_infinity_audio.html"; a.click(); URL.revokeObjectURL(a.href);
 };
+
 /* ===== PDF ===== */
 $("#btnPDF").onclick=()=>window.print();
 
 /* ===== Boot ===== */
 (function(){
-  // Si viene desde un HTML exportado con datos embebidos:
-  if(window.__EMBEDDED_STATE){
-    state={...DEFAULT,...window.__EMBEDDED_STATE};
-  }
+  if(window.__EMBEDDED_STATE){ state={...DEFAULT,...window.__EMBEDDED_STATE}; }
   renderGamas(); renderUpgrades(); fill(); calc(); toggleEditUI();
 })();
 </script>
