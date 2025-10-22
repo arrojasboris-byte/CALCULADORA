@@ -1,109 +1,455 @@
-<!-- ===================== COMPROMISOS (DESPUÉS DE 2º PAREJA) ===================== -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>CALCULADORA INFINITY AUDIO</title>
+<meta name="color-scheme" content="light"/>
+<link rel="preconnect" href="https://cdn.tailwindcss.com">
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-  /* Forzamos faldón rojo y mismo “skin” del resto de secciones */
-  #compromisos-block .hd{
-    background:#dc2626 !important;
-    color:#fff !important;
-    padding:10px 14px !important;
-    font-weight:700 !important;
-    border-top-left-radius:12px !important;
-    border-top-right-radius:12px !important;
+  html,body{background:#f6f7f9}
+  .paper{background:#fff; box-shadow:0 8px 26px rgba(0,0,0,.08); border-radius:16px}
+  .hd{background:#efefef; border-top-left-radius:16px; border-top-right-radius:16px; padding:10px 14px; font-weight:700}
+  .bd{padding:14px}
+  .imgBox{aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; border:1px dashed #e5e7eb; border-radius:12px}
+  .imgBox img{max-width:100%; max-height:100%; object-fit:cover; border-radius:10px}
+  .pill{border-radius:9999px}
+  .btn{border-radius:10px; padding:.5rem .75rem; font-weight:600}
+  .btn-red{background:#dc2626; color:#fff}
+  .btn-red:hover{background:#b91c1c}
+  .btn-line{border:1px solid #e5e7eb; background:#fff}
+  .title{font-weight:900; letter-spacing:.2px}
+  .mini{font-size:12px; color:#6b7280}
+  .grid-cards{display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:.75rem}
+  @media (max-width:1024px){ .grid-cards{grid-template-columns: repeat(2,minmax(0,1fr))} }
+  @media print{
+    .no-print{display:none !important}
+    html,body{background:#fff}
+    .paper{box-shadow:none}
   }
-  #compromisos-block .bd{
-    background:#fff !important;
-    padding:12px 14px !important;
-    border-bottom-left-radius:12px !important;
-    border-bottom-right-radius:12px !important;
-  }
-  #compromisos-block details>summary{
-    cursor:pointer; list-style:none;
-    margin-bottom:8px; font-weight:600;
-  }
-  #compromisos-block details>summary::-webkit-details-marker{ display:none; }
-  #compromisos-block .area{
-    width:100%; min-height:220px; resize:vertical;
-    border:1px solid #e5e7eb; border-radius:10px; padding:10px;
-    font-family:inherit; font-size:14px;
-    background:#fff;
-  }
-  #compromisos-block .note{ font-size:12px; color:#6b7280; margin-top:6px; }
 </style>
+</head>
+<body class="min-h-screen text-gray-900">
+<main class="max-w-6xl mx-auto p-4 md:p-8 space-y-5">
 
-<section class="paper" id="compromisos-block">
-  <div class="hd">COMPROMISOS</div>
-  <div class="bd">
-    <details id="compWrap" open>
-      <summary>Mostrar / ocultar</summary>
-      <textarea id="txtComp_calc_infy" class="area" readonly
-        placeholder="Escribe aquí los compromisos…"></textarea>
-      <div class="note">Editable con PIN (usa el botón “Editar”).</div>
-    </details>
-  </div>
-</section>
+  <!-- CABECERA -->
+  <header class="space-y-1">
+    <h1 class="title text-4xl md:text-5xl text-red-700 leading-tight">
+      CALCULADORA INFINITY<br/>AUDIO
+    </h1>
+    <p class="text-sm text-gray-600">36 MESES 0% TAE + 6 MESES 7,95% TAE</p>
+  </header>
+
+  <!-- FORMATOS -->
+  <section class="paper">
+    <div class="hd flex items-center justify-between">
+      <span>Formatos de audífonos</span>
+      <button id="btnEdit" class="btn btn-red no-print">Editar</button>
+    </div>
+    <div class="bd">
+      <div class="grid-cards">
+        <div class="imgBox"><img id="img1" alt="RIC/RIC Premium"></div>
+        <div class="imgBox"><img id="img2" alt="BTE"></div>
+        <div class="imgBox"><img id="img3" alt="Intracanal estándar"></div>
+        <div class="imgBox"><img id="img4" alt="Intracanal a medida"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARACTERÍSTICAS Y GAMAS -->
+  <section class="paper">
+    <div class="hd">Características y gamas</div>
+    <div class="bd grid md:grid-cols-2 gap-3">
+      <div class="space-y-2">
+        <div class="paper p-0">
+          <div class="bd space-y-2">
+            <div class="flex items-center justify-between border rounded-lg px-3 py-2">
+              <span>Diamante Plus</span>
+              <span class="font-bold"><span data-precio="diamantePlus"></span> €</span>
+            </div>
+            <div class="flex items-center justify-between border rounded-lg px-3 py-2">
+              <span>Diamante</span>
+              <span class="font-bold"><span data-precio="diamante"></span> €</span>
+            </div>
+            <div class="flex items-center justify-between border rounded-lg px-3 py-2">
+              <span>Platino Plus</span>
+              <span class="font-bold"><span data-precio="platinoPlus"></span> €</span>
+            </div>
+            <div class="flex items-center justify-between border rounded-lg px-3 py-2">
+              <span>Platino</span>
+              <span class="font-bold"><span data-precio="platino"></span> €</span>
+            </div>
+            <div class="flex items-center justify-between border rounded-lg px-3 py-2">
+              <span>Oro</span>
+              <span class="font-bold"><span data-precio="oro"></span> €</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selector de gama -->
+        <div class="flex gap-2">
+          <label class="text-sm mt-2">Gama:&nbsp;</label>
+          <select id="selGama" class="border rounded-lg px-3 py-2 w-full">
+            <option value="diamantePlus">Diamante Plus</option>
+            <option value="diamante">Diamante</option>
+            <option value="platinoPlus">Platino Plus</option>
+            <option value="platino">Platino</option>
+            <option value="oro">Oro</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label class="text-sm text-gray-600">Características</label>
+        <textarea id="txtCar" class="w-full h-48 border rounded-lg px-3 py-2" placeholder="Escribe aquí las características (una por línea)..." readonly></textarea>
+        <p class="mini">Para editar las características introduce el PIN en “Editar”.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINANCIACIÓN -->
+  <section class="paper">
+    <div class="hd">Financiación Infinity + tchin tchin</div>
+    <div class="bd grid md:grid-cols-4 gap-3">
+      <div class="border rounded-xl p-4 bg-gray-50">
+        <div class="mini mb-1">Importe total</div>
+        <div id="importeBase" class="text-2xl font-extrabold">—</div>
+      </div>
+      <div class="border rounded-xl p-4 bg-white">
+        <div class="mini mb-1">Cuota 36m (0%)</div>
+        <div id="cuota36" class="text-3xl font-extrabold text-red-600">—</div>
+        <div class="mini" id="mini36">—</div>
+      </div>
+      <div class="border rounded-xl p-4 bg-white">
+        <div class="mini mb-1">RESTANTE 6M–AHORRO SI RENUEVAS</div>
+        <div id="restante" class="text-2xl font-extrabold">—</div>
+      </div>
+      <div class="border rounded-xl p-4 bg-white">
+        <div class="mini mb-1">Cuota 6m (7,95% TAE)</div>
+        <div id="cuota6" class="text-2xl font-extrabold">—</div>
+      </div>
+
+      <div class="border rounded-xl p-4 bg-gray-50">
+        <div class="mini mb-1">Importe con 2ª pareja</div>
+        <div id="importeUpgrade" class="text-2xl font-extrabold">—</div>
+      </div>
+      <div class="border rounded-xl p-4 bg-white">
+        <div class="mini mb-1">Cuota 36m (0%)</div>
+        <div id="cuota36Up" class="text-3xl font-extrabold text-red-600">—</div>
+        <div class="mini" id="mini36Up">—</div>
+      </div>
+      <div class="border rounded-xl p-4 bg-white">
+        <div class="mini mb-1">RESTANTE 6M–AHORRO SI RENUEVAS</div>
+        <div id="restanteUp" class="text-2xl font-extrabold">—</div>
+      </div>
+      <div class="border rounded-xl p-4 bg-white">
+        <div class="mini mb-1">Cuota 6m (7,95% TAE)</div>
+        <div id="cuota6Up" class="text-2xl font-extrabold">—</div>
+      </div>
+
+      <div class="col-span-4 flex gap-2 mt-2">
+        <button id="btnPDF" class="btn btn-line no-print">Guardar PDF</button>
+        <button id="btnGuardar" class="btn btn-line no-print">Descargar HTML con datos (solo lectura)</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2ª PAREJA RECOMENDADA -->
+  <section class="paper">
+    <div class="hd">2º PAREJA RECOMENDADA</div>
+    <div class="bd space-y-3">
+      <div class="grid md:grid-cols-4 gap-2">
+        <button class="btn btn-red w-full" data-up="diamantePlus">Diamante Plus (+2004€)</button>
+        <button class="btn btn-line w-full" data-up="diamante">Diamante (+1904€)</button>
+        <button class="btn btn-line w-full" data-up="platinoPlus">Platino Plus (+1404€)</button>
+        <button class="btn btn-line w-full" data-up="platino">Platino (+1304€)</button>
+      </div>
+      <p class="mini">Se muestra en rojo la de la misma gama; las superiores se deshabilitan.</p>
+    </div>
+  </section>
+
+  <!-- ===================== COMPROMISOS (faldón rojo) ===================== -->
+  <style>
+    #compromisos-block .hd{
+      background:#dc2626!important; color:#fff!important;
+      padding:10px 14px!important; font-weight:700!important;
+      border-top-left-radius:16px!important; border-top-right-radius:16px!important;
+    }
+    #compromisos-block .bd{
+      background:#fff!important; padding:12px 14px!important;
+      border-bottom-left-radius:16px!important; border-bottom-right-radius:16px!important;
+    }
+    #compromisos-block details>summary{ cursor:pointer; list-style:none; margin-bottom:8px; font-weight:600 }
+    #compromisos-block details>summary::-webkit-details-marker{ display:none }
+    #compromisos-block .area{
+      width:100%; min-height:220px; resize:vertical;
+      border:1px solid #e5e7eb; border-radius:10px; padding:10px;
+      font-family:inherit; font-size:14px; background:#fff;
+    }
+    #compromisos-block .note{ font-size:12px; color:#6b7280; margin-top:6px }
+  </style>
+  <section class="paper" id="compromisos-block">
+    <div class="hd">COMPROMISOS</div>
+    <div class="bd">
+      <details id="compWrap" open>
+        <summary>Mostrar / ocultar</summary>
+        <textarea id="txtComp" class="area" readonly placeholder="Escribe aquí los compromisos…"></textarea>
+        <div class="note">Editable con PIN (usa el botón “Editar”).</div>
+      </details>
+    </div>
+  </section>
+  <!-- =================== /COMPROMISOS =================== -->
+
+  <!-- MODAL PIN -->
+  <dialog id="dlgPin" class="rounded-2xl p-0 w-full max-w-xs">
+    <form method="dialog" class="p-0 m-0">
+      <div class="p-4 space-y-3">
+        <h3 class="text-base font-semibold">Introduce PIN</h3>
+        <input id="pin" type="password" inputmode="numeric" maxlength="8"
+               class="w-full rounded-lg border px-3 py-2 text-center tracking-widest"
+               placeholder="••••"/>
+        <div class="flex justify-end gap-2">
+          <button class="btn btn-line">Cancelar</button>
+          <button id="btnPinOk" class="btn btn-red">Aceptar</button>
+        </div>
+        <div id="pinMsg" class="text-sm text-red-600"></div>
+      </div>
+    </form>
+  </dialog>
+
+</main>
 
 <script>
-/* Glue: integra COMPROMISOS con tu flujo de PIN/Guardar sin tocar el resto */
+/* ================== Estado y utilidades ================== */
+const LS_KEY = 'calc_infy_state_v1';
+const fmt = n=> (Number(n)||0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+const tna = 0.0795; // 7,95% TAE
+
+const precios = {
+  diamantePlus: 3995,
+  diamante: 3895,
+  platinoPlus: 3395,
+  platino: 3295,
+  oro: 1991
+};
+const upgradeImporte = {
+  diamantePlus: 2004,
+  diamante: 1904,
+  platinoPlus: 1404,
+  platino: 1304
+};
+
+let state = load() || {
+  imagenes: [null,null,null,null],
+  gama: 'diamantePlus',
+  car: {
+    diamantePlus: '• Gran rendimiento\n• 16 canales\n• Control inteligencia ambiental',
+    diamante: '• Gran rendimiento\n• 14 canales\n• Control inteligencia ambiental',
+    platinoPlus: '• Rendimiento sólido\n• 12 canales',
+    platino: '• Rendimiento básico\n• 10 canales',
+    oro: '• Funcional para pérdidas auditivas\n• Confort en ambientes silenciosos\n• Pilas'
+  },
+  compromisos: '• Compromiso 1\n• Compromiso 2'
+};
+let pinOk = false;
+
+/* ================== Cargar/guardar ================== */
+function load(){
+  try{const raw=localStorage.getItem(LS_KEY); if(raw) return JSON.parse(raw);}catch(e){}
+  return null;
+}
+function saveAll(){
+  try{localStorage.setItem(LS_KEY, JSON.stringify(state));}catch(e){}
+}
+
+/* ================== Pintar imágenes ================== */
+function pintarImgs(){
+  state.imagenes.forEach((u,i)=>{
+    const el = document.getElementById('img'+(i+1));
+    if(u){ el.src=u; el.style.opacity=1; }
+    else { el.removeAttribute('src'); el.style.opacity=.3; el.alt='Formato '+(i+1); }
+  });
+}
+
+/* ================== Pintar precios y gama ================== */
+function pintarPrecios(){
+  document.querySelectorAll('[data-precio]').forEach(s=>{
+    const key=s.getAttribute('data-precio');
+    s.textContent = fmt(precios[key]);
+  });
+  document.getElementById('selGama').value = state.gama;
+}
+
+/* ================== Características ================== */
+function pintarCar(){
+  const g = state.gama;
+  const txt = state.car[g] || '';
+  const ta = document.getElementById('txtCar');
+  ta.value = txt;
+  ta.readOnly = !pinOk;
+}
+
+/* ================== Financiación ================== */
+function mensualidad(p,m,t){ const r=t/12; if(!r) return p/m; const pow=Math.pow(1+r,m); return p*(r*pow)/(pow-1); }
+function calcular(){
+  const g = state.gama;
+  const base = precios[g];
+  const mBase = base/42;
+  const rest = base - (mBase*36);
+  const cuota6 = mensualidad(rest,6,tna);
+
+  const upSel = document.querySelector('.btn.btn-red[data-up]')?.getAttribute('data-up') || 'diamantePlus';
+  const upImp = upgradeImporte[upSel]||0;
+  const totalUp = base + upImp;
+  const mUp = totalUp/42;
+  const restUp = totalUp - (mUp*36);
+  const cuota6Up = mensualidad(restUp,6,tna);
+
+  // pintar
+  document.getElementById('importeBase').textContent = fmt(base)+' €';
+  document.getElementById('cuota36').textContent = fmt(mBase)+' €';
+  document.getElementById('mini36').textContent = fmt(base)+' € / 42';
+  document.getElementById('restante').textContent = fmt(rest)+' €';
+  document.getElementById('cuota6').textContent = fmt(cuota6)+' €';
+
+  document.getElementById('importeUpgrade').textContent = fmt(totalUp)+' €';
+  document.getElementById('cuota36Up').textContent = fmt(mUp)+' €';
+  document.getElementById('mini36Up').textContent = fmt(totalUp)+' € / 42';
+  document.getElementById('restanteUp').textContent = fmt(restUp)+' €';
+  document.getElementById('cuota6Up').textContent = fmt(cuota6Up)+' €';
+}
+
+/* ================== Upgrade buttons ================== */
+function pintarUpgradeButtons(){
+  const g = state.gama;
+  const order = ['diamantePlus','diamante','platinoPlus','platino'];
+  order.forEach(k=>{
+    const btn = document.querySelector(`[data-up="${k}"]`);
+    if(!btn) return;
+    // deshabilita superiores a la gama
+    const disable = order.indexOf(k) < order.indexOf(g);
+    btn.disabled = disable;
+    btn.className = 'btn w-full ' + (k===g ? 'btn-red' : 'btn-line');
+  });
+}
+
+/* ================== Eventos ================== */
+document.getElementById('selGama').addEventListener('change', e=>{
+  state.gama = e.target.value;
+  saveAll();
+  pintarCar(); pintarUpgradeButtons(); calcular();
+});
+
+// upgrade click
+document.querySelectorAll('[data-up]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    // Mantiene en rojo la de misma gama por defecto, pero permite elegir inferiores
+    const g = state.gama;
+    document.querySelectorAll('[data-up]').forEach(x=>{
+      const k = x.getAttribute('data-up');
+      const isSame = (k===g);
+      const isSuperior = ['diamantePlus','diamante','platinoPlus','platino'].indexOf(k) < ['diamantePlus','diamante','platinoPlus','platino'].indexOf(g);
+      x.className = 'btn w-full ' + (isSame ? 'btn-red' : 'btn-line');
+      x.disabled = isSuperior;
+    });
+    // recalcula (el cálculo toma el botón rojo activo – el de misma gama)
+    calcular();
+  });
+});
+
+/* ================== Editar (PIN) ================== */
+function pedirPin(){
+  return new Promise(res=>{
+    const dlg = document.getElementById('dlgPin');
+    const ok = ()=>{ dlg.close(); res(document.getElementById('pin').value.trim()); };
+    document.getElementById('btnPinOk').onclick = ok;
+    dlg.addEventListener('close', ()=>res(null), {once:true});
+    document.getElementById('pin').value='';
+    dlg.showModal();
+  });
+}
+
+function toggleEditUI(){
+  const car = document.getElementById('txtCar');
+  const comp = document.getElementById('txtComp');
+  car.readOnly = !pinOk;
+  comp.readOnly = !pinOk;
+}
+
+document.getElementById('btnEdit').addEventListener('click', async ()=>{
+  if(!pinOk){
+    const pin = await pedirPin();
+    if(pin!=='4321'){ document.getElementById('pinMsg').textContent='PIN incorrecto'; return; }
+    document.getElementById('pinMsg').textContent='';
+    pinOk = true;
+    toggleEditUI();
+    // permitir subir imágenes
+    subirImagen(0); subirImagen(1); subirImagen(2); subirImagen(3);
+    alert('Edición activada');
+  }else{
+    pinOk = false; toggleEditUI(); alert('Edición desactivada');
+  }
+});
+
+// subir imágenes (abre selector al hacer clic)
+function subirImagen(i){
+  const el = document.getElementById('img'+(i+1));
+  el.style.cursor='pointer';
+  el.onclick = ()=>{
+    if(!pinOk) return;
+    const inp = document.createElement('input');
+    inp.type='file'; inp.accept='image/*';
+    inp.onchange = ()=>{
+      const f = inp.files?.[0]; if(!f) return;
+      const r = new FileReader();
+      r.onload = ()=>{ state.imagenes[i]=r.result; saveAll(); pintarImgs(); };
+      r.readAsDataURL(f);
+    };
+    inp.click();
+  };
+}
+
+/* ================== Guardar HTML y PDF ================== */
+document.getElementById('btnGuardar').addEventListener('click', ()=>{
+  // guarda texto de características y compromisos si estás en edición
+  if(pinOk){
+    state.car[state.gama] = document.getElementById('txtCar').value;
+    state.compromisos = document.getElementById('txtComp').value;
+    saveAll();
+  }
+  // descarga el HTML auto-contenido (este mismo archivo con state en local)
+  const blob = new Blob([document.documentElement.outerHTML],{type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'calculadora_infinity_audio.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+document.getElementById('btnPDF').addEventListener('click', ()=>window.print());
+
+/* ================== COMPROMISOS glue ================== */
 (function(){
-  const LS_KEY = 'calc_infy_state';
-  const el = document.getElementById('txtComp_calc_infy');
+  const el = document.getElementById('txtComp');
   if(!el) return;
-
-  function getState(){
-    try{ if (window.state && typeof window.state==='object') return window.state; }catch(e){}
-    try{ const raw = localStorage.getItem(LS_KEY); if (raw) return JSON.parse(raw); }catch(e){}
-    return {};
-  }
-  function setState(s){
-    try{ localStorage.setItem(LS_KEY, JSON.stringify(s)); }catch(e){}
-  }
-
-  // Inicializa
-  const st = getState();
-  if (typeof st.compromisos === 'string'){
-    el.value = st.compromisos;
-  } else {
-    // Texto por defecto EN DOS LÍNEAS (sin \n literal en pantalla)
-    el.value = '• Compromiso 1\n• Compromiso 2';
-  }
-
-  // Respeta el modo edición/solo lectura (PIN 4321)
-  function applyReadOnly(){
-    const can = (typeof window.pinOk !== 'undefined') ? !!window.pinOk : false;
-    el.readOnly = !can;
-  }
-  applyReadOnly();
-
-  // Hook al botón Editar para alternar readonly según tu toggleEditUI
-  if (typeof window.toggleEditUI === 'function'){
-    const _orig = window.toggleEditUI;
-    window.toggleEditUI = function(){
-      let r; try{ r = _orig.apply(this, arguments); }catch(e){}
-      applyReadOnly(); return r;
-    };
-  }
-
-  // Persistencia al Guardar (se une a tu save existente)
+  el.value = (typeof state.compromisos==='string') ? state.compromisos : '• Compromiso 1\n• Compromiso 2';
   function persist(){
-    const s = getState();
-    // Solo sobreescribe si estás en edición; en lectura respeta lo guardado
-    if (!el.readOnly) s.compromisos = el.value;
-    else if (typeof s.compromisos === 'undefined') s.compromisos = el.value;
-    setState(s);
+    if(pinOk){ state.compromisos = el.value; saveAll(); }
+    else if(typeof state.compromisos==='undefined'){ state.compromisos = el.value; saveAll(); }
   }
+  el.addEventListener('change', persist);
+})();
 
-  if (typeof window.save === 'function'){
-    const _save = window.save;
-    window.save = function(){
-      let r; try{ r = _save.apply(this, arguments); }catch(e){}
-      persist(); return r;
-    };
-  } else {
-    const btn = document.getElementById('btnSave') || document.querySelector('[data-action="guardar"]');
-    if (btn) btn.addEventListener('click', persist);
-  }
-
-  // Pequeña seguridad extra si editas y sales
-  el.addEventListener('change', ()=>{ if(!el.readOnly) persist(); });
+/* ================== Init ================== */
+(function init(){
+  // precios y estado
+  pintarPrecios();
+  pintarImgs();
+  pintarCar();
+  pintarUpgradeButtons();
+  calcular();
 })();
 </script>
-<!-- =================== /COMPROMISOS =================== -->
+</body>
+</html>
