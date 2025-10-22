@@ -2,422 +2,381 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>CALCULADORA INFINITY AUDIO</title>
 <style>
 :root{
-  --brand:#DC2626; --brand-700:#B91C1C; --bg:#fff; --soft:#f6f7f9;
-  --text:#111827; --muted:#6B7280; --line:#E5E7EB; --card:#ffffff;
+  --brand:#DC2626; --ink:#111827; --muted:#6B7280; --bg:#F6F7F9; --white:#fff;
+  --card:#ffffff; --line:#E5E7EB;
 }
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--soft);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial}
-.container{max-width:1100px;margin:0 auto;padding:20px}
-.header{margin-bottom:14px}
-.h1{margin:0;line-height:1.1;font-weight:900;color:var(--brand);font-size:44px}
-.sub{color:var(--muted);font-size:13px;margin-top:6px}
-
-/* Paper / cards */
-.paper{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.06);overflow:hidden}
-.paper .hd{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
-.paper .bd{padding:18px}
-.row{display:grid;gap:12px}
-.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
-.card{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
-.card .img{height:140px;background:#F9FAFB;display:flex;align-items:center;justify-content:center}
-.card .img img{max-width:100%;max-height:100%;object-fit:contain}
-.card .cap{padding:8px 10px;color:var(--muted);font-size:12px;text-align:center}
-.card.sel{outline:2px solid var(--brand)}
-
-/* Inputs / buttons */
-.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-select,input,textarea{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px}
-textarea{width:100%}
-.btn{background:var(--brand);border:0;color:#fff;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
-.btn:hover{background:var(--brand-700)}
-.btn.s{padding:6px 10px;border-radius:8px;font-size:13px}
-.btn.ghost{background:#fff;color:var(--text);border:1px solid var(--line)}
-.btn.ghost:hover{background:#fafafa}
-.note{color:var(--muted);font-size:12px}
-
-/* Tabla de gamas */
-.table{width:100%;border-collapse:separate;border-spacing:0 8px}
-.thead{background:var(--brand);color:#fff}
-.thead th{padding:10px 12px;text-align:left;font-weight:700}
-tr.item td{padding:10px 12px;background:#fff;border:1px solid var(--line)}
-tr.item td:first-child{border-radius:10px 0 0 10px}
-tr.item td:last-child{border-radius:0 10px 10px 0}
-
-/* KPIs financiación */
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
-.kpi .t{font-size:12px;color:var(--muted)}
-.kpi .v{font-size:22px;font-weight:900;margin-top:4px}
-.kpi.red{background:var(--brand);border-color:transparent;color:#fff}
-.kpi.red .t{color:#fff;opacity:.9}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-
-/* Upgrade */
-.upg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.pill{background:var(--brand);color:#fff;border-radius:12px;padding:14px 12px;text-align:center;cursor:pointer;font-weight:700}
-.pill.dim{background:#F3F4F6;color:#6B7280;cursor:not-allowed}
-.pill.active{box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(220,38,38,.25)}
-.badge{display:inline-flex;align-items:center;gap:6px;color:#6B7280}
-.badge:before{content:"•";color:var(--brand);font-weight:900}
-
-/* Editor */
-.drop{border:2px dashed #e5e7eb;border-radius:12px;padding:10px;text-align:center;color:#6b7280;cursor:pointer}
-.drop.drag{background:#fff0f0;border-color:#DC2626;color:#DC2626}
-
-@media print{
-  .no-print{display:none!important}
-  .container{max-width:none;padding:0 16px}
-  body{background:#fff}
+html,body{background:var(--bg); color:var(--ink); margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;}
+h1{margin:16px 0 0 0; font-size:42px; font-weight:900; letter-spacing:.5px;}
+h1 small{display:block; font-size:14px; color:var(--muted); font-weight:700; margin-top:2px}
+.wrapper{max-width:1100px;margin:0 auto;padding:16px 16px 40px}
+.paper{background:var(--card); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.08); margin:12px 0; overflow:hidden}
+.hd{padding:10px 14px; font-weight:800; color:#fff; background:var(--brand)}
+.hd.ribbon{position:relative}
+.bd{padding:14px}
+.grid{display:grid;gap:12px}
+.g-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g-cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:center;min-height:120px}
+.tab{display:flex;gap:8px}
+.tab .btn{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:14px;font-size:13px;cursor:pointer}
+.tab .btn.sel{outline:2px solid var(--brand)}
+.tab .btn small{color:var(--muted)}
+.pr{font-weight:800}
+.area{width:100%;min-height:140px;border:1px solid var(--line);border-radius:12px;padding:10px;resize:vertical}
+.area[readonly]{background:#FAFAFA}
+.note{color:var(--muted);font-size:12px;margin-top:8px}
+.kpis{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:10px}
+.kpis .box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
+.kpis .big{font-size:36px;font-weight:900;color:var(--brand)}
+.kpis .mut{color:var(--muted);font-size:12px;margin-top:4px}
+.kpis .gray{background:#F8FAFC}
+.kpis .bign{font-size:32px;font-weight:900}
+.rows{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.b{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.b.red{background:var(--brand);color:#fff;border-color:var(--brand)}
+.b.ghost{background:#fff}
+.badge{display:inline-block;border-radius:999px;padding:4px 8px;border:1px solid var(--line);font-size:12px}
+#upBox{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.pill{border-radius:12px;background:#fff;border:1px solid var(--line);padding:12px 14px;text-align:center;cursor:pointer;font-weight:800}
+.pill.red{background:var(--brand);color:#fff;border-color:var(--brand)}
+.pill.dim{background:#E5E7EB;color:#6B7280;cursor:not-allowed}
+.pill.sel{outline:2px solid var(--brand)}
+hr.sep{border:0;height:1px;background:var(--line);margin:12px 0}
+.top-actions{display:flex;gap:8px;align-items:center}
+@media (max-width:980px){
+  .kpis{grid-template-columns:1fr 1fr}
+  #upBox{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
 <body>
-<div class="container">
-  <header class="header">
-    <h1 class="h1">CALCULADORA INFINITY<br/>AUDIO</h1>
-    <div class="sub">36 MESES 0% TAE + 6 MESES 7,95% TAE</div>
-  </header>
+  <div class="wrapper">
+    <h1>CALCULADORA INFINITY <small>AUDIO · 36 MESES 0% TAE + 6 MESES 7,95% TAE</small></h1>
 
-  <!-- FORMATOS -->
-  <section class="paper">
-    <div class="hd">
-      <strong>Formatos de audífonos</strong>
-      <div class="controls no-print">
-        <button id="btnEdit" class="btn s">Editar</button>
-        <button id="btnSave" class="btn s" style="display:none">Guardar</button>
-      </div>
-    </div>
-    <div class="bd">
-      <div id="formatos" class="row grid-4"></div>
-      <!-- editor de imágenes -->
-      <div id="imgEditor" class="no-print" style="display:none;margin-top:12px">
-        <div class="controls">
-          <div class="drop" id="dropZone" title="Clic o arrastra imágenes (4 formatos)">
-            Arrastra o haz clic para subir imágenes (RIC, BTE, Intracanal estándar, Intracanal a medida)
+    <!-- FORMATOS -->
+    <section class="paper">
+      <div class="hd ribbon">
+        <div class="top-actions" style="justify-content:space-between">
+          <span>Formatos de audífonos</span>
+          <div>
+            <button id="btnEdit" class="b red">Editar</button>
+            <button id="btnSave" class="b" style="display:none">Guardar</button>
           </div>
-          <input type="file" id="filePick" accept="image/*" multiple style="display:none"/>
         </div>
-        <div class="note" style="margin-top:6px">Las imágenes se guardan embebidas (base64) y podrán compartirse en el HTML exportado.</div>
       </div>
+      <div class="bd">
+        <div class="grid g-cols-4">
+          <div class="card">RIC / RIC Premium</div>
+          <div class="card">BTE</div>
+          <div class="card">Intracanal estándar</div>
+          <div class="card">Intracanal a medida</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GAMAS + CARACTERÍSTICAS -->
+    <section class="paper">
+      <div class="hd ribbon">Características y gamas</div>
+      <div class="bd">
+        <div class="grid g-cols-2">
+          <div><div id="gamas" class="tab"></div></div>
+          <div>
+            <div style="font-weight:800;margin:4px 0 6px">Características – <span id="carTitle"></span></div>
+            <textarea id="txtCar" class="area" readonly placeholder="Escribe aquí las características (una por línea)…"></textarea>
+            <div class="note">Para editar las características introduce el PIN en “Editar”.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINANCIACIÓN -->
+    <section class="paper">
+      <div class="hd ribbon">Financiación Infinity + tchin tchin</div>
+      <div class="bd">
+        <div class="kpis">
+          <div class="box gray">
+            <div class="mut">Importe total</div>
+            <div id="impBase" class="bign">—</div>
+          </div>
+          <div class="box">
+            <div class="mut">Cuota 36m (0%)</div>
+            <div class="big"><span id="c36">—</span></div>
+            <div class="mut" id="c36det">—</div>
+          </div>
+          <div class="box">
+            <div class="mut">RESTANTE 6M-AHORRO SI RENUEVAS</div>
+            <div class="bign" id="res6">—</div>
+          </div>
+          <div class="box">
+            <div class="mut">Cuota 6m (7,95% TAE)</div>
+            <div class="bign" id="c6">—</div>
+          </div>
+        </div>
+
+        <div class="rows">
+          <div class="box gray">
+            <div class="mut">Importe con 2º pareja</div>
+            <div id="impUp" class="bign">—</div>
+          </div>
+          <div class="box">
+            <div class="mut">Cuota 36m (0%)</div>
+            <div class="big"><span id="c36u">—</span></div>
+            <div class="mut" id="c36udet">—</div>
+          </div>
+          <div class="box">
+            <div class="mut">RESTANTE 6M-AHORRO SI RENUEVAS</div>
+            <div class="bign" id="res6u">—</div>
+          </div>
+          <div class="box">
+            <div class="mut">Cuota 6m (7,95% TAE)</div>
+            <div class="bign" id="c6u">—</div>
+          </div>
+        </div>
+
+        <div class="btns" style="margin-top:12px">
+          <button id="btnPDF" class="b">Guardar PDF</button>
+          <button id="btnHtml" class="b">Descargar HTML con datos (solo lectura)</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPROMISOS -->
+    <section class="paper">
+      <div class="hd ribbon">COMPROMISOS</div>
+      <div class="bd">
+        <details id="compWrap" open>
+          <summary style="cursor:pointer;font-weight:800;color:#374151;margin-bottom:8px">Mostrar / ocultar</summary>
+          <textarea id="txtComp" class="area" readonly placeholder="Escribe aquí los compromisos (se guardan en este archivo)."></textarea>
+          <div class="note">Editable con PIN (botón “Editar”). Si no lo despliegas, se guarda igualmente el valor por defecto.</div>
+        </details>
+      </div>
+    </section>
+
+    <!-- COMPROMISOS AAA (nuevo, plegado por defecto) -->
+    <section class="paper">
+      <div class="hd ribbon">COMPROMISOS AAA</div>
+      <div class="bd">
+        <details id="compWrap2">
+          <summary style="cursor:pointer;font-weight:800;color:#374151;margin-bottom:8px">Mostrar / ocultar</summary>
+          <textarea id="txtComp2" class="area" readonly placeholder="Escribe aquí los compromisos AAA (se guardan en este archivo)."></textarea>
+          <div class="note">Editable con PIN (botón “Editar”). Aunque quede plegado, su contenido se guarda por defecto.</div>
+        </details>
+      </div>
+    </section>
+
+    <!-- UPGRADE -->
+    <section class="paper">
+      <div class="hd ribbon">2º PAREJA RECOMENDADA</div>
+      <div class="bd">
+        <div id="upBox"></div>
+        <div class="note" style="margin-top:8px">Se muestra en rojo la recomendada (Diamante Plus); las superiores se deshabilitan.</div>
+      </div>
+    </section>
+
+  </div>
+
+<!-- PIN dialog nativo -->
+<dialog id="dlg">
+  <form method="dialog" style="min-width:280px">
+    <h3 style="margin:0 0 8px;font-weight:900">Introduce PIN</h3>
+    <input id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="••••"
+           style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px"/>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+      <button class="b">Cancelar</button>
+      <button id="okPin" class="b red">Aceptar</button>
     </div>
-  </section>
-
-  <!-- CARACTERÍSTICAS -->
-  <section class="paper" style="margin-top:12px">
-    <div class="hd"><strong>Características de gamas</strong></div>
-    <div class="bd">
-      <div class="controls">
-        <select id="selGama" class="editable" disabled></select>
-        <input id="search" class="editable" disabled placeholder="Buscar característica…" style="flex:1"/>
-      </div>
-      <div style="margin-top:10px">
-        <textarea id="txtCar" rows="5" class="editable" disabled></textarea>
-        <div class="note" style="margin-top:6px">Edición protegida con PIN 4321. Guardado local y “Descargar HTML con datos”.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- LISTA GAMAS -->
-  <section class="paper" style="margin-top:12px">
-    <div class="hd"><strong>Gamas</strong></div>
-    <div class="bd">
-      <table class="table">
-        <thead class="thead"><tr><th>Gama</th><th>Precio</th><th>Características</th></tr></thead>
-        <tbody id="tblGamas"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- FINANCIACIÓN -->
-  <section class="paper" style="margin-top:12px">
-    <div class="hd"><strong>Financiación Infinity</strong></div>
-    <div class="bd">
-      <div class="kpis">
-        <div class="kpi red"><div class="t">Importe base</div><div class="v" id="impBase">—</div></div>
-        <div class="kpi"><div class="t">Cuota 36 meses</div><div class="v" id="c36Base">—</div></div>
-        <div class="kpi"><div class="t">Importe restante (6m)</div><div class="v" id="restBase">—</div></div>
-        <div class="kpi"><div class="t">Financiación 6m (7,95% TAE)</div><div class="v" id="c6Base">—</div></div>
-      </div>
-      <div style="height:10px"></div>
-      <div class="kpis">
-        <div class="kpi red"><div class="t">Importe con upgrade</div><div class="v" id="impUpg">—</div></div>
-        <div class="kpi"><div class="t">Cuota 36 meses</div><div class="v" id="c36Upg">—</div></div>
-        <div class="kpi"><div class="t">Importe restante (6m)</div><div class="v" id="restUpg">—</div></div>
-        <div class="kpi"><div class="t">Financiación 6m (7,95% TAE)</div><div class="v" id="c6Upg">—</div></div>
-      </div>
-
-      <div class="actions no-print">
-        <button class="btn ghost" onclick="window.print()">Guardar PDF</button>
-        <button class="btn ghost" id="btnExportHtml">Descargar HTML con datos</button>
-        <button class="btn ghost" id="btnExportCsv">Exportar Excel</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- UPGRADE -->
-  <section class="paper" style="margin-top:12px">
-    <div class="hd"><strong>UPGRADE</strong></div>
-    <div class="bd"><div id="upgrades" class="upg"></div></div>
-  </section>
-</div>
+    <div id="pinMsg" class="note" style="color:#DC2626"></div>
+  </form>
+</dialog>
 
 <script>
-/* ====== DATOS INCRUSTADOS (se actualiza al exportar) ======
-   ¡NO BORRAR!  (Marcadores para el exportador)             */
-<!--DATA_START-->
-window.__EMBEDDED_STATE = null;
-<!--DATA_END-->
-
-/* ================== CONFIG ================== */
-const PIN = '4321';
-const LS_KEY = 'infinity_calc_v1';
-
-/* ================== DATA ================== */
-const FORMATOS = [
-  {id:'ric',  nombre:'RIC / RIC Premium'},
-  {id:'bte',  nombre:'BTE'},
-  {id:'cic',  nombre:'Intracanal estándar'},
-  {id:'ite',  nombre:'Intracanal a medida'}
+/* === Datos base === */
+const GAMAS=[
+  {id:"diamantePlus",  nombre:"Diamante Plus", precio:3995, upgNombre:"Diamante Plus (+2004€)", upgImporte:2004},
+  {id:"diamante",      nombre:"Diamante",      precio:3895, upgNombre:"Diamante (+1904€)",     upgImporte:1904},
+  {id:"platinoPlus",   nombre:"Platino Plus",  precio:3395, upgNombre:"Platino Plus (+1404€)", upgImporte:1404},
+  {id:"platino",       nombre:"Platino",       precio:3295, upgNombre:"Platino (+1304€)",      upgImporte:1304},
+  {id:"oro",           nombre:"Oro",           precio:1991, upgNombre:"", upgImporte:0},
 ];
 
-// SVG de reserva (si aún no hay imágenes cargadas)
-const placeholder = t => "data:image/svg+xml;utf8," + encodeURIComponent(
-  "<svg xmlns='http://www.w3.org/2000/svg' width='600' height='420'>"
- + "<rect x='10' y='10' width='580' height='400' rx='16' ry='16' fill='#F9FAFB' stroke='#E5E7EB' stroke-width='3'/>"
- + "<text x='300' y='220' font-family='Arial' font-size='26' fill='#9CA3AF' text-anchor='middle'>"+t+"</text></svg>"
-);
+/* === Estado y helpers === */
+const $=sel=>document.querySelector(sel);
+const fmt=(n)=>n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+const mensualidad=(p,m,t)=>{const r=t/12;if(!r)return p/m;const pow=Math.pow(1+r,m);return p*(r*pow)/(pow-1);};
 
-const GAMAS = [
-  {id:'diamante_plus', nombre:'Diamante Plus', precio:3995, upgNombre:'Diamante Plus (+2004)', upgImporte:2004},
-  {id:'diamante',      nombre:'Diamante',      precio:3895, upgNombre:'Diamante (+1904)',      upgImporte:1904},
-  {id:'platino_plus',  nombre:'Platino Plus',  precio:3395, upgNombre:'Platino Plus (+1404)',  upgImporte:1404},
-  {id:'platino',       nombre:'Platino',       precio:3295, upgNombre:'Platino (+1294)',       upgImporte:1294},
-  {id:'oro',           nombre:'Oro',           precio:1991, upgNombre:'—',                     upgImporte:0   },
-];
-
-/* ================== STATE ================== */
-let stateDefault = {
-  formato:'ric',
-  gamaId:'diamante_plus',
-  pinOk:false,
-  upgradeId:'diamante_plus',  // recomendado por defecto
-  upgradeActivo:true,
-  imagenes:{                  // se rellenan con tus imágenes
-    ric:null,bte:null,cic:null,ite:null
-  },
-  caracteristicas:{
-    diamante_plus:'• Prestaciones máximas\n• 16 canales\n• Reducción de ruido avanzada\n• Bluetooth LE',
-    diamante:'• Gran rendimiento\n• 14 canales\n• Control inteligencia ambiental',
-    platino_plus:'• 12 canales\n• IP67\n• Carga rápida',
-    platino:'• 10 canales\n• Control básico de ruido',
-    oro:'• 6 canales\n• Esencial'
-  }
+const DEFAULT={
+  gamaId:"diamantePlus",
+  caracteristicas:"• Gran rendimiento\n• 14 canales\n• Control inteligencia ambiental",
+  imagenes:[],
+  compromisos:"• Revisiones trimestrales\n• Mantenimiento preventivo\n• Sustitución de filtros incluida",
+  compromisosAAA:"• Compromiso AAA 1\n• Compromiso AAA 2"
 };
 
-// 1) Si viene HTML con datos incrustados, usarlo
-let state = window.__EMBEDDED_STATE ? window.__EMBEDDED_STATE : stateDefault;
+/* Cargamos estado y fijamos SIEMPRE la recomendada a Diamante Plus */
+let state = window.__EMBEDDED_STATE ? {...DEFAULT,...window.__EMBEDDED_STATE}: DEFAULT;
+if(state.upgradeFixedId===undefined){ state.upgradeFixedId = "diamantePlus"; }  // SIEMPRE Diamante Plus
+if(state.upgradeChosenId===undefined){ state.upgradeChosenId = null; }
+if(state.upgradeActivo===undefined){ state.upgradeActivo = true; }
 
-// 2) Si hay localStorage, tiene prioridad (para seguir editando)
-try{
-  const s=JSON.parse(localStorage.getItem(LS_KEY)||'{}');
-  if(s && Object.keys(s).length){ state={...state,...s}; }
-}catch{}
+function gamaById(id){ return GAMAS.find(g=>g.id===id); }
 
-/* ================== HELPERS ================== */
-const $=(q,c=document)=>c.querySelector(q);
-const $$=(q,c=document)=>Array.from(c.querySelectorAll(q));
-const money=n=> n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
-const mensualidad=(p,m,t)=>{const r=t/12;if(!r)return p/m;const pow=Math.pow(1+r,m);return p*(r*pow)/(pow-1)};
-const save=()=>localStorage.setItem(LS_KEY, JSON.stringify(state));
-const gamaById=id=>GAMAS.find(g=>g.id===id);
-
-/* ================== RENDER ================== */
-function renderFormatos(){
-  const wrap=$("#formatos"); wrap.innerHTML='';
-  FORMATOS.forEach(f=>{
-    const c=document.createElement('div');
-    c.className='card'+(state.formato===f.id?' sel':'');
-    const src = state.imagenes[f.id] || placeholder(f.nombre);
-    c.innerHTML=`<div class="img"><img src="${src}" alt=""></div><div class="cap">${f.nombre}</div>`;
-    c.onclick=()=>{state.formato=f.id; save(); renderFormatos();}
-    wrap.appendChild(c);
-  });
-}
-function renderSelectGama(){
-  const sel=$("#selGama");
-  sel.innerHTML=GAMAS.map(g=>`<option value="${g.id}">${g.nombre}</option>`).join('');
-  sel.value=state.gamaId;
-}
-function renderTablaGamas(){
-  const tb=$("#tblGamas"); tb.innerHTML='';
+/* === Render de gamas (sin tocar cálculo recomendado fijo) === */
+function renderGamas(){
+  const box=$("#gamas"); box.innerHTML="";
   GAMAS.forEach(g=>{
-    const tr=document.createElement('tr'); tr.className='item';
-    const checked=(state.gamaId===g.id)?'checked':'';
-    const mini=(state.caracteristicas[g.id]||'').split('\n').filter(Boolean);
-    tr.innerHTML=`
-      <td style="width:250px">
-        <label style="display:flex;gap:8px;align-items:center;cursor:pointer">
-          <input type="radio" name="rg" value="${g.id}" ${checked}/>
-          <strong>${g.nombre}</strong>
-        </label>
-      </td>
-      <td style="width:130px">${money(g.precio)}</td>
-      <td><span class="badge">Ver características (${mini.length})</span></td>`;
-    tr.querySelector('input').onchange=()=>{
+    if(g.id==="oro") return;
+    const btn=document.createElement("div");
+    btn.className="btn"+(state.gamaId===g.id?" sel":"");
+    btn.innerHTML=`<span>${g.nombre}</span><span class="pr">${fmt(g.precio)}</span>`;
+    btn.onclick=()=>{
       state.gamaId=g.id;
-      state.upgradeId=g.id; state.upgradeActivo=true; // recomendado
-      save(); renderSelectGama(); renderUpgrades(); calc();
-    };
-    tr.querySelector('.badge').onclick=()=>alert(`${g.nombre}\n\n${state.caracteristicas[g.id]||'Sin características'}`);
-    tb.appendChild(tr);
-  });
-}
-function renderUpgrades(){
-  const box=$("#upgrades"); box.innerHTML='';
-  const idx=GAMAS.findIndex(g=>g.id===state.gamaId);
-  GAMAS.forEach(g=>{
-    const superior = (GAMAS.indexOf(g) < idx); // superiores deshabilitadas
-    const active = state.upgradeActivo && (state.upgradeId===g.id);
-    const div=document.createElement('div');
-    div.className='pill '+(superior?'dim':(active?'active':'')); 
-    div.textContent=g.upgNombre;
-    div.title= superior ? 'Solo misma gama o inferior' : '';
-    div.onclick=()=>{
-      if(superior) return;
-      if(g.id===state.gamaId){
-        state.upgradeActivo=!state.upgradeActivo; // toggle recomendado
-      }else{
-        state.upgradeId=g.id; state.upgradeActivo=true; // elegir inferior
+      // La recomendada se mantiene SIEMPRE en Diamante Plus; no se cambia aquí.
+      // Si hay una elección temporal y dejara de ser inferior, se anula.
+      if(state.upgradeChosenId){
+        const idxSel=GAMAS.findIndex(gg=>gg.id===state.gamaId);
+        const idxChosen=GAMAS.findIndex(gg=>gg.id===state.upgradeChosenId);
+        if(idxChosen<idxSel) state.upgradeChosenId=null;
       }
+      save(); renderGamas(); renderUpgrades(); fillSide(); calc();
+    };
+    box.appendChild(btn);
+  });
+  $("#carTitle").textContent=gamaById(state.gamaId).nombre;
+}
+
+/* === Upgrades: Diamante Plus SIEMPRE rojo y fijo; inferiores opcionales === */
+function renderUpgrades(){
+  const box=$("#upBox"); box.innerHTML="";
+  const idxSel=GAMAS.findIndex(g=>g.id===state.gamaId);
+  GAMAS.filter(g=>g.id!=="oro").forEach(g=>{
+    const idxG=GAMAS.findIndex(gg=>gg.id===g.id);
+    const superior = idxG < idxSel;
+    const isFixed = g.id==="diamantePlus";              // fija en Diamante Plus SIEMPRE
+    const isChosen = state.upgradeChosenId===g.id;
+    const pill=document.createElement("div");
+    pill.className="pill "+(isFixed?"red":(superior?"dim":(isChosen?"sel":"")));
+    pill.textContent=g.upgNombre || g.nombre;
+    pill.onclick=()=>{
+      if(isFixed){
+        // Recomendado fijo: volver al valor original siempre (no varía)
+        state.upgradeChosenId=null;
+      }else{
+        if(superior) return; // superiores deshabilitadas
+        state.upgradeChosenId = (state.upgradeChosenId===g.id ? null : g.id);
+      }
+      state.upgradeActivo=true;
       save(); renderUpgrades(); calc();
     };
-    box.appendChild(div);
+    box.appendChild(pill);
   });
 }
-function toggleEdit(){
-  const on=state.pinOk;
-  $$('.editable').forEach(el=>el.disabled=!on);
-  $('#btnSave').style.display=on?'inline-flex':'none';
-  $('#imgEditor').style.display=on?'block':'none';
+
+/* === Side (características y compromisos) === */
+function fillSide(){
+  $("#txtCar").value = state.caracteristicas||"";
+  $("#txtComp").value= state.compromisos||"";
+  $("#txtComp2").value= state.compromisosAAA||"";
 }
+
+/* === Cálculos === */
 function calc(){
   const g=gamaById(state.gamaId);
-  const imp=g.precio, c36=imp/42, rest=imp-c36*36, c6=mensualidad(rest,6,0.0795);
-  $('#impBase').textContent=money(imp);
-  $('#c36Base').textContent=money(c36);
-  $('#restBase').textContent=money(rest);
-  $('#c6Base').textContent=money(c6);
+  const base=g.precio;
 
-  let upg=0;
-  if(state.upgradeActivo){
-    const ug=gamaById(state.upgradeId);
-    upg = ug ? (ug.upgImporte||0) : 0;
+  const c36=base/42;
+  const rest=base - c36*36;
+  const c6 = mensualidad(rest,6,0.0795);
+
+  $("#impBase").textContent=fmt(base);
+  $("#c36").textContent=fmt(c36);
+  $("#c36det").textContent=`${fmt(base)} / 42`;
+  $("#res6").textContent=fmt(rest);
+  $("#c6").textContent=fmt(c6);
+
+  // Segunda operación: usa elección temporal si existe; si no, SIEMPRE Diamante Plus
+  const upId = state.upgradeChosenId || "diamantePlus";
+  const ug=gamaById(upId);
+  const up = ug ? (ug.upgImporte||0) : 0;
+  const tot = base + up;
+
+  const c36u=tot/42;
+  const restu=tot - c36u*36;
+  const c6u=mensualidad(restu,6,0.0795);
+
+  $("#impUp").textContent=fmt(tot);
+  $("#c36u").textContent=fmt(c36u);
+  $("#c36udet").textContent=`${fmt(tot)} / 42`;
+  $("#res6u").textContent=fmt(restu);
+  $("#c6u").textContent=fmt(c6u);
+}
+
+/* === Export === */
+$("#btnPDF").onclick=()=>window.print();
+function exportHTML(){
+  const html=document.documentElement.outerHTML
+    .replace("</head>","<script>window.__EMBEDDED_STATE="+JSON.stringify(state)+"</script></head>");
+  const blob=new Blob([html],{type:"text/html"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="calculadora_infinity_audio.html";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+$("#btnHtml").onclick=exportHTML;
+
+/* === PIN / Edición === */
+let pinOk=false;
+function toggleEditUI(){
+  const on=pinOk;
+  $("#btnEdit").style.display=on?"none":"inline-block";
+  $("#btnSave").style.display=on?"inline-block":"none";
+  $("#txtCar").readOnly=!on;
+  $("#txtComp").readOnly=!on;
+  $("#txtComp2").readOnly=!on;
+}
+$("#btnEdit").onclick=()=>{
+  const dlg=$("#dlg"), pin=$("#pin"), msg=$("#pinMsg");
+  msg.textContent=""; pin.value="";
+  dlg.showModal();
+  $("#okPin").onclick=(ev)=>{
+    ev.preventDefault();
+    if(pin.value.trim()==="4321"){
+      pinOk=true; toggleEditUI(); dlg.close();
+    }else{
+      msg.textContent="PIN incorrecto";
+    }
+  };
+};
+$("#btnSave").onclick=()=>{
+  save();
+  pinOk=false; toggleEditUI();
+  alert("Guardado ✅");
+};
+
+/* === Persistencia === */
+function save(){
+  if(pinOk){
+    state.caracteristicas = $("#txtCar").value;
+    state.compromisos   = $("#txtComp").value;
+    state.compromisosAAA= $("#txtComp2").value;
   }
-  const tot=imp+upg, c36u=tot/42, restu=tot-c36u*36, c6u=mensualidad(restu,6,0.0795);
-  $('#impUpg').textContent=money(tot);
-  $('#c36Upg').textContent=money(c36u);
-  $('#restUpg').textContent=money(restu);
-  $('#c6Upg').textContent=money(c6u);
+  localStorage.setItem("calc_infy_state", JSON.stringify(state));
 }
-
-/* ================== EDITAR ================== */
-function bindEdit(){
-  $('#btnEdit').onclick=()=>{
-    const p=prompt('Introduce PIN');
-    if(p===PIN){ state.pinOk=true; save(); toggleEdit(); }
-    else alert('PIN incorrecto');
-  };
-  $('#btnSave').onclick=()=>{ save(); alert('Guardado ✅'); };
-
-  $('#selGama').onchange=e=>{
-    state.gamaId=e.target.value; state.upgradeId=state.gamaId; state.upgradeActivo=true;
-    save(); renderTablaGamas(); renderUpgrades(); calc();
-    $('#txtCar').value=state.caracteristicas[state.gamaId]||'';
-  };
-  $('#txtCar').oninput=e=>{
-    state.caracteristicas[$('#selGama').value]=e.target.value;
-  };
-  $('#search').oninput=e=>{
-    const v=e.target.value.toLowerCase();
-    const key=$('#selGama').value;
-    const src=(state.caracteristicas[key]||'').split('\n').filter(Boolean);
-    $('#txtCar').value = v ? src.filter(x=>x.toLowerCase().includes(v)).join('\n') : (state.caracteristicas[key]||'');
-  };
-
-  // Subida de imágenes
-  const dz = $('#dropZone'), fp = $('#filePick');
-  const handleFiles = files=>{
-    [...files].forEach(f=>{
-      const r=new FileReader();
-      r.onload=()=>{
-        // orden: ric,bte,cic,ite – rellenamos el primero que falte
-        for(const id of ['ric','bte','cic','ite']){
-          if(!state.imagenes[id]){ state.imagenes[id]=r.result; break; }
-        }
-        save(); renderFormatos();
-      };
-      r.readAsDataURL(f);
-    });
-  };
-  dz.onclick=()=>fp.click();
-  dz.ondragover=e=>{e.preventDefault();dz.classList.add('drag');};
-  dz.ondragleave=()=>dz.classList.remove('drag');
-  dz.ondrop=e=>{e.preventDefault();dz.classList.remove('drag'); handleFiles(e.dataTransfer.files);};
-  fp.onchange=e=>handleFiles(e.target.files);
-}
-
-/* ================== EXPORTAR ================== */
-function download(filename, text){
-  const blob=new Blob([text],{type:'text/html;charset=utf-8;'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();
-}
-function exportHtmlWithData(){
-  // Clonar estado y quitar flags volátiles
-  const data = JSON.parse(JSON.stringify(state));
-  data.pinOk = false; // no exportamos sesión abierta
-
-  // Insertar JSON dentro de esta misma página (entre DATA_START / DATA_END)
-  let html = document.documentElement.outerHTML;
-  const json = "window.__EMBEDDED_STATE = " + JSON.stringify(data) + ";";
-  html = html.replace(/<!--DATA_START-->[\\s\\S]*?<!--DATA_END-->/,
-                      "<!--DATA_START-->\n"+json+"\n<!--DATA_END-->");
-  download("calculadora_infinity_con_datos.html", html);
-}
-function exportCSV(){
-  const g=gamaById(state.gamaId);
-  const imp=g.precio, c36=imp/42, rest=imp-c36*36, c6=mensualidad(rest,6,0.0795);
-  const ug=gamaById(state.upgradeId);
-  const upgVal=state.upgradeActivo?(ug.upgImporte||0):0, upgNom=state.upgradeActivo?ug.upgNombre:'—';
-  const tot=imp+upgVal, c36u=tot/42, restu=tot-c36u*36, c6u=mensualidad(restu,6,0.0795);
-
-  const rows=[['Gama','Precio','Cuota36','Restante6m','Cuota6m','Upgrade','ImporteUpg','Total','Cuota36Upg','Restante6mUpg','Cuota6mUpg'],
-              [g.nombre,imp,c36,rest,c6,upgNom,upgVal,tot,c36u,restu,c6u]];
-  const csv=rows.map(r=>r.join(';')).join('\\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download='calculadora_infinity.csv';a.click();
-}
-
-/* ================== INIT ================== */
-function init(){
-  renderFormatos();
-  renderSelectGama();
-  renderTablaGamas();
-  renderUpgrades();
-  toggleEdit();
-  bindEdit();
-  $('#txtCar').value=state.caracteristicas[state.gamaId]||'';
-  calc();
-
-  $('#btnExportHtml').onclick=exportHtmlWithData;
-  $('#btnExportCsv').onclick=exportCSV;
-}
-document.addEventListener('DOMContentLoaded', init);
+(function boot(){
+  try{
+    const s=JSON.parse(localStorage.getItem("calc_infy_state")||"{}");
+    state={...DEFAULT,...s};
+  }catch{}
+  // Asegura recomendada fija en Diamante Plus SIEMPRE
+  state.upgradeFixedId="diamantePlus";
+  renderGamas(); renderUpgrades(); fillSide(); calc(); toggleEditUI();
+})();
 </script>
 </body>
 </html>
