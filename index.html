@@ -59,6 +59,10 @@ h1 small{display:block;color:var(--muted);font-weight:700;font-size:13px;margin-
 
 details summary{cursor:pointer;font-weight:800;color:#374151;margin-bottom:8px}
 .small{font-size:12px}
+@media print{
+  .btns, #btnEdit, #btnSave { display:none !important; }
+  body{background:#fff}
+}
 </style>
 </head>
 <body>
@@ -124,7 +128,7 @@ details summary{cursor:pointer;font-weight:800;color:#374151;margin-bottom:8px}
     </div>
   </section>
 
-  <!-- 2ª PAREJA -->
+  <!-- 2ª PAREJA RECOMENDADA -->
   <section class="paper">
     <div class="hd">2º PAREJA RECOMENDADA</div>
     <div class="bd">
@@ -133,7 +137,7 @@ details summary{cursor:pointer;font-weight:800;color:#374151;margin-bottom:8px}
     </div>
   </section>
 
-  <!-- COMPROMISOS -->
+  <!-- COMPROMISOS (ÚNICO BLOQUE) -->
   <section class="paper">
     <div class="hd">COMPROMISOS</div>
     <div class="bd">
@@ -141,18 +145,6 @@ details summary{cursor:pointer;font-weight:800;color:#374151;margin-bottom:8px}
         <summary>Mostrar / ocultar</summary>
         <textarea id="txtComp" class="area" readonly placeholder="Escribe aquí los compromisos (se guardan en este archivo)."></textarea>
         <div class="note">Editable con PIN (botón “Editar”).</div>
-      </details>
-    </div>
-  </section>
-
-  <!-- COMPROMISOS AAA -->
-  <section class="paper">
-    <div class="hd">COMPROMISOS AAA</div>
-    <div class="bd">
-      <details id="compWrap2">
-        <summary>Mostrar / ocultar</summary>
-        <textarea id="txtComp2" class="area" readonly placeholder="Escribe aquí los compromisos AAA (se guardan en este archivo)."></textarea>
-        <div class="note">Editable con PIN (botón “Editar”). Aunque quede plegado, su contenido se guarda.</div>
       </details>
     </div>
   </section>
@@ -199,9 +191,8 @@ const DEFAULT={
 • Ajuste en remoto
 • Programa Tinnitus`,
   compromisos:"• Revisiones trimestrales\n• Mantenimiento preventivo\n• Sustitución de filtros incluida",
-  compromisosAAA:"• Compromiso AAA 1\n• Compromiso AAA 2",
-  upgradeFixedId:"diamantePlus",
-  upgradeChosenId:null         // si es null, calcula con la recomendada (Diamante Plus)
+  upgradeFixedId:"diamantePlus",   // Recomendación fija en Diamante Plus
+  upgradeChosenId:null             // Si null, usa recomendada
 };
 
 let state=DEFAULT;
@@ -224,7 +215,7 @@ function renderGamas(){
     btn.innerHTML=`<span>${g.nombre}</span><span class="price">${fmt(g.precio)}</span>`;
     btn.onclick=()=>{
       state.gamaId=g.id;
-      // Si había seleccionada una superior, se deselecciona
+      // Si había elegida una superior, se deselecciona
       if(state.upgradeChosenId){
         const idxSel=GAMAS.findIndex(x=>x.id===state.gamaId);
         const idxCh =GAMAS.findIndex(x=>x.id===state.upgradeChosenId);
@@ -244,15 +235,17 @@ function renderUpgrades(){
   GAMAS.filter(g=>g.id!=="oro").forEach(g=>{
     const idxG=GAMAS.findIndex(x=>x.id===g.id);
     const isSuperior=idxG<idxSel;
-    const isFixed=(g.id==="diamantePlus");
+    const isFixed=(g.id==="diamantePlus");   // Siempre en rojo y válida
     const isChosen=(state.upgradeChosenId===g.id);
     const pill=document.createElement("div");
     pill.className="pill "+(isFixed?"red":(isSuperior?"dim":(isChosen?"sel":"")));
     pill.textContent=g.upgNombre||g.nombre;
     pill.onclick=()=>{
-      if(isFixed){ state.upgradeChosenId=null; } // recomendado “ancla”; si lo pulsas quita otros
-      else{
-        if(isSuperior) return;
+      if(isFixed){
+        // Recomendado actúa como “volver al valor base recomendado”
+        state.upgradeChosenId=null;
+      }else{
+        if(isSuperior) return; // superiores deshabilitadas
         state.upgradeChosenId = isChosen ? null : g.id;
       }
       save(); renderUpgrades(); calc();
@@ -265,7 +258,6 @@ function renderUpgrades(){
 function fill(){
   $("#txtCar").value=state.caracteristicas||"";
   $("#txtComp").value=state.compromisos||"";
-  $("#txtComp2").value=state.compromisosAAA||"";
 }
 
 /* ===== Cálculos ===== */
@@ -283,7 +275,7 @@ function calc(){
   $("#res6").textContent=fmt(rest);
   $("#c6").textContent=fmt(c6);
 
-  // 2ª pareja: por defecto Diamante Plus siempre
+  // 2ª pareja: por defecto Diamante Plus (fija)
   const upId= state.upgradeChosenId || "diamantePlus";
   const ug  = gamaById(upId);
   const up  = ug ? ug.upgImporte||0 : 0;
@@ -308,7 +300,6 @@ function toggleEditUI(){
   $("#btnSave").style.display=on?"inline-block":"none";
   $("#txtCar").readOnly=!on;
   $("#txtComp").readOnly=!on;
-  $("#txtComp2").readOnly=!on;
 }
 $("#btnEdit").onclick=()=>{
   const dlg=$("#dlg"), pin=$("#pin"), msg=$("#pinMsg"); msg.textContent=""; pin.value="";
@@ -326,7 +317,6 @@ function save(fromEditor=false){
   if(fromEditor && pinOk){
     state.caracteristicas=$("#txtCar").value;
     state.compromisos=$("#txtComp").value;
-    state.compromisosAAA=$("#txtComp2").value;
   }
   localStorage.setItem("calc_infy_state",JSON.stringify(state));
 }
