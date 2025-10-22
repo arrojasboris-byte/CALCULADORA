@@ -5,182 +5,176 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>CALCULADORA INFINITY AUDIO</title>
 <style>
-:root{
-  --rojo:#D7302F; --gris:#f2f3f5; --borde:#e5e7eb; --texto:#222; --texto-suave:#6b7280;
-}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:#fff;color:var(--texto);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif}
-.wrapper{width:960px;margin:24px auto 64px auto}
-h1{margin:0 0 4px 0;font-size:44px;letter-spacing:.5px}
-.sub{margin:0 0 18px 0;color:var(--texto-suave);font-size:14px}
-.faldon{background:var(--rojo);color:#fff;padding:10px 14px;border-radius:8px 8px 0 0;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:space-between}
-.card{background:#fff;border:1px solid var(--borde);border-top:0;border-radius:0 0 8px 8px;padding:14px}
-.row{display:flex;gap:14px;flex-wrap:wrap}
-.col{flex:1 1 0}
-.box{background:var(--gris);border:1px dashed #d8dbe1;border-radius:12px;height:150px;display:flex;align-items:center;justify-content:center;color:#9aa0a6;font-weight:700}
-.small{height:120px}
-label.tag{display:inline-block;background:#fff;border:1px solid var(--borde);border-radius:10px;padding:10px 12px;width:100%;cursor:pointer}
-label.tag.active{outline:2px solid var(--rojo)}
-.tag .precio{float:right;color:#111;font-weight:700}
-.badge{display:inline-block;background:#ffecee;color:#c02121;padding:2px 6px;border-radius:6px;font-size:12px;font-weight:700}
-.kpi{background:#fff;border:1px solid var(--borde);border-radius:10px;padding:14px;height:88px;display:flex;flex-direction:column;gap:6px;justify-content:center}
-.kpi .t{font-size:12px;color:var(--texto-suave)}
-.kpi .v{font-size:18px;font-weight:800}
-.kpi.red .v{color:#d61c2f}
-.actions{display:flex;gap:10px;margin-top:10px}
-.btn{border:0;border-radius:10px;background:#eceff3;color:#111;padding:10px 12px;cursor:pointer;font-weight:700}
-.btn.red{background:var(--rojo);color:#fff}
-.btn.ghost{background:#fff;border:1px solid var(--borde)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.help{color:var(--texto-suave);font-size:12px}
-.hidden{display:none}
-.hr{height:1px;background:var(--borde);margin:10px 0}
-.pad{padding:10px}
-textarea.input{width:100%;min-height:140px;border:1px solid var(--borde);border-radius:10px;padding:10px;font-family:inherit}
-.input[disabled]{background:#fafafa}
-.center{display:flex;align-items:center;gap:8px}
-.pill{border-radius:999px;padding:10px 12px;border:1px solid var(--borde);background:#fff;cursor:pointer;font-weight:700}
-.pill.red{background:var(--rojo);border-color:var(--rojo);color:#fff}
-.pill.disabled{opacity:.4;cursor:not-allowed}
-.header-line{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px 0}
+  :root{
+    --rojo:#d62b2b;
+    --rojo-osc:#c02020;
+    --gris:#f4f5f7;
+    --borde:#e6e6e6;
+    --texto:#222;
+    --muted:#6b7280;
+    --card:#ffffff;
+  }
+  html,body{margin:0;padding:0;background:#fff;color:var(--texto);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1020px;margin:24px auto;padding:0 16px;}
+  h1{margin:0 0 8px 0;font-size:40px;letter-spacing:.5px;}
+  .sub{color:#8f8f8f;font-size:12px;margin:0 0 16px 0}
+  /* card / secciones */
+  .card{background:var(--card);border:1px solid var(--borde);border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,.02);margin:12px 0;}
+  .bar{background:var(--rojo);color:#fff;font-weight:700;font-size:14px;padding:10px 14px;border-top-left-radius:10px;border-top-right-radius:10px;display:flex;align-items:center;justify-content:space-between}
+  .bar small{opacity:.9;font-weight:600}
+  .body{padding:14px}
+  /* formatos */
+  .formatos{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .format{border:1px solid var(--borde);border-radius:10px;background:var(--gris);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;height:150px;cursor:pointer}
+  .format.active{outline:2px solid var(--rojo)}
+  .format input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;display:none}
+  .format img{max-height:120px;max-width:90%;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.1))}
+  .format .ph{color:#9aa1ab;font-weight:700}
+  .fmt-caption{margin-top:6px;text-align:center;font-size:12px;color:#666}
+  .fmt-box{display:flex;flex-direction:column;gap:6px}
+  /* gamas */
+  .grid-2{display:grid;grid-template-columns:260px 1fr;gap:12px}
+  .gamas{display:flex;flex-direction:column;gap:8px}
+  .gbtn{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--borde);background:#fff;border-radius:8px;padding:10px 12px;cursor:pointer}
+  .gbtn.active{border-color:var(--rojo);box-shadow:0 0 0 2px rgba(214,43,43,.1)}
+  .gbtn .precio{color:#111;font-weight:700;font-size:12px}
+  .gbtn .nombre{font-weight:700}
+  textarea{width:100%;min-height:140px;border:1px solid var(--borde);border-radius:8px;padding:10px;resize:vertical;font-family:inherit}
+  .help{font-size:12px;color:#8590a2;margin-top:6px}
+  /* financiación */
+  .fin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .box{border:1px solid var(--borde);border-radius:10px;background:#fff;padding:12px}
+  .ttl{font-size:12px;color:#6b7280;font-weight:600;margin-bottom:2px}
+  .num{font-size:26px;font-weight:800;color:#111}
+  .num.red{color:var(--rojo)}
+  .subtxt{font-size:12px;color:#6b7280}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .btn{background:#fff;border:1px solid var(--borde);padding:9px 12px;border-radius:8px;font-weight:700;cursor:pointer}
+  .btn:hover{border-color:#bbb}
+  .btn.red{background:var(--rojo);border-color:var(--rojo);color:#fff}
+  .btn.red:hover{background:var(--rojo-osc)}
+  /* upgrade */
+  .upg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .upg{border:1px solid var(--borde);border-radius:10px;padding:12px;background:#fff;font-weight:800;text-align:center;cursor:pointer}
+  .upg.disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.3)}
+  .upg.active{background:var(--rojo);border-color:var(--rojo);color:#fff}
+  /* compromisos */
+  details summary{cursor:pointer;font-weight:800}
+  .muted{color:#6b7280}
+  /* edición */
+  .right{display:flex;gap:8px;align-items:center}
+  .pin{width:82px;border:1px solid var(--borde);border-radius:6px;padding:6px 8px}
+  .hidden{display:none !important}
+  /* print */
+  @media print{
+    .no-print{display:none !important}
+    .wrap{max-width:794px}
+    @page{size:A4;margin:12mm}
+  }
 </style>
 </head>
 <body>
-<div class="wrapper">
-
-  <h1>CALCULADORA INFINITY<br/>AUDIO</h1>
-  <div class="sub">36 meses 0%TAE + 6 meses 7,95% TAE</div>
+<div class="wrap">
+  <h1>CALCULADORA INFINITY AUDIO</h1>
+  <p class="sub">36 MESES 0%TAE + 6 MESES 7,95% TAE</p>
 
   <!-- FORMATOS -->
-  <div class="faldon">
-    <div>Formatos de audífonos</div>
-    <div class="center">
-      <button id="btnEdit" class="btn ghost">Editar</button>
-      <button id="btnSave" class="btn red hidden">Guardar</button>
-    </div>
-  </div>
   <div class="card">
-    <div class="row">
-      <div class="col">
-        <div class="box" id="fmt_ric_box">RIC / RIC Premium</div>
-        <div class="help">RIC / RIC Premium</div>
-        <input type="file" id="fmt_ric" class="hidden" accept="image/*" />
+    <div class="bar">
+      <span>Formatos de audífonos</span>
+      <div class="right no-print">
+        <input id="pin1" class="pin" type="password" placeholder="PIN" />
+        <button id="btnEditar" class="btn red">Editar</button>
+        <button id="btnGuardar" class="btn hidden">Guardar</button>
       </div>
-      <div class="col">
-        <div class="box" id="fmt_bte_box">BTE</div>
-        <div class="help">BTE</div>
-        <input type="file" id="fmt_bte" class="hidden" accept="image/*" />
-      </div>
-      <div class="col">
-        <div class="box" id="fmt_ite_box">Intracanal estándar</div>
-        <div class="help">Intracanal estándar</div>
-        <input type="file" id="fmt_ite" class="hidden" accept="image/*" />
-      </div>
-      <div class="col">
-        <div class="box" id="fmt_cic_box">Intracanal a medida</div>
-        <div class="help">Intracanal a medida</div>
-        <input type="file" id="fmt_cic" class="hidden" accept="image/*" />
-      </div>
+    </div>
+    <div class="body formatos" id="formatos">
+      <!-- generado por JS -->
     </div>
   </div>
 
-  <!-- GAMAS -->
-  <div class="faldon">Características y gamas</div>
+  <!-- CARACTERÍSTICAS Y GAMAS -->
   <div class="card">
-    <div class="grid2">
+    <div class="bar"><span>Características y gamas</span></div>
+    <div class="body grid-2">
+      <div class="gamas" id="listaGamas"></div>
       <div>
-        <div style="display:grid;gap:8px">
-          <label class="tag" data-gama="Diamante Plus"><span>Diamante Plus</span> <span class="precio">3995,00 €</span></label>
-          <label class="tag" data-gama="Diamante"><span>Diamante</span> <span class="precio">3895,00 €</span></label>
-          <label class="tag" data-gama="Platino Plus"><span>Platino Plus</span> <span class="precio">3395,00 €</span></label>
-          <label class="tag" data-gama="Platino"><span>Platino</span> <span class="precio">3295,00 €</span></label>
-          <label class="tag" data-gama="Oro"><span>Oro</span> <span class="precio">1991,00 €</span></label>
-        </div>
-      </div>
-      <div>
-        <div class="header-line">
-          <div><b id="carTitle">Características – Diamante Plus</b></div>
-          <div class="help">Para editar introduce el PIN en “Editar”.</div>
-        </div>
-        <textarea id="carText" class="input textarea" disabled></textarea>
+        <div class="ttl">Características — <span id="lblGamaSel">–</span></div>
+        <textarea id="txtCar"></textarea>
+        <div class="help">Para editar las características introduce el PIN y pulsa “Editar”.</div>
       </div>
     </div>
   </div>
 
   <!-- FINANCIACIÓN -->
-  <div class="faldon">Financiación Infinity + tchin tchin</div>
   <div class="card">
-    <div class="grid4">
-      <div class="kpi">
-        <div class="t">Importe total</div>
-        <div class="v" id="impTotal">—</div>
-        <div class="help" id="impTotalHelp"></div>
+    <div class="bar"><span>Financiación Infinity + tchin tchin</span></div>
+    <div class="body">
+      <div class="fin-grid" id="finBase">
+        <div class="box">
+          <div class="ttl">Importe total</div>
+          <div class="num" id="impBase">—</div>
+        </div>
+        <div class="box">
+          <div class="ttl">Cuota 36m (0%)</div>
+          <div class="num red" id="c36Base">—</div>
+          <div class="subtxt" id="c36det">— / 42</div>
+        </div>
+        <div class="box">
+          <div class="ttl">RESTANTE 6M–AHORRO SI RENUEVAS</div>
+          <div class="num" id="restBase">—</div>
+        </div>
+        <div class="box">
+          <div class="ttl">Cuota 6m (7,95% TAE)</div>
+          <div class="num" id="c6Base">—</div>
+        </div>
       </div>
-      <div class="kpi red">
-        <div class="t">Cuota 36m (0%)</div>
-        <div class="v" id="c36">—</div>
-        <div class="help" id="c36h"></div>
-      </div>
-      <div class="kpi">
-        <div class="t">RESTANTE 6M – AHORRO SI RENUEVAS</div>
-        <div class="v" id="rest6">—</div>
-      </div>
-      <div class="kpi">
-        <div class="t">Cuota 6m (7,95% TAE)</div>
-        <div class="v" id="c6">—</div>
-      </div>
-    </div>
 
-    <div class="hr"></div>
+      <div class="fin-grid" style="margin-top:10px" id="finUpg">
+        <div class="box">
+          <div class="ttl">Importe con 2ª pareja</div>
+          <div class="num" id="impUpg">—</div>
+        </div>
+        <div class="box">
+          <div class="ttl">Cuota 36m (0%)</div>
+          <div class="num red" id="c36Upg">—</div>
+          <div class="subtxt" id="c36detU">— / 42</div>
+        </div>
+        <div class="box">
+          <div class="ttl">RESTANTE 6M–AHORRO SI RENUEVAS</div>
+          <div class="num" id="restUpg">—</div>
+        </div>
+        <div class="box">
+          <div class="ttl">Cuota 6m (7,95% TAE)</div>
+          <div class="num" id="c6Upg">—</div>
+        </div>
+      </div>
 
-    <div class="grid4">
-      <div class="kpi">
-        <div class="t">Importe con 2ª pareja</div>
-        <div class="v" id="imp2">—</div>
-        <div class="help" id="imp2h"></div>
+      <div class="row no-print">
+        <button id="btnPDF" class="btn">Guardar PDF</button>
+        <button id="btnExport" class="btn">Descargar HTML con datos (solo lectura)</button>
       </div>
-      <div class="kpi red">
-        <div class="t">Cuota 36m (0%)</div>
-        <div class="v" id="c36_2">—</div>
-        <div class="help" id="c36_2h"></div>
-      </div>
-      <div class="kpi">
-        <div class="t">RESTANTE 6M – AHORRO SI RENUEVAS</div>
-        <div class="v" id="rest6_2">—</div>
-      </div>
-      <div class="kpi">
-        <div class="t">Cuota 6m (7,95% TAE)</div>
-        <div class="v" id="c6_2">—</div>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="btn" id="btnPDF">Guardar PDF</button>
-      <button class="btn ghost" id="btnExport">Descargar HTML con datos (solo lectura)</button>
     </div>
   </div>
 
   <!-- 2ª PAREJA -->
-  <div class="faldon">2º PAREJA RECOMENDADA</div>
   <div class="card">
-    <div class="help" style="margin-bottom:8px">Se muestra en rojo la de la misma gama; las superiores se deshabilitan.</div>
-    <div class="row">
-      <button class="pill" data-upg="Diamante Plus">Diamante Plus (+2004€)</button>
-      <button class="pill" data-upg="Diamante">Diamante (+1904€)</button>
-      <button class="pill" data-upg="Platino Plus">Platino Plus (+1404€)</button>
-      <button class="pill" data-upg="Platino">Platino (+1304€)</button>
+    <div class="bar"><span>2º PAREJA RECOMENDADA</span></div>
+    <div class="body">
+      <div class="upg-grid" id="upgrades"></div>
+      <div class="help">Se muestra en rojo la de la misma gama; las superiores se deshabilitan.</div>
     </div>
   </div>
 
   <!-- COMPROMISOS -->
-  <div class="faldon">COMPROMISOS</div>
   <div class="card">
-    <button class="btn ghost" id="btnComp">Mostrar / ocultar</button>
-    <div id="compWrap" class="pad">
-      <textarea id="compText" class="input textarea" placeholder="Escribe aquí los compromisos (uno por línea)..." disabled></textarea>
-      <div class="help">Editable con PIN (botón “Editar”).</div>
+    <div class="bar"><span>COMPROMISOS</span></div>
+    <div class="body">
+      <details id="detComp" open>
+        <summary>Mostrar / ocultar</summary>
+        <textarea id="txtComp" style="min-height:120px"></textarea>
+        <div class="help">Editable con PIN (usa el botón “Editar”).</div>
+      </details>
     </div>
   </div>
 
@@ -188,185 +182,344 @@ textarea.input{width:100%;min-height:140px;border:1px solid var(--borde);border-
 
 <script>
 /* ====== Datos base ====== */
-const PRICES = {
-  "Diamante Plus": 3995, "Diamante": 3895, "Platino Plus": 3395, "Platino": 3295, "Oro": 1991
-};
-const UPG_DIFF = {
-  "Diamante Plus": 2004, "Diamante": 1904, "Platino Plus": 1404, "Platino": 1304
-};
-const ORDER = ["Diamante Plus","Diamante","Platino Plus","Platino","Oro"];
-const TAE6 = 0.0795;
+const PIN = "4321";
+const factorTAE = 1.0235; // ajusta 47,40 -> 48,51
+const gamas = [
+  { id:"diamantePlus", nombre:"Diamante Plus", precio:3995, upg:+2004,
+    car:`Amplio ancho de bandas-canales de programación.
+Bluetooth universal
+Streaming de Audio directo
+Tcoil
+Recargable
+Multifoco, detecta hasta 4 hablantes para mayor entendimiento en ruido.
+Autonomía de la carga de la batería hasta 5h
+Ajuste en remoto
+Programa Tinnitus`
+  },
+  { id:"diamante", nombre:"Diamante", precio:3895, upg:+1904,
+    car:`Gran rendimiento
+14 canales
+Control inteligencia ambiental`
+  },
+  { id:"platinoPlus", nombre:"Platino Plus", precio:3395, upg:+1404,
+    car:`Rendimiento alto en ruidos moderados
+12 canales
+Opciones de conectividad`
+  },
+  { id:"platino", nombre:"Platino", precio:3295, upg:+1304,
+    car:`Buen desempeño general
+10 canales
+Ajustes esenciales`
+  },
+  { id:"oro", nombre:"Oro", precio:1991, upg:0,
+    car:`Funcional para todas las pérdidas auditivas
+Confort en ambientes silenciosos, sin ruidos.
+Pilas
+Programa de Tinnitus
+Otros programas de programación específicos y personalizados.
+Ancho de bandas de programación más limitado`
+  }
+];
+
+const formatos = [
+  {id:"fmt1", titulo:"RIC / RIC Premium"},
+  {id:"fmt2", titulo:"BTE"},
+  {id:"fmt3", titulo:"Intracanal estándar"},
+  {id:"fmt4", titulo:"Intracanal a medida"}
+];
 
 /* ====== Estado ====== */
-const S = JSON.parse(localStorage.getItem("calc_infy_v1")||"{}");
-if(!S.gama) S.gama = "Diamante Plus";
-if(!S.car)  S.car = {
-  "Diamante Plus":"• Amplio ancho de bandas-canales de programación.\n• Bluetooth universal.\n• Streaming de audio directo.\n• Tcoil.\n• Recargable.\n• Multifoco/detección hablantes / autonomía batería ~5h.\n• Ajuste en remoto.\n• Programa Tinnitus.",
-  "Diamante":"• Gran rendimiento.\n• 14 canales.\n• Control inteligencia ambiental",
-  "Platino Plus":"• Alta relación calidad/precio.\n• Buen desempeño en ruido moderado.",
-  "Platino":"• Rendimiento sólido.\n• 12 canales.",
-  "Oro":"• Funcional para todas las pérdidas auditivas.\n• Confort en ambiente silencioso.\n• Pila.\n• Programa de Tinnitus.\n• Ancho de banda más limitado."
+let state = {
+  gamaSel: "diamantePlus",
+  car: {},         // por gama
+  imgs: {},        // base64 por formato
+  comp: "",
+  edit: false,
+  upgSel: "diamantePlus" // por defecto misma gama (se mostrará activa en rojo)
 };
-if(!S.comp) S.comp = "• Compromiso 1\n• Compromiso 2";
-if(!S.upg)  S.upg  = "Diamante Plus";
 
-const E = (q)=>document.querySelector(q);
-const $$ = (q)=>document.querySelectorAll(q);
-
-/* ====== Helpers ====== */
-const fmt = (n)=> n===null?"—": n.toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})+" €";
-function cuotaMensual(monto, meses, interes){
-  if(interes<=0) return monto/meses;
-  const r = interes/12;
-  return monto * (r*Math.pow(1+r, meses))/(Math.pow(1+r, meses)-1);
+// Cargar de localStorage si existe
+const saved = localStorage.getItem("calc_infinity_audio_v1");
+if(saved){
+  try{ Object.assign(state, JSON.parse(saved)); }catch(e){}
 }
-function guardar(){
-  localStorage.setItem("calc_infy_v1", JSON.stringify(S));
+// inicializa car por defecto
+for(const g of gamas){
+  if(!state.car[g.id]) state.car[g.id] = g.car;
 }
 
-/* ====== UI Inicial ====== */
-function pintarGamas(){
-  $$(".tag").forEach(l=>{
-    l.classList.toggle("active", l.dataset.gama===S.gama);
+/* ====== Utilidades ====== */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
+const fmtMoney = n => n.toLocaleString("es-ES",{style:"currency",currency:"EUR"});
+const saveLS = ()=>localStorage.setItem("calc_infinity_audio_v1", JSON.stringify(state));
+
+/* ====== Render formatos ====== */
+function renderFormatos(){
+  const box = $("#formatos");
+  box.innerHTML = "";
+  formatos.forEach(f=>{
+    const wrap = document.createElement("div");
+    wrap.className="fmt-box";
+    const el = document.createElement("div");
+    el.className = "format";
+    el.dataset.id = f.id;
+    if(state.edit) el.classList.add("active");
+
+    const img = document.createElement("img");
+    if(state.imgs[f.id]) img.src = state.imgs[f.id];
+    else{
+      const ph = document.createElement("div");
+      ph.className="ph"; ph.textContent=f.titulo;
+      el.appendChild(ph);
+    }
+    if(state.imgs[f.id]) el.appendChild(img);
+
+    const inp = document.createElement("input");
+    inp.type="file"; inp.accept="image/*";
+    if(state.edit){ inp.style.display="block"; }
+    inp.addEventListener("change", ev=>{
+      const file = ev.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = e=>{
+        state.imgs[f.id] = e.target.result;
+        saveLS(); renderFormatos();
+      };
+      reader.readAsDataURL(file);
+    });
+    el.appendChild(inp);
+
+    const cap = document.createElement("div");
+    cap.className="fmt-caption";
+    cap.textContent = f.titulo;
+
+    wrap.appendChild(el);
+    wrap.appendChild(cap);
+    box.appendChild(wrap);
   });
-  E("#carTitle").textContent = "Características – "+S.gama;
-  E("#carText").value = S.car[S.gama]||"";
 }
-function pintarComp(){ E("#compText").value = S.comp||""; }
-function bloquearEdicion(lock){
-  E("#carText").disabled = lock;
-  E("#compText").disabled = lock;
-  ["fmt_ric","fmt_bte","fmt_ite","fmt_cic"].forEach(id=>{
-    E("#"+id).classList.toggle("hidden", lock);
+
+/* ====== Render gamas + características ====== */
+function renderGamas(){
+  const lst = $("#listaGamas");
+  lst.innerHTML = "";
+  gamas.forEach(g=>{
+    const b = document.createElement("button");
+    b.className="gbtn";
+    if(g.id===state.gamaSel) b.classList.add("active");
+    b.innerHTML = `<span class="nombre">${g.nombre}</span><span class="precio">${fmtMoney(g.precio)}</span>`;
+    b.onclick = ()=>{
+      state.gamaSel = g.id;
+      // por defecto, 2ª pareja de la misma gama
+      state.upgSel = g.id;
+      saveLS(); renderAll();
+    };
+    lst.appendChild(b);
   });
-  E("#btnEdit").classList.toggle("hidden", !lock);
-  E("#btnSave").classList.toggle("hidden", lock);
+  $("#lblGamaSel").textContent = gamas.find(x=>x.id===state.gamaSel).nombre;
+  const t = $("#txtCar");
+  t.value = state.car[state.gamaSel] || "";
+  t.disabled = !state.edit;
 }
-function cargarImagen(idBox, key){
-  const data = S[key];
-  const box = E(idBox);
-  if(data){
-    box.style.background = `#fff url(${data}) center/contain no-repeat`;
-    box.textContent = "";
-  }else{
-    box.style.background="var(--gris)";
-    box.textContent = box.dataset ?? box.textContent;
+
+/* ====== Render financiación ====== */
+function calcCuotas(importe){
+  const c36 = importe/42;
+  const resto6 = c36*6;
+  const c6 = c36*factorTAE;
+  return { c36, resto6, c6 };
+}
+function renderFin(){
+  const g = gamas.find(x=>x.id===state.gamaSel);
+  const imp = g.precio;
+  const c = calcCuotas(imp);
+  $("#impBase").textContent = fmtMoney(imp);
+  $("#c36Base").textContent = fmtMoney(c.c36);
+  $("#c36det").textContent = `${fmtMoney(imp)} / 42`;
+  $("#restBase").textContent = fmtMoney(c.resto6);
+  $("#c6Base").textContent = fmtMoney(c.c6);
+
+  // con 2ª pareja
+  const uG = gamas.find(x=>x.id===state.upgSel);
+  const impU = imp + (uG ? uG.upg : 0);
+  const cu = calcCuotas(impU);
+  $("#impUpg").textContent = fmtMoney(impU);
+  $("#c36Upg").textContent = fmtMoney(cu.c36);
+  $("#c36detU").textContent = `${fmtMoney(impU)} / 42`;
+  $("#restUpg").textContent = fmtMoney(cu.resto6);
+  $("#c6Upg").textContent = fmtMoney(cu.c6);
+}
+
+/* ====== Render upgrades con regla "no superior" ====== */
+function renderUpgrades(){
+  const box = $("#upgrades"); box.innerHTML="";
+  const idxSel = gamas.findIndex(x=>x.id===state.gamaSel);
+  gamas
+    .filter(g=>g.id!=="oro") // oro no tiene upg propio (0€) para la pareja; no lo mostramos como “misma gama” de upg
+    .slice(0,4) // solo los 4 botones definidos
+    .forEach(g=>{
+      const u = document.createElement("div");
+      u.className="upg";
+      // deshabilitar superiores
+      const idxG = gamas.findIndex(x=>x.id===g.id);
+      const disabled = idxG < idxSel; // si es superior (índice menor -> gama más alta)
+      if(disabled) u.classList.add("disabled");
+      if(g.id===state.upgSel) u.classList.add("active");
+      u.textContent = `${g.nombre} (+${fmtMoney(g.upg)})`;
+      u.onclick = ()=>{
+        if(disabled) return;
+        state.upgSel = g.id;
+        saveLS(); renderFin(); renderUpgrades();
+      };
+      box.appendChild(u);
+    });
+  // asegurar por defecto "misma gama"
+  const gSel = gamas.find(x=>x.id===state.gamaSel);
+  if(!gSel) return;
+  const idxUpg = gamas.findIndex(x=>x.id===state.upgSel);
+  if(idxUpg < idxSel){ // quedó superior por algún motivo → corrige
+    state.upgSel = state.gamaSel;
   }
 }
-function pintarFormatos(){
-  cargarImagen("#fmt_ric_box","img_ric");
-  cargarImagen("#fmt_bte_box","img_bte");
-  cargarImagen("#fmt_ite_box","img_ite");
-  cargarImagen("#fmt_cic_box","img_cic");
+
+/* ====== Compromisos ====== */
+function renderComp(){
+  $("#txtComp").value = state.comp || "";
+  $("#txtComp").disabled = !state.edit;
 }
 
-/* ====== Financiación ====== */
-function recalcular(){
-  const base = PRICES[S.gama];
-  E("#impTotal").textContent = fmt(base);
-  E("#impTotalHelp").textContent = "";
-  const c36 = cuotaMensual(base,36,0);
-  const c6  = cuotaMensual(base,6,TAE6);
-  E("#c36").textContent = fmt(c36);
-  E("#c36h").textContent = `${fmt(base)} / 42`;
-  E("#c6").textContent  = fmt(c6);
-  E("#rest6").textContent = fmt(base - c36*36);
-
-  // 2ª pareja (mismo u inferior)
-  let up = S.upg;
-  if(ORDER.indexOf(up)<ORDER.indexOf(S.gama)) up = S.gama; // seguridad
-  if(ORDER.indexOf(up)>ORDER.indexOf(S.gama)) up = S.gama; // nunca superior
-
-  const upImporte = PRICES[up] + (UPG_DIFF[up]||0);
-  E("#imp2").textContent = fmt(upImporte);
-  E("#imp2h").textContent = `${fmt(upImporte)} / 42`;
-  const c36_2 = cuotaMensual(upImporte,36,0);
-  const c6_2  = cuotaMensual(upImporte,6,TAE6);
-  E("#c36_2").textContent = fmt(c36_2);
-  E("#c36_2h").textContent = `${fmt(upImporte)} / 42`;
-  E("#c6_2").textContent  = fmt(c6_2);
-  E("#rest6_2").textContent = fmt(upImporte - c36_2*36);
-
-  // botones de upg (rojo la misma, deshabilitar superiores)
-  $$(".pill").forEach(b=>{
-    const g = b.dataset.upg;
-    const superior = ORDER.indexOf(g) < ORDER.indexOf(S.gama);
-    b.classList.toggle("red", g===S.gama);
-    b.classList.toggle("disabled", superior); // superiores deshabilitadas
-    b.disabled = superior;
-  });
+/* ====== Edición (PIN) ====== */
+function setEdit(on){
+  state.edit = on;
+  // botones
+  $("#btnEditar").classList.toggle("hidden", on);
+  $("#btnGuardar").classList.toggle("hidden", !on);
+  // activar inputs de formatos
+  renderFormatos();
+  // activar textareas
+  $("#txtCar").disabled = !on;
+  $("#txtComp").disabled = !on;
+}
+function handleEditar(){
+  const pin = $("#pin1").value.trim();
+  if(pin !== PIN){ alert("PIN incorrecto"); return; }
+  setEdit(true);
+}
+function handleGuardar(){
+  // recoger cambios
+  state.car[state.gamaSel] = $("#txtCar").value;
+  state.comp = $("#txtComp").value;
+  saveLS();
+  setEdit(false);
+  alert("Guardado ✅");
 }
 
-/* ====== Eventos ====== */
-// elegir gama
-$$(".tag").forEach(l=>{
-  l.addEventListener("click",()=>{
-    S.gama = l.dataset.gama;
-    // si la 2ª pareja quedó superior, corrige
-    if(ORDER.indexOf(S.upg)<ORDER.indexOf(S.gama)) S.upg = S.gama;
-    pintarGamas(); recalcular(); guardar();
-  });
+/* ====== Export HTML con datos incrustados (solo lectura) ====== */
+function exportHTML(){
+  const payload = {
+    state,
+    gamas,
+    formatos,
+    factorTAE
+  };
+  const tpl = `
+<!doctype html><html lang="es"><meta charset="utf-8">
+<title>Calculadora Infinity (solo lectura)</title>
+<style>body{font-family:system-ui,Segoe UI,Roboto,Inter,Arial;margin:20px}
+h2{margin:.2em 0}.muted{color:#666}
+.box{border:1px solid #e6e6e6;padding:10px;border-radius:8px;margin:6px 0}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+img{max-height:120px;max-width:95%}
+@media print{@page{size:A4;margin:12mm}}</style>
+<h2>CALCULADORA INFINITY AUDIO</h2>
+<div class="muted">Modo visor sin edición – datos incrustados.</div>
+<div id="root"></div>
+<script>
+const data = ${JSON.stringify(payload)};
+const fmt = n=>n.toLocaleString("es-ES",{style:"currency",currency:"EUR"});
+const root = document.getElementById('root');
+
+function calc(imp){const c36=imp/42;return{c36,resto6:c36*6,c6:c36*${factorTAE}}}
+const gSel = data.gamas.find(g=>g.id===data.state.gamaSel);
+
+const imp = gSel.precio;
+const cu = calc(imp);
+
+// 2ª pareja
+const uG = data.gamas.find(g=>g.id===data.state.upgSel);
+const impU = imp + (uG?uG.upg:0);
+const cuU = calc(impU);
+
+// formatos
+const fmtDiv = document.createElement('div');
+fmtDiv.className='grid';
+data.formatos.forEach(f=>{
+  const d=document.createElement('div');d.className='box';
+  d.innerHTML='<div style="font-weight:700">'+f.titulo+'</div>';
+  if(data.state.imgs[f.id]){const im=new Image();im.src=data.state.imgs[f.id];d.appendChild(im)}
+  root.appendChild(fmtDiv);
+  fmtDiv.appendChild(d);
 });
 
-// upg
-$$(".pill").forEach(b=>{
-  b.addEventListener("click",()=>{
-    const g = b.dataset.upg;
-    if(ORDER.indexOf(g) < ORDER.indexOf(S.gama)) return; // nunca superior
-    S.upg = g;
-    recalcular(); guardar();
-  });
-});
+// gamas y car
+const carDiv=document.createElement('div');carDiv.className='box';
+carDiv.innerHTML='<div><b>Gama:</b> '+gSel.nombre+' — '+fmt(gSel.precio)+'</div><pre style="white-space:pre-wrap;margin:.5em 0 0">'+(data.state.car[gSel.id]||'')+'</pre>';
+root.appendChild(carDiv);
 
-// editar/guardar con PIN
-E("#btnEdit").addEventListener("click",()=>{
-  const pin = prompt("PIN de edición:");
-  if(pin==="4321"){ bloquearEdicion(false); }
-  else alert("PIN incorrecto");
-});
-E("#btnSave").addEventListener("click",()=>{
-  S.car[S.gama] = E("#carText").value;
-  S.comp = E("#compText").value;
-  guardar();
-  bloquearEdicion(true);
-  alert("Guardado");
-});
+// fin
+const fin=document.createElement('div');fin.className='box';
+fin.innerHTML=\`
+<b>Financiación Infinity + tchin tchin</b>
+<div class="grid" style="margin-top:6px">
+  <div class="box"><div>Importe total</div><div>\${fmt(imp)}</div></div>
+  <div class="box"><div>Cuota 36m (0%)</div><div><b>\${fmt(cu.c36)}</b></div></div>
+  <div class="box"><div>RESTANTE 6M–AHORRO SI RENUEVAS</div><div>\${fmt(cu.resto6)}</div></div>
+  <div class="box"><div>Cuota 6m (7,95% TAE)</div><div>\${fmt(cu.c6)}</div></div>
 
-// toggle compromisos
-E("#btnComp").addEventListener("click",()=>{
-  E("#compWrap").classList.toggle("hidden");
-});
+  <div class="box"><div>Importe con 2ª pareja</div><div>\${fmt(impU)}</div></div>
+  <div class="box"><div>Cuota 36m (0%)</div><div><b>\${fmt(cuU.c36)}</b></div></div>
+  <div class="box"><div>RESTANTE 6M–AHORRO SI RENUEVAS</div><div>\${fmt(cuU.resto6)}</div></div>
+  <div class="box"><div>Cuota 6m (7,95% TAE)</div><div>\${fmt(cuU.c6)}</div></div>
+</div>\`;
+root.appendChild(fin);
 
-// exportar HTML con datos
-E("#btnExport").addEventListener("click",()=>{
-  const blob = new Blob([document.documentElement.outerHTML],{type:"text/html"});
+// 2ª pareja
+const upg=document.createElement('div');upg.className='box';
+upg.innerHTML='<b>2º PAREJA RECOMENDADA:</b> '+(uG?uG.nombre+' (+'+fmt(uG.upg)+')':'—');
+root.appendChild(upg);
+
+// compromisos
+const comp=document.createElement('div');comp.className='box';
+comp.innerHTML='<b>COMPROMISOS</b><pre style="white-space:pre-wrap;margin:.5em 0 0">'+(data.state.comp||'')+'</pre>';
+root.appendChild(comp);
+</script>`;
+  const blob = new Blob([tpl],{type:"text/html;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "calculadora_infinity_offline.html";
-  a.click();
-});
+  a.href = url; a.download = "calculadora_infinity_visor.html";
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},0);
+}
 
-// PDF (usa diálogo de impresión)
-E("#btnPDF").addEventListener("click",()=>{ window.print(); });
+/* ====== Eventos / vínculos ====== */
+$("#txtCar").addEventListener("input", ()=>{ if(state.edit){ state.car[state.gamaSel] = $("#txtCar").value; saveLS(); }});
+$("#txtComp").addEventListener("input", ()=>{ if(state.edit){ state.comp = $("#txtComp").value; saveLS(); }});
+$("#btnEditar").onclick = handleEditar;
+$("#btnGuardar").onclick = handleGuardar;
+$("#btnPDF").onclick = ()=>window.print();
+$("#btnExport").onclick = exportHTML;
 
-// carga de imágenes
-[
-  {input:"#fmt_ric", box:"#fmt_ric_box", key:"img_ric"},
-  {input:"#fmt_bte", box:"#fmt_bte_box", key:"img_bte"},
-  {input:"#fmt_ite", box:"#fmt_ite_box", key:"img_ite"},
-  {input:"#fmt_cic", box:"#fmt_cic_box", key:"img_cic"}
-].forEach(({input,box,key})=>{
-  E(box).addEventListener("click",()=>{ if(!E("#btnSave").classList.contains("hidden")) E(input).click(); });
-  E(input).addEventListener("change",(ev)=>{
-    const f = ev.target.files[0]; if(!f) return;
-    const r = new FileReader();
-    r.onload = (e)=>{ S[key]=e.target.result; guardar(); pintarFormatos(); };
-    r.readAsDataURL(f);
-  });
-});
-
-/* ====== Init ====== */
-pintarGamas(); pintarFormatos(); pintarComp(); bloquearEdicion(true); recalcular();
+/* ====== Render general ====== */
+function renderAll(){
+  renderFormatos();
+  renderGamas();
+  renderFin();
+  renderUpgrades();
+  renderComp();
+}
+renderAll();
+setEdit(false);
 </script>
 </body>
 </html>
