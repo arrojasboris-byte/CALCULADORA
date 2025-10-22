@@ -1,343 +1,109 @@
-<!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>CALCULADORA INFINITY AUDIO</title>
+<!-- ===================== COMPROMISOS (DESPUÉS DE 2º PAREJA) ===================== -->
 <style>
-:root{
-  --brand:#DC2626; --ink:#111827; --muted:#6B7280; --bg:#F6F7F9; --card:#fff; --line:#E5E7EB;
-}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Noto Sans",sans-serif}
-h1{margin:16px 0 0;font-size:44px;line-height:1.05;font-weight:900;letter-spacing:.3px}
-h1 small{display:block;color:var(--muted);font-weight:700;font-size:13px;margin-top:2px}
-.wrapper{max-width:1100px;margin:0 auto;padding:16px 16px 40px}
-
-/* tarjetas */
-.paper{background:var(--card);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08);margin:12px 0;overflow:hidden}
-.hd{padding:10px 14px;font-weight:900;color:#fff;background:var(--brand);display:flex;align-items:center;justify-content:space-between}
-.bd{padding:14px}
-
-.grid{display:grid;gap:12px}
-.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
-.g2{grid-template-columns:330px 1fr}
-
-.card{border:1px solid var(--line);border-radius:12px;min-height:116px;display:flex;align-items:center;justify-content:center;padding:8px;background:#fff}
-.card img{max-width:100%;max-height:92px;object-fit:contain;opacity:.95}
-.card small{display:block;margin-top:6px;color:var(--muted);font-weight:700}
-
-/* gamas */
-.tab{display:flex;flex-direction:column;gap:8px}
-.tab .btn{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;cursor:pointer}
-.tab .btn.sel{outline:2px solid var(--brand)}
-.tab .btn small{color:var(--muted)}
-.price{font-weight:900}
-
-/* textarea */
-.area{width:100%;min-height:160px;border:1px solid var(--line);border-radius:12px;padding:10px;resize:vertical}
-.area[readonly]{background:#FAFAFA}
-.note{color:var(--muted);font-size:12px;margin-top:6px}
-
-/* kpis */
-.kpis{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:10px}
-.box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
-.big{font-size:32px;font-weight:900;color:var(--brand)}   /* Cuota 36m en rojo */
-.bign{font-size:28px;font-weight:900}
-.gray{background:#F8FAFC}
-
-.rows{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-top:10px}
-.btns{display:flex;gap:8px;flex-wrap:wrap}
-.b{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer}
-.b.red{background:var(--brand);color:#fff;border-color:var(--brand)}
-
-#upBox{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.pill{border-radius:12px;background:#fff;border:1px solid var(--line);padding:12px 14px;text-align:center;cursor:pointer;font-weight:900}
-.pill.red{background:var(--brand);color:#fff;border-color:var(--brand)}
-.pill.dim{background:#E5E7EB;color:#6B7280;cursor:not-allowed}
-.pill.sel{outline:2px solid var(--brand)}
-
-details summary{cursor:pointer;font-weight:800;color:#374151;margin-bottom:8px}
-.small{font-size:12px}
-@media print{
-  .btns, #btnEdit, #btnSave { display:none !important; }
-  body{background:#fff}
-}
+  /* Forzamos faldón rojo y mismo “skin” del resto de secciones */
+  #compromisos-block .hd{
+    background:#dc2626 !important;
+    color:#fff !important;
+    padding:10px 14px !important;
+    font-weight:700 !important;
+    border-top-left-radius:12px !important;
+    border-top-right-radius:12px !important;
+  }
+  #compromisos-block .bd{
+    background:#fff !important;
+    padding:12px 14px !important;
+    border-bottom-left-radius:12px !important;
+    border-bottom-right-radius:12px !important;
+  }
+  #compromisos-block details>summary{
+    cursor:pointer; list-style:none;
+    margin-bottom:8px; font-weight:600;
+  }
+  #compromisos-block details>summary::-webkit-details-marker{ display:none; }
+  #compromisos-block .area{
+    width:100%; min-height:220px; resize:vertical;
+    border:1px solid #e5e7eb; border-radius:10px; padding:10px;
+    font-family:inherit; font-size:14px;
+    background:#fff;
+  }
+  #compromisos-block .note{ font-size:12px; color:#6b7280; margin-top:6px; }
 </style>
-</head>
-<body>
-<div class="wrapper">
-  <h1>CALCULADORA INFINITY<small>AUDIO · 36 MESES 0% TAE + 6 MESES 7,95% TAE</small></h1>
 
-  <!-- FORMATOS -->
-  <section class="paper">
-    <div class="hd">
-      <span>Formatos de audífonos</span>
-      <div>
-        <button id="btnEdit" class="b red">Editar</button>
-        <button id="btnSave" class="b" style="display:none">Guardar</button>
-      </div>
-    </div>
-    <div class="bd">
-      <div class="grid g4">
-        <div class="card"><div><img src="" alt=""><small>RIC / RIC Premium</small></div></div>
-        <div class="card"><div><img src="" alt=""><small>BTE</small></div></div>
-        <div class="card"><div><img src="" alt=""><small>Intracanal estándar</small></div></div>
-        <div class="card"><div><img src="" alt=""><small>Intracanal a medida</small></div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- GAMAS + CARACTERÍSTICAS -->
-  <section class="paper">
-    <div class="hd">Características y gamas</div>
-    <div class="bd">
-      <div class="grid g2">
-        <div><div id="gamas" class="tab"></div></div>
-        <div>
-          <div style="font-weight:900;margin:2px 0 6px">Características – <span id="carTitle"></span></div>
-          <textarea id="txtCar" class="area" readonly placeholder="Escribe aquí las características (una por línea)…"></textarea>
-          <div class="note">Para editar las características introduce el PIN en “Editar”.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FINANCIACIÓN -->
-  <section class="paper">
-    <div class="hd">Financiación Infinity + tchin tchin</div>
-    <div class="bd">
-      <div class="kpis">
-        <div class="box gray"><div class="small">Importe total</div><div id="impBase" class="bign">—</div></div>
-        <div class="box"><div class="small">Cuota 36m (0%)</div><div class="big" id="c36">—</div><div class="small" id="c36det">—</div></div>
-        <div class="box"><div class="small">RESTANTE 6M-AHORRO SI RENUEVAS</div><div id="res6" class="bign">—</div></div>
-        <div class="box"><div class="small">Cuota 6m (7,95% TAE)</div><div id="c6" class="bign">—</div></div>
-      </div>
-
-      <div class="rows">
-        <div class="box gray"><div class="small">Importe con 2º pareja</div><div id="impUp" class="bign">—</div></div>
-        <div class="box"><div class="small">Cuota 36m (0%)</div><div class="big" id="c36u">—</div><div class="small" id="c36udet">—</div></div>
-        <div class="box"><div class="small">RESTANTE 6M-AHORRO SI RENUEVAS</div><div id="res6u" class="bign">—</div></div>
-        <div class="box"><div class="small">Cuota 6m (7,95% TAE)</div><div id="c6u" class="bign">—</div></div>
-      </div>
-
-      <div class="btns" style="margin-top:12px">
-        <button id="btnPDF" class="b">Guardar PDF</button>
-        <button id="btnHtml" class="b">Descargar HTML con datos (solo lectura)</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2ª PAREJA RECOMENDADA -->
-  <section class="paper">
-    <div class="hd">2º PAREJA RECOMENDADA</div>
-    <div class="bd">
-      <div id="upBox"></div>
-      <div class="note" style="margin-top:8px">Se muestra en rojo la recomendada (Diamante Plus); las superiores se deshabilitan.</div>
-    </div>
-  </section>
-
-  <!-- COMPROMISOS (ÚNICO BLOQUE) -->
-  <section class="paper">
-    <div class="hd">COMPROMISOS</div>
-    <div class="bd">
-      <details id="compWrap" open>
-        <summary>Mostrar / ocultar</summary>
-        <textarea id="txtComp" class="area" readonly placeholder="Escribe aquí los compromisos (se guardan en este archivo)."></textarea>
-        <div class="note">Editable con PIN (botón “Editar”).</div>
-      </details>
-    </div>
-  </section>
-</div>
-
-<!-- PIN -->
-<dialog id="dlg">
-  <form method="dialog" style="min-width:280px">
-    <h3 style="margin:0 0 8px;font-weight:900">Introduce PIN</h3>
-    <input id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="••••"
-           style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px"/>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
-      <button class="b">Cancelar</button>
-      <button id="okPin" class="b red">Aceptar</button>
-    </div>
-    <div id="pinMsg" class="note" style="color:#DC2626"></div>
-  </form>
-</dialog>
+<section class="paper" id="compromisos-block">
+  <div class="hd">COMPROMISOS</div>
+  <div class="bd">
+    <details id="compWrap" open>
+      <summary>Mostrar / ocultar</summary>
+      <textarea id="txtComp_calc_infy" class="area" readonly
+        placeholder="Escribe aquí los compromisos…"></textarea>
+      <div class="note">Editable con PIN (usa el botón “Editar”).</div>
+    </details>
+  </div>
+</section>
 
 <script>
-/* ===== Datos base ===== */
-const GAMAS=[
-  {id:"diamantePlus", nombre:"Diamante Plus", precio:3995, upgNombre:"Diamante Plus (+2004€)", upgImporte:2004},
-  {id:"diamante",     nombre:"Diamante",      precio:3895, upgNombre:"Diamante (+1904€)",     upgImporte:1904},
-  {id:"platinoPlus",  nombre:"Platino Plus",  precio:3395, upgNombre:"Platino Plus (+1404€)", upgImporte:1404},
-  {id:"platino",      nombre:"Platino",       precio:3295, upgNombre:"Platino (+1304€)",      upgImporte:1304},
-  {id:"oro",          nombre:"Oro",           precio:1991, upgNombre:"",                      upgImporte:0}
-];
-
-const $=s=>document.querySelector(s);
-const fmt=n=>n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
-const mensualidad=(p,m,t)=>{const r=t/12;if(!r)return p/m;const pow=Math.pow(1+r,m);return p*(r*pow)/(pow-1);};
-
-/* ===== Estado ===== */
-const DEFAULT={
-  gamaId:"diamantePlus",
-  caracteristicas:
-`• Amplio ancho de bandas-canales de programación.
-• Bluetooth universal
-• Streaming de audio directo
-• Recargable
-• Multifoco, detecta hasta 4 hablantes para mayor entendimiento en ruido.
-• Autonomía de la batería hasta 5h (ejemplo)
-• Ajuste en remoto
-• Programa Tinnitus`,
-  compromisos:"• Revisiones trimestrales\n• Mantenimiento preventivo\n• Sustitución de filtros incluida",
-  upgradeFixedId:"diamantePlus",   // Recomendación fija en Diamante Plus
-  upgradeChosenId:null             // Si null, usa recomendada
-};
-
-let state=DEFAULT;
-try{
-  const s=JSON.parse(localStorage.getItem("calc_infy_state")||"{}");
-  state={...DEFAULT,...s};
-}catch{}
-
-/* ===== Util ===== */
-function gamaById(id){return GAMAS.find(g=>g.id===id);}
-
-/* ===== Render gamas ===== */
-function renderGamas(){
-  const box=$("#gamas"); box.innerHTML="";
-  GAMAS.forEach(g=>{
-    if(g.id==="oro")return;
-    const btn=document.createElement("button");
-    btn.type="button";
-    btn.className="btn"+(state.gamaId===g.id?" sel":"");
-    btn.innerHTML=`<span>${g.nombre}</span><span class="price">${fmt(g.precio)}</span>`;
-    btn.onclick=()=>{
-      state.gamaId=g.id;
-      // Si había elegida una superior, se deselecciona
-      if(state.upgradeChosenId){
-        const idxSel=GAMAS.findIndex(x=>x.id===state.gamaId);
-        const idxCh =GAMAS.findIndex(x=>x.id===state.upgradeChosenId);
-        if(idxCh<idxSel) state.upgradeChosenId=null;
-      }
-      save(); renderGamas(); renderUpgrades(); fill(); calc();
-    };
-    box.appendChild(btn);
-  });
-  $("#carTitle").textContent=gamaById(state.gamaId).nombre;
-}
-
-/* ===== Render upgrades ===== */
-function renderUpgrades(){
-  const box=$("#upBox"); box.innerHTML="";
-  const idxSel=GAMAS.findIndex(g=>g.id===state.gamaId);
-  GAMAS.filter(g=>g.id!=="oro").forEach(g=>{
-    const idxG=GAMAS.findIndex(x=>x.id===g.id);
-    const isSuperior=idxG<idxSel;
-    const isFixed=(g.id==="diamantePlus");   // Siempre en rojo y válida
-    const isChosen=(state.upgradeChosenId===g.id);
-    const pill=document.createElement("div");
-    pill.className="pill "+(isFixed?"red":(isSuperior?"dim":(isChosen?"sel":"")));
-    pill.textContent=g.upgNombre||g.nombre;
-    pill.onclick=()=>{
-      if(isFixed){
-        // Recomendado actúa como “volver al valor base recomendado”
-        state.upgradeChosenId=null;
-      }else{
-        if(isSuperior) return; // superiores deshabilitadas
-        state.upgradeChosenId = isChosen ? null : g.id;
-      }
-      save(); renderUpgrades(); calc();
-    };
-    box.appendChild(pill);
-  });
-}
-
-/* ===== Pinta textos ===== */
-function fill(){
-  $("#txtCar").value=state.caracteristicas||"";
-  $("#txtComp").value=state.compromisos||"";
-}
-
-/* ===== Cálculos ===== */
-function calc(){
-  const g=gamaById(state.gamaId);
-  const base=g.precio;
-
-  const c36 = base/42;
-  const rest= base - 36*c36;
-  const c6  = mensualidad(rest,6,0.0795);
-
-  $("#impBase").textContent=fmt(base);
-  $("#c36").textContent=fmt(c36);
-  $("#c36det").textContent=`${fmt(base)} / 42`;
-  $("#res6").textContent=fmt(rest);
-  $("#c6").textContent=fmt(c6);
-
-  // 2ª pareja: por defecto Diamante Plus (fija)
-  const upId= state.upgradeChosenId || "diamantePlus";
-  const ug  = gamaById(upId);
-  const up  = ug ? ug.upgImporte||0 : 0;
-  const tot = base + up;
-
-  const c36u = tot/42;
-  const restu= tot - 36*c36u;
-  const c6u  = mensualidad(restu,6,0.0795);
-
-  $("#impUp").textContent=fmt(tot);
-  $("#c36u").textContent=fmt(c36u);
-  $("#c36udet").textContent=`${fmt(tot)} / 42`;
-  $("#res6u").textContent=fmt(restu);
-  $("#c6u").textContent=fmt(c6u);
-}
-
-/* ===== PIN / edición ===== */
-let pinOk=false;
-function toggleEditUI(){
-  const on=pinOk;
-  $("#btnEdit").style.display=on?"none":"inline-block";
-  $("#btnSave").style.display=on?"inline-block":"none";
-  $("#txtCar").readOnly=!on;
-  $("#txtComp").readOnly=!on;
-}
-$("#btnEdit").onclick=()=>{
-  const dlg=$("#dlg"), pin=$("#pin"), msg=$("#pinMsg"); msg.textContent=""; pin.value="";
-  dlg.showModal();
-  $("#okPin").onclick=(ev)=>{
-    ev.preventDefault();
-    if(pin.value.trim()==="4321"){ pinOk=true; toggleEditUI(); dlg.close(); }
-    else { msg.textContent="PIN incorrecto"; }
-  };
-};
-$("#btnSave").onclick=()=>{ save(true); pinOk=false; toggleEditUI(); alert("Guardado ✅"); };
-
-/* ===== Guardado ===== */
-function save(fromEditor=false){
-  if(fromEditor && pinOk){
-    state.caracteristicas=$("#txtCar").value;
-    state.compromisos=$("#txtComp").value;
-  }
-  localStorage.setItem("calc_infy_state",JSON.stringify(state));
-}
-
-/* ===== Exportar HTML con datos embebidos ===== */
-$("#btnHtml").onclick=()=>{
-  const html=document.documentElement.outerHTML
-    .replace("</head>","<script>window.__EMBEDDED_STATE="+JSON.stringify(state)+"</script></head>");
-  const blob=new Blob([html],{type:"text/html"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
-  a.download="calculadora_infinity_audio.html"; a.click(); URL.revokeObjectURL(a.href);
-};
-
-/* ===== PDF ===== */
-$("#btnPDF").onclick=()=>window.print();
-
-/* ===== Boot ===== */
+/* Glue: integra COMPROMISOS con tu flujo de PIN/Guardar sin tocar el resto */
 (function(){
-  if(window.__EMBEDDED_STATE){ state={...DEFAULT,...window.__EMBEDDED_STATE}; }
-  renderGamas(); renderUpgrades(); fill(); calc(); toggleEditUI();
+  const LS_KEY = 'calc_infy_state';
+  const el = document.getElementById('txtComp_calc_infy');
+  if(!el) return;
+
+  function getState(){
+    try{ if (window.state && typeof window.state==='object') return window.state; }catch(e){}
+    try{ const raw = localStorage.getItem(LS_KEY); if (raw) return JSON.parse(raw); }catch(e){}
+    return {};
+  }
+  function setState(s){
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(s)); }catch(e){}
+  }
+
+  // Inicializa
+  const st = getState();
+  if (typeof st.compromisos === 'string'){
+    el.value = st.compromisos;
+  } else {
+    // Texto por defecto EN DOS LÍNEAS (sin \n literal en pantalla)
+    el.value = '• Compromiso 1\n• Compromiso 2';
+  }
+
+  // Respeta el modo edición/solo lectura (PIN 4321)
+  function applyReadOnly(){
+    const can = (typeof window.pinOk !== 'undefined') ? !!window.pinOk : false;
+    el.readOnly = !can;
+  }
+  applyReadOnly();
+
+  // Hook al botón Editar para alternar readonly según tu toggleEditUI
+  if (typeof window.toggleEditUI === 'function'){
+    const _orig = window.toggleEditUI;
+    window.toggleEditUI = function(){
+      let r; try{ r = _orig.apply(this, arguments); }catch(e){}
+      applyReadOnly(); return r;
+    };
+  }
+
+  // Persistencia al Guardar (se une a tu save existente)
+  function persist(){
+    const s = getState();
+    // Solo sobreescribe si estás en edición; en lectura respeta lo guardado
+    if (!el.readOnly) s.compromisos = el.value;
+    else if (typeof s.compromisos === 'undefined') s.compromisos = el.value;
+    setState(s);
+  }
+
+  if (typeof window.save === 'function'){
+    const _save = window.save;
+    window.save = function(){
+      let r; try{ r = _save.apply(this, arguments); }catch(e){}
+      persist(); return r;
+    };
+  } else {
+    const btn = document.getElementById('btnSave') || document.querySelector('[data-action="guardar"]');
+    if (btn) btn.addEventListener('click', persist);
+  }
+
+  // Pequeña seguridad extra si editas y sales
+  el.addEventListener('change', ()=>{ if(!el.readOnly) persist(); });
 })();
 </script>
-</body>
-</html>
+<!-- =================== /COMPROMISOS =================== -->
