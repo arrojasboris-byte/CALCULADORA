@@ -18,12 +18,9 @@
   .wrap{max-width:1020px;margin:24px auto;padding:0 16px;}
   h1{margin:0 0 8px 0;font-size:40px;letter-spacing:.5px;}
   .sub{color:#8f8f8f;font-size:12px;margin:0 0 16px 0}
-  /* card / secciones */
   .card{background:var(--card);border:1px solid var(--borde);border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,.02);margin:12px 0;}
   .bar{background:var(--rojo);color:#fff;font-weight:700;font-size:14px;padding:10px 14px;border-top-left-radius:10px;border-top-right-radius:10px;display:flex;align-items:center;justify-content:space-between}
-  .bar small{opacity:.9;font-weight:600}
   .body{padding:14px}
-  /* formatos */
   .formatos{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
   .format{border:1px solid var(--borde);border-radius:10px;background:var(--gris);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;height:150px;cursor:pointer}
   .format.active{outline:2px solid var(--rojo)}
@@ -32,7 +29,6 @@
   .format .ph{color:#9aa1ab;font-weight:700}
   .fmt-caption{margin-top:6px;text-align:center;font-size:12px;color:#666}
   .fmt-box{display:flex;flex-direction:column;gap:6px}
-  /* gamas */
   .grid-2{display:grid;grid-template-columns:260px 1fr;gap:12px}
   .gamas{display:flex;flex-direction:column;gap:8px}
   .gbtn{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--borde);background:#fff;border-radius:8px;padding:10px 12px;cursor:pointer}
@@ -41,7 +37,6 @@
   .gbtn .nombre{font-weight:700}
   textarea{width:100%;min-height:140px;border:1px solid var(--borde);border-radius:8px;padding:10px;resize:vertical;font-family:inherit}
   .help{font-size:12px;color:#8590a2;margin-top:6px}
-  /* financiación */
   .fin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
   .box{border:1px solid var(--borde);border-radius:10px;background:#fff;padding:12px}
   .ttl{font-size:12px;color:#6b7280;font-weight:600;margin-bottom:2px}
@@ -50,22 +45,16 @@
   .subtxt{font-size:12px;color:#6b7280}
   .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
   .btn{background:#fff;border:1px solid var(--borde);padding:9px 12px;border-radius:8px;font-weight:700;cursor:pointer}
-  .btn:hover{border-color:#bbb}
   .btn.red{background:var(--rojo);border-color:var(--rojo);color:#fff}
-  .btn.red:hover{background:var(--rojo-osc)}
-  /* upgrade */
+  .btn.red:hover{background:#c02020}
   .upg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
   .upg{border:1px solid var(--borde);border-radius:10px;padding:12px;background:#fff;font-weight:800;text-align:center;cursor:pointer}
   .upg.disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.3)}
   .upg.active{background:var(--rojo);border-color:var(--rojo);color:#fff}
-  /* compromisos */
   details summary{cursor:pointer;font-weight:800}
-  .muted{color:#6b7280}
-  /* edición */
   .right{display:flex;gap:8px;align-items:center}
   .pin{width:82px;border:1px solid var(--borde);border-radius:6px;padding:6px 8px}
   .hidden{display:none !important}
-  /* print */
   @media print{
     .no-print{display:none !important}
     .wrap{max-width:794px}
@@ -78,7 +67,6 @@
   <h1>CALCULADORA INFINITY AUDIO</h1>
   <p class="sub">36 MESES 0%TAE + 6 MESES 7,95% TAE</p>
 
-  <!-- FORMATOS -->
   <div class="card">
     <div class="bar">
       <span>Formatos de audífonos</span>
@@ -88,12 +76,9 @@
         <button id="btnGuardar" class="btn hidden">Guardar</button>
       </div>
     </div>
-    <div class="body formatos" id="formatos">
-      <!-- generado por JS -->
-    </div>
+    <div class="body formatos" id="formatos"></div>
   </div>
 
-  <!-- CARACTERÍSTICAS Y GAMAS -->
   <div class="card">
     <div class="bar"><span>Características y gamas</span></div>
     <div class="body grid-2">
@@ -106,7 +91,6 @@
     </div>
   </div>
 
-  <!-- FINANCIACIÓN -->
   <div class="card">
     <div class="bar"><span>Financiación Infinity + tchin tchin</span></div>
     <div class="body">
@@ -114,7 +98,15 @@
         <div class="box">
           <div class="ttl">Importe total</div>
           <div class="num" id="impBase">—</div>
-          <!-- aquí se inyectará el input e IVA -->
+          <!-- NUEVO: campo editable -->
+          <input id="impBaseEdit" type="number" min="0" step="1"
+                 style="display:none;width:100%;font-size:1.6rem;font-weight:700;border:1px solid #ddd;border-radius:6px;padding:4px 6px;margin-top:4px;">
+          <div class="mini" id="ivaRow" style="margin-top:4px;">
+            IVA (%):
+            <span id="ivaView">10</span>
+            <input id="ivaEdit" type="number" min="0" step="0.1"
+                   style="display:none;width:70px;margin-left:4px;">
+          </div>
         </div>
         <div class="box">
           <div class="ttl">Cuota 36m (0%)</div>
@@ -158,7 +150,6 @@
     </div>
   </div>
 
-  <!-- 2ª PAREJA -->
   <div class="card">
     <div class="bar"><span>2º PAREJA RECOMENDADA</span></div>
     <div class="body">
@@ -167,7 +158,6 @@
     </div>
   </div>
 
-  <!-- COMPROMISOS -->
   <div class="card">
     <div class="bar"><span>COMPROMISOS</span></div>
     <div class="body">
@@ -181,14 +171,12 @@
 
 </div>
 
-<!-- ====== TU SCRIPT ORIGINAL ====== -->
 <script>
 /* ====== Datos base ====== */
 const PIN = "4321";
-const factorTAE = 1.0235; // ajusta 47,40 -> 48,51
+const factorTAE = 1.0235;
 const gamas = [
-  { id:"diamantePlus", nombre:"Diamante Plus", precio:3995, upg:+2004,
-    car:`Amplio ancho de bandas-canales de programación.
+  { id:"diamantePlus", nombre:"Diamante Plus", precio:3995, upg:+2004, car:`Amplio ancho de bandas-canales de programación.
 Bluetooth universal
 Streaming de Audio directo
 Tcoil
@@ -196,33 +184,23 @@ Recargable
 Multifoco, detecta hasta 4 hablantes para mayor entendimiento en ruido.
 Autonomía de la carga de la batería hasta 5h
 Ajuste en remoto
-Programa Tinnitus`
-  },
-  { id:"diamante", nombre:"Diamante", precio:3895, upg:+1904,
-    car:`Gran rendimiento
+Programa Tinnitus` },
+  { id:"diamante", nombre:"Diamante", precio:3895, upg:+1904, car:`Gran rendimiento
 14 canales
-Control inteligencia ambiental`
-  },
-  { id:"platinoPlus", nombre:"Platino Plus", precio:3395, upg:+1404,
-    car:`Rendimiento alto en ruidos moderados
+Control inteligencia ambiental` },
+  { id:"platinoPlus", nombre:"Platino Plus", precio:3395, upg:+1404, car:`Rendimiento alto en ruidos moderados
 12 canales
-Opciones de conectividad`
-  },
-  { id:"platino", nombre:"Platino", precio:3295, upg:+1304,
-    car:`Buen desempeño general
+Opciones de conectividad` },
+  { id:"platino", nombre:"Platino", precio:3295, upg:+1304, car:`Buen desempeño general
 10 canales
-Ajustes esenciales`
-  },
-  { id:"oro", nombre:"Oro", precio:1991, upg:0,
-    car:`Funcional para todas las pérdidas auditivas
+Ajustes esenciales` },
+  { id:"oro", nombre:"Oro", precio:1991, upg:0, car:`Funcional para todas las pérdidas auditivas
 Confort en ambientes silenciosos, sin ruidos.
 Pilas
 Programa de Tinnitus
 Otros programas de programación específicos y personalizados.
-Ancho de bandas de programación más limitado`
-  }
+Ancho de bandas de programación más limitado` }
 ];
-
 const formatos = [
   {id:"fmt1", titulo:"RIC / RIC Premium"},
   {id:"fmt2", titulo:"BTE"},
@@ -233,67 +211,73 @@ const formatos = [
 /* ====== Estado ====== */
 let state = {
   gamaSel: "diamantePlus",
-  car: {},         // por gama
-  imgs: {},        // base64 por formato
+  car: {},
+  imgs: {},
   comp: "",
   edit: false,
-  upgSel: "diamantePlus"
+  upgSel: "diamantePlus",
+  // NUEVO
+  finImporteManual: null,
+  finIvaPct: 10
 };
 
-// Cargar de localStorage si existe
+// cargar de LS
 const saved = localStorage.getItem("calc_infinity_audio_v1");
-if(saved){
-  try{ Object.assign(state, JSON.parse(saved)); }catch(e){}
-}
-// inicializa car por defecto
-for(const g of gamas){
-  if(!state.car[g.id]) state.car[g.id] = g.car;
+if (saved) {
+  try { Object.assign(state, JSON.parse(saved)); } catch(e){}
 }
 
-/* ====== Utilidades ====== */
-const $ = sel => document.querySelector(sel);
-const $$ = sel => document.querySelectorAll(sel);
+// inicializar car
+for (const g of gamas) {
+  if (!state.car[g.id]) state.car[g.id] = g.car;
+}
+
+/* ====== helpers ====== */
+const $ = s => document.querySelector(s);
 const fmtMoney = n => n.toLocaleString("es-ES",{style:"currency",currency:"EUR"});
-const saveLS = ()=>localStorage.setItem("calc_infinity_audio_v1", JSON.stringify(state));
+const saveLS = () => localStorage.setItem("calc_infinity_audio_v1", JSON.stringify(state));
 
-/* ====== Render formatos ====== */
+/* ====== formatos ====== */
 function renderFormatos(){
   const box = $("#formatos");
   box.innerHTML = "";
   formatos.forEach(f=>{
     const wrap = document.createElement("div");
-    wrap.className="fmt-box";
+    wrap.className = "fmt-box";
     const el = document.createElement("div");
     el.className = "format";
-    el.dataset.id = f.id;
-    if(state.edit) el.classList.add("active");
+    if (state.edit) el.classList.add("active");
 
-    const img = document.createElement("img");
-    if(state.imgs[f.id]) img.src = state.imgs[f.id];
-    else{
+    if (state.imgs[f.id]) {
+      const img = document.createElement("img");
+      img.src = state.imgs[f.id];
+      el.appendChild(img);
+    } else {
       const ph = document.createElement("div");
-      ph.className="ph"; ph.textContent=f.titulo;
+      ph.className = "ph";
+      ph.textContent = f.titulo;
       el.appendChild(ph);
     }
-    if(state.imgs[f.id]) el.appendChild(img);
 
     const inp = document.createElement("input");
-    inp.type="file"; inp.accept="image/*";
-    if(state.edit){ inp.style.display="block"; }
+    inp.type = "file";
+    inp.accept = "image/*";
+    if (state.edit) inp.style.display = "block";
     inp.addEventListener("change", ev=>{
       const file = ev.target.files[0];
-      if(!file) return;
+      if (!file) return;
       const reader = new FileReader();
       reader.onload = e=>{
         state.imgs[f.id] = e.target.result;
-        saveLS(); renderFormatos();
+        saveLS();
+        renderFormatos();
       };
       reader.readAsDataURL(file);
     });
     el.appendChild(inp);
 
     const cap = document.createElement("div");
-    cap.className="fmt-caption";
+    cap.className = "fmt-caption";
     cap.textContent = f.titulo;
 
     wrap.appendChild(el);
@@ -302,38 +286,44 @@ function renderFormatos(){
   });
 }
 
-/* ====== Render gamas + características ====== */
+/* ====== gamas ====== */
 function renderGamas(){
   const lst = $("#listaGamas");
   lst.innerHTML = "";
   gamas.forEach(g=>{
     const b = document.createElement("button");
-    b.className="gbtn";
-    if(g.id===state.gamaSel) b.classList.add("active");
+    b.className = "gbtn";
+    if (g.id === state.gamaSel) b.classList.add("active");
     b.innerHTML = `<span class="nombre">${g.nombre}</span><span class="precio">${fmtMoney(g.precio)}</span>`;
     b.onclick = ()=>{
       state.gamaSel = g.id;
-      state.upgSel = g.id; // por defecto recomendada misma gama
-      saveLS(); renderAll();
+      state.upgSel = g.id; // recomendación misma gama
+      saveLS();
+      renderAll();
     };
     lst.appendChild(b);
   });
   $("#lblGamaSel").textContent = gamas.find(x=>x.id===state.gamaSel).nombre;
-  const t = $("#txtCar");
-  t.value = state.car[state.gamaSel] || "";
-  t.disabled = !state.edit;
+  $("#txtCar").value = state.car[state.gamaSel] || "";
+  $("#txtCar").disabled = !state.edit;
 }
 
-/* ====== Cálculo financiación base ====== */
+/* ====== financiación ====== */
 function calcCuotas(importe){
-  const c36 = importe/42;
-  const resto6 = c36*6;
-  const c6 = c36*factorTAE;
+  const c36 = importe / 42;
+  const resto6 = c36 * 6;
+  const c6 = c36 * factorTAE;
   return { c36, resto6, c6 };
 }
 function renderFin(){
   const g = gamas.find(x=>x.id===state.gamaSel);
-  const imp = g.precio;
+  let imp = g ? g.precio : 0;
+
+  // si hay importe manual, manda ese
+  if (state.finImporteManual !== null && !isNaN(state.finImporteManual)) {
+    imp = Number(state.finImporteManual);
+  }
+
   const c = calcCuotas(imp);
   $("#impBase").textContent = fmtMoney(imp);
   $("#c36Base").textContent = fmtMoney(c.c36);
@@ -341,7 +331,7 @@ function renderFin(){
   $("#restBase").textContent = fmtMoney(c.resto6);
   $("#c6Base").textContent = fmtMoney(c.c6);
 
-  // con 2ª pareja
+  // 2ª pareja
   const uG = gamas.find(x=>x.id===state.upgSel);
   const impU = imp + (uG ? uG.upg : 0);
   const cu = calcCuotas(impU);
@@ -350,43 +340,83 @@ function renderFin(){
   $("#c36detU").textContent = `${fmtMoney(impU)} / 42`;
   $("#restUpg").textContent = fmtMoney(cu.resto6);
   $("#c6Upg").textContent = fmtMoney(cu.c6);
+
+  // IVA
+  const ivaView = $("#ivaView");
+  if (ivaView) ivaView.textContent = state.finIvaPct ?? 10;
+
+  // mostrar/ocultar inputs según edición
+  const impView = $("#impBase");
+  const impEdit = $("#impBaseEdit");
+  const ivaEdit = $("#ivaEdit");
+  if (impView && impEdit) {
+    if (state.edit) {
+      impView.style.display = "none";
+      impEdit.style.display = "block";
+      impEdit.value = (state.finImporteManual !== null) ? state.finImporteManual : "";
+      if (ivaEdit) {
+        ivaEdit.style.display = "inline-block";
+        ivaEdit.value = state.finIvaPct ?? 10;
+      }
+      // eventos
+      impEdit.oninput = function(e){
+        const v = e.target.value.trim();
+        state.finImporteManual = v === "" ? null : Number(v);
+        saveLS();
+        renderFin();
+      };
+      if (ivaEdit) {
+        ivaEdit.oninput = function(e){
+          const v = e.target.value.trim();
+          state.finIvaPct = v === "" ? 0 : Number(v);
+          saveLS();
+          renderFin();
+        };
+      }
+    } else {
+      impView.style.display = "block";
+      impEdit.style.display = "none";
+      if (ivaEdit) ivaEdit.style.display = "none";
+    }
+  }
 }
 
-/* ====== Render upgrades (regla no superior) ====== */
+/* ====== upgrades ====== */
 function renderUpgrades(){
-  const box = $("#upgrades"); box.innerHTML="";
+  const box = $("#upgrades");
+  box.innerHTML = "";
   const idxSel = gamas.findIndex(x=>x.id===state.gamaSel);
-  gamas
-    .filter(g=>g.id!=="oro")
-    .forEach(g=>{
-      const u = document.createElement("div");
-      u.className="upg";
-      const idxG = gamas.findIndex(x=>x.id===g.id);
-      const disabled = idxG < idxSel;
-      if(disabled) u.classList.add("disabled");
-      if(g.id===state.upgSel) u.classList.add("active");
-      u.textContent = `${g.nombre} (+${fmtMoney(g.upg)})`;
-      u.onclick = ()=>{
-        if(disabled) return;
-        state.upgSel = g.id;
-        saveLS(); renderFin(); renderUpgrades();
-      };
-      box.appendChild(u);
-    });
-  const gSel = gamas.find(x=>x.id===state.gamaSel);
+  gamas.filter(g=>g.id!=="oro").forEach(g=>{
+    const idxG = gamas.findIndex(x=>x.id===g.id);
+    const disabled = idxG < idxSel;
+    const d = document.createElement("div");
+    d.className = "upg";
+    if (disabled) d.classList.add("disabled");
+    if (g.id === state.upgSel) d.classList.add("active");
+    d.textContent = `${g.nombre} (+${fmtMoney(g.upg)})`;
+    d.onclick = ()=>{
+      if (disabled) return;
+      state.upgSel = g.id;
+      saveLS();
+      renderFin();
+      renderUpgrades();
+    };
+    box.appendChild(d);
+  });
+  // seguridad: si quedó superior
   const idxUpg = gamas.findIndex(x=>x.id===state.upgSel);
-  if(idxUpg < idxSel){
+  if (idxUpg < idxSel) {
     state.upgSel = state.gamaSel;
   }
 }
 
-/* ====== Compromisos ====== */
+/* ====== compromisos ====== */
 function renderComp(){
   $("#txtComp").value = state.comp || "";
   $("#txtComp").disabled = !state.edit;
 }
 
-/* ====== Edición (PIN) ====== */
+/* ====== edición ====== */
 function setEdit(on){
   state.edit = on;
   $("#btnEditar").classList.toggle("hidden", on);
@@ -394,12 +424,12 @@ function setEdit(on){
   renderFormatos();
   $("#txtCar").disabled = !on;
   $("#txtComp").disabled = !on;
-  // muy importante: refrescar controles de financiación
-  if (typeof window.renderFinEditable === "function") window.renderFinEditable();
+  // MUY IMPORTANTE: refrescar financiación para mostrar el input
+  renderFin();
 }
 function handleEditar(){
   const pin = $("#pin1").value.trim();
-  if(pin !== PIN){ alert("PIN incorrecto"); return; }
+  if (pin !== PIN){ alert("PIN incorrecto"); return; }
   setEdit(true);
 }
 function handleGuardar(){
@@ -410,14 +440,9 @@ function handleGuardar(){
   alert("Guardado ✅");
 }
 
-/* ====== Export HTML con datos incrustados (solo lectura) ====== */
+/* ====== export ====== */
 function exportHTML(){
-  const payload = {
-    state,
-    gamas,
-    formatos,
-    factorTAE
-  };
+  const payload = { state, gamas, formatos, factorTAE };
   const tpl = `
 <!doctype html><html lang="es"><meta charset="utf-8">
 <title>Calculadora Infinity (solo lectura)</title>
@@ -434,35 +459,25 @@ img{max-height:120px;max-width:95%}
 const data = ${JSON.stringify(payload)};
 const fmt = n=>n.toLocaleString("es-ES",{style:"currency",currency:"EUR"});
 const root = document.getElementById('root');
-
 function calc(imp){const c36=imp/42;return{c36,resto6:c36*6,c6:c36*${factorTAE}}}
 const gSel = data.gamas.find(g=>g.id===data.state.gamaSel);
-
-const imp = gSel.precio;
+let imp = gSel.precio;
+if (data.state.finImporteManual !== null) imp = data.state.finImporteManual;
 const cu = calc(imp);
-
-// 2ª pareja
 const uG = data.gamas.find(g=>g.id===data.state.upgSel);
 const impU = imp + (uG?uG.upg:0);
 const cuU = calc(impU);
-
-// formatos
 const fmtDiv = document.createElement('div');
 fmtDiv.className='grid';
 data.formatos.forEach(f=>{
   const d=document.createElement('div');d.className='box';
   d.innerHTML='<div style="font-weight:700">'+f.titulo+'</div>';
   if(data.state.imgs[f.id]){const im=new Image();im.src=data.state.imgs[f.id];d.appendChild(im)}
-  root.appendChild(fmtDiv);
-  fmtDiv.appendChild(d);
+  root.appendChild(fmtDiv);fmtDiv.appendChild(d);
 });
-
-// gamas y car
 const carDiv=document.createElement('div');carDiv.className='box';
-carDiv.innerHTML='<div><b>Gama:</b> '+gSel.nombre+' — '+fmt(gSel.precio)+'</div><pre style="white-space:pre-wrap;margin:.5em 0 0">'+(data.state.car[gSel.id]||'')+'</pre>';
+carDiv.innerHTML='<div><b>Gama:</b> '+gSel.nombre+' — '+fmt(imp)+'</div><pre style="white-space:pre-wrap;margin:.5em 0 0">'+(data.state.car[gSel.id]||'')+'</pre>';
 root.appendChild(carDiv);
-
-// fin
 const fin=document.createElement('div');fin.className='box';
 fin.innerHTML=\`
 <b>Financiación Infinity + tchin tchin</b>
@@ -471,33 +486,30 @@ fin.innerHTML=\`
   <div class="box"><div>Cuota 36m (0%)</div><div><b>\${fmt(cu.c36)}</b></div></div>
   <div class="box"><div>RESTANTE 6M–AHORRO SI RENUEVAS</div><div>\${fmt(cu.resto6)}</div></div>
   <div class="box"><div>Cuota 6m (7,95% TAE)</div><div>\${fmt(cu.c6)}</div></div>
-
   <div class="box"><div>Importe con 2ª pareja</div><div>\${fmt(impU)}</div></div>
   <div class="box"><div>Cuota 36m (0%)</div><div><b>\${fmt(cuU.c36)}</b></div></div>
   <div class="box"><div>RESTANTE 6M–AHORRO SI RENUEVAS</div><div>\${fmt(cuU.resto6)}</div></div>
   <div class="box"><div>Cuota 6m (7,95% TAE)</div><div>\${fmt(cuU.c6)}</div></div>
 </div>\`;
 root.appendChild(fin);
-
-// 2ª pareja
 const upg=document.createElement('div');upg.className='box';
 upg.innerHTML='<b>2º PAREJA RECOMENDADA:</b> '+(uG?uG.nombre+' (+'+fmt(uG.upg)+')':'—');
 root.appendChild(upg);
-
-// compromisos
 const comp=document.createElement('div');comp.className='box';
 comp.innerHTML='<b>COMPROMISOS</b><pre style="white-space:pre-wrap;margin:.5em 0 0">'+(data.state.comp||'')+'</pre>';
 root.appendChild(comp);
-</script>`;
-  const blob = new Blob([tpl],{type:"text/html;charset=utf-8"});
+<\/script>`;
+  const blob = new Blob([tpl], {type:"text/html;charset=utf-8"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = "calculadora_infinity_visor.html";
-  document.body.appendChild(a); a.click();
+  a.href = url;
+  a.download = "calculadora_infinity_visor.html";
+  document.body.appendChild(a);
+  a.click();
   setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},0);
 }
 
-/* ====== Eventos ====== */
+/* ====== eventos ====== */
 $("#txtCar").addEventListener("input", ()=>{ if(state.edit){ state.car[state.gamaSel] = $("#txtCar").value; saveLS(); }});
 $("#txtComp").addEventListener("input", ()=>{ if(state.edit){ state.comp = $("#txtComp").value; saveLS(); }});
 $("#btnEditar").onclick = handleEditar;
@@ -505,7 +517,7 @@ $("#btnGuardar").onclick = handleGuardar;
 $("#btnPDF").onclick = ()=>window.print();
 $("#btnExport").onclick = exportHTML;
 
-/* ====== Render general ====== */
+/* ====== render inicial ====== */
 function renderAll(){
   renderFormatos();
   renderGamas();
@@ -516,150 +528,5 @@ function renderAll(){
 renderAll();
 setEdit(false);
 </script>
-
-<!-- ====== BLOQUE NUEVO: financiación editable SOLO cuando EDITAS ====== -->
-<script>
-(function () {
-  // aseguramos campos nuevos en el estado
-  if (typeof window.state === "undefined") window.state = {};
-  if (typeof state.finImporteManual === "undefined") state.finImporteManual = null;
-  if (typeof state.finIvaPct === "undefined") state.finIvaPct = 10;
-
-  // crea inputs en la tarjeta si no existen
-  function ensureFinControls() {
-    const impBase = document.getElementById("impBase");
-    if (!impBase) return;
-    const kpi = impBase.parentElement;
-    if (!kpi || kpi.dataset.finEnhanced === "1") return;
-
-    const inp = document.createElement("input");
-    inp.type = "number";
-    inp.min = "0";
-    inp.step = "1";
-    inp.id = "impBaseEdit";
-    inp.style.display = "none";
-    inp.style.width = "100%";
-    inp.style.fontSize = "1.6rem";
-    inp.style.fontWeight = "700";
-    inp.style.border = "1px solid #ddd";
-    inp.style.borderRadius = "6px";
-    inp.style.padding = "4px 6px";
-
-    const ivaRow = document.createElement("div");
-    ivaRow.id = "ivaRow";
-    ivaRow.className = "mini";
-    ivaRow.style.marginTop = "4px";
-    ivaRow.innerHTML = 'IVA (%): <span id="ivaView">10</span>';
-    const ivaInp = document.createElement("input");
-    ivaInp.type = "number";
-    ivaInp.min = "0";
-    ivaInp.step = "0.1";
-    ivaInp.id = "ivaEdit";
-    ivaInp.style.display = "none";
-    ivaInp.style.width = "70px";
-    ivaInp.style.marginLeft = "4px";
-    ivaRow.appendChild(ivaInp);
-
-    kpi.appendChild(inp);
-    kpi.appendChild(ivaRow);
-
-    kpi.dataset.finEnhanced = "1";
-  }
-
-  // mostrar/ocultar en función de state.edit
-  function renderFinEditable() {
-    ensureFinControls();
-    const impBase = document.getElementById("impBase");
-    const impEdit = document.getElementById("impBaseEdit");
-    const ivaView = document.getElementById("ivaView");
-    const ivaEdit = document.getElementById("ivaEdit");
-    if (!impBase || !impEdit) return;
-
-    const canEdit = !!state.edit; // USAMOS TU FLAG, no readOnly/pinOk
-
-    if (canEdit) {
-      impBase.style.display = "none";
-      impEdit.style.display = "block";
-      if (ivaEdit) ivaEdit.style.display = "inline-block";
-      if (ivaView) ivaView.style.display = "none";
-
-      impEdit.value = state.finImporteManual != null ? state.finImporteManual : "";
-      if (ivaEdit) ivaEdit.value = state.finIvaPct != null ? state.finIvaPct : 10;
-
-      impEdit.oninput = function (e) {
-        const v = e.target.value.trim();
-        state.finImporteManual = v === "" ? null : Number(v);
-        if (typeof window.saveLS === "function") window.saveLS();
-        // recalcular con nuevo importe
-        recalcFin();
-      };
-
-      if (ivaEdit) {
-        ivaEdit.oninput = function (e) {
-          const v = e.target.value.trim();
-          state.finIvaPct = v === "" ? 0 : Number(v);
-          if (typeof window.saveLS === "function") window.saveLS();
-          recalcFin();
-        };
-      }
-    } else {
-      impBase.style.display = "block";
-      impEdit.style.display = "none";
-      if (ivaEdit) ivaEdit.style.display = "none";
-      if (ivaView) {
-        ivaView.style.display = "inline";
-        ivaView.textContent = state.finIvaPct ?? 10;
-      }
-    }
-  }
-
-  // recalcula SOLO la parte de financiación, sin romper tu renderFin original
-  function recalcFin() {
-    // importe actual que tienes en pantalla
-    const impBase = document.getElementById("impBase");
-    let base = 0;
-    if (state.finImporteManual != null) {
-      base = Number(state.finImporteManual) || 0;
-    } else {
-      // leemos el que pintó tu renderFin
-      if (impBase && impBase.textContent) {
-        base = Number(
-          impBase.textContent
-            .replace(/€/g, "")
-            .replace(/\./g, "")
-            .replace(/,/g, ".")
-        ) || 0;
-      }
-    }
-
-    // no aplicamos IVA todavía al total (lo dejas tú a tu gusto)
-    const total = base;
-
-    const c36 = total / 42;
-    const rest = total - c36 * 36;
-    const c6 = total ? (c36 * factorTAE) : 0;
-
-    const c36Base = document.getElementById("c36Base");
-    const miniBase = document.getElementById("c36det");
-    const restBase = document.getElementById("restBase");
-    const c6Base = document.getElementById("c6Base");
-
-    if (impBase) impBase.textContent = fmt(total);
-    if (c36Base) c36Base.textContent = fmt(c36);
-    if (miniBase) miniBase.textContent = fmt(total) + " / 42";
-    if (restBase) restBase.textContent = fmt(rest);
-    if (c6Base) c6Base.textContent = fmt(c6);
-  }
-
-  // exponerlo para que setEdit() lo llame
-  window.renderFinEditable = renderFinEditable;
-
-  // al cargar
-  document.addEventListener("DOMContentLoaded", function () {
-    renderFinEditable();
-  });
-})();
-</script>
-
 </body>
 </html>
