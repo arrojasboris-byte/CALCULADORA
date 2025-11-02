@@ -114,6 +114,7 @@
         <div class="box">
           <div class="ttl">Importe total</div>
           <div class="num" id="impBase">—</div>
+          <!-- aquí se inyectará el input e IVA -->
         </div>
         <div class="box">
           <div class="ttl">Cuota 36m (0%)</div>
@@ -180,6 +181,7 @@
 
 </div>
 
+<!-- ====== TU SCRIPT ORIGINAL ====== -->
 <script>
 /* ====== Datos base ====== */
 const PIN = "4321";
@@ -235,7 +237,7 @@ let state = {
   imgs: {},        // base64 por formato
   comp: "",
   edit: false,
-  upgSel: "diamantePlus" // por defecto misma gama (se mostrará activa en rojo)
+  upgSel: "diamantePlus"
 };
 
 // Cargar de localStorage si existe
@@ -311,8 +313,7 @@ function renderGamas(){
     b.innerHTML = `<span class="nombre">${g.nombre}</span><span class="precio">${fmtMoney(g.precio)}</span>`;
     b.onclick = ()=>{
       state.gamaSel = g.id;
-      // por defecto, 2ª pareja de la misma gama
-      state.upgSel = g.id;
+      state.upgSel = g.id; // por defecto recomendada misma gama
       saveLS(); renderAll();
     };
     lst.appendChild(b);
@@ -323,7 +324,7 @@ function renderGamas(){
   t.disabled = !state.edit;
 }
 
-/* ====== Render financiación ====== */
+/* ====== Cálculo financiación base ====== */
 function calcCuotas(importe){
   const c36 = importe/42;
   const resto6 = c36*6;
@@ -351,19 +352,17 @@ function renderFin(){
   $("#c6Upg").textContent = fmtMoney(cu.c6);
 }
 
-/* ====== Render upgrades con regla "no superior" ====== */
+/* ====== Render upgrades (regla no superior) ====== */
 function renderUpgrades(){
   const box = $("#upgrades"); box.innerHTML="";
   const idxSel = gamas.findIndex(x=>x.id===state.gamaSel);
   gamas
-    .filter(g=>g.id!=="oro") // oro no tiene upg propio (0€) para la pareja; no lo mostramos como “misma gama” de upg
-    .slice(0,4) // solo los 4 botones definidos
+    .filter(g=>g.id!=="oro")
     .forEach(g=>{
       const u = document.createElement("div");
       u.className="upg";
-      // deshabilitar superiores
       const idxG = gamas.findIndex(x=>x.id===g.id);
-      const disabled = idxG < idxSel; // si es superior (índice menor -> gama más alta)
+      const disabled = idxG < idxSel;
       if(disabled) u.classList.add("disabled");
       if(g.id===state.upgSel) u.classList.add("active");
       u.textContent = `${g.nombre} (+${fmtMoney(g.upg)})`;
@@ -374,11 +373,9 @@ function renderUpgrades(){
       };
       box.appendChild(u);
     });
-  // asegurar por defecto "misma gama"
   const gSel = gamas.find(x=>x.id===state.gamaSel);
-  if(!gSel) return;
   const idxUpg = gamas.findIndex(x=>x.id===state.upgSel);
-  if(idxUpg < idxSel){ // quedó superior por algún motivo → corrige
+  if(idxUpg < idxSel){
     state.upgSel = state.gamaSel;
   }
 }
@@ -392,14 +389,13 @@ function renderComp(){
 /* ====== Edición (PIN) ====== */
 function setEdit(on){
   state.edit = on;
-  // botones
   $("#btnEditar").classList.toggle("hidden", on);
   $("#btnGuardar").classList.toggle("hidden", !on);
-  // activar inputs de formatos
   renderFormatos();
-  // activar textareas
   $("#txtCar").disabled = !on;
   $("#txtComp").disabled = !on;
+  // muy importante: refrescar controles de financiación
+  if (typeof window.renderFinEditable === "function") window.renderFinEditable();
 }
 function handleEditar(){
   const pin = $("#pin1").value.trim();
@@ -407,7 +403,6 @@ function handleEditar(){
   setEdit(true);
 }
 function handleGuardar(){
-  // recoger cambios
   state.car[state.gamaSel] = $("#txtCar").value;
   state.comp = $("#txtComp").value;
   saveLS();
@@ -502,7 +497,7 @@ root.appendChild(comp);
   setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},0);
 }
 
-/* ====== Eventos / vínculos ====== */
+/* ====== Eventos ====== */
 $("#txtCar").addEventListener("input", ()=>{ if(state.edit){ state.car[state.gamaSel] = $("#txtCar").value; saveLS(); }});
 $("#txtComp").addEventListener("input", ()=>{ if(state.edit){ state.comp = $("#txtComp").value; saveLS(); }});
 $("#btnEditar").onclick = handleEditar;
@@ -520,46 +515,23 @@ function renderAll(){
 }
 renderAll();
 setEdit(false);
+</script>
+
+<!-- ====== BLOQUE NUEVO: financiación editable SOLO cuando EDITAS ====== -->
 <script>
 (function () {
-  // 1. aseguramos estado sin romper lo que ya tienes
-  window.state = window.state || {};
+  // aseguramos campos nuevos en el estado
+  if (typeof window.state === "undefined") window.state = {};
   if (typeof state.finImporteManual === "undefined") state.finImporteManual = null;
   if (typeof state.finIvaPct === "undefined") state.finIvaPct = 10;
 
-  // 2. guardamos tu calc original (no la perdemos)
-  const ORIG_CALC = typeof window.calc === "function" ? window.calc : function () {};
-
-  // helper para formatear
-  function fmt(n) {
-    if (isNaN(n)) return "—";
-    return new Intl.NumberFormat("es-ES", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(n) + " €";
-  }
-
-  // helper para parsear lo que ya pintó tu calc
-  function parseEuro(txt) {
-    if (!txt) return NaN;
-    // quita € y puntos y cambia coma por punto
-    return Number(
-      txt.toString()
-        .replace(/€/g, "")
-        .replace(/\./g, "")
-        .replace(/,/g, ".")
-        .trim()
-    );
-  }
-
-  // 3. crear controles de edición encima de tu kpi de importe total
+  // crea inputs en la tarjeta si no existen
   function ensureFinControls() {
     const impBase = document.getElementById("impBase");
     if (!impBase) return;
     const kpi = impBase.parentElement;
     if (!kpi || kpi.dataset.finEnhanced === "1") return;
 
-    // input importe
     const inp = document.createElement("input");
     inp.type = "number";
     inp.min = "0";
@@ -573,7 +545,6 @@ setEdit(false);
     inp.style.borderRadius = "6px";
     inp.style.padding = "4px 6px";
 
-    // fila IVA
     const ivaRow = document.createElement("div");
     ivaRow.id = "ivaRow";
     ivaRow.className = "mini";
@@ -595,19 +566,18 @@ setEdit(false);
     kpi.dataset.finEnhanced = "1";
   }
 
-  // 4. aplicar modo lectura / edición
-  function renderFinControls() {
+  // mostrar/ocultar en función de state.edit
+  function renderFinEditable() {
+    ensureFinControls();
     const impBase = document.getElementById("impBase");
     const impEdit = document.getElementById("impBaseEdit");
     const ivaView = document.getElementById("ivaView");
     const ivaEdit = document.getElementById("ivaEdit");
-
     if (!impBase || !impEdit) return;
 
-    const canEdit = !state.readOnly && state.pinOk; // tu lógica de admin
+    const canEdit = !!state.edit; // USAMOS TU FLAG, no readOnly/pinOk
 
     if (canEdit) {
-      // mostrar inputs
       impBase.style.display = "none";
       impEdit.style.display = "block";
       if (ivaEdit) ivaEdit.style.display = "inline-block";
@@ -619,21 +589,20 @@ setEdit(false);
       impEdit.oninput = function (e) {
         const v = e.target.value.trim();
         state.finImporteManual = v === "" ? null : Number(v);
-        if (typeof window.save === "function") window.save();
-        // recalc con nuevo importe
-        window.calc();
+        if (typeof window.saveLS === "function") window.saveLS();
+        // recalcular con nuevo importe
+        recalcFin();
       };
 
       if (ivaEdit) {
         ivaEdit.oninput = function (e) {
           const v = e.target.value.trim();
           state.finIvaPct = v === "" ? 0 : Number(v);
-          if (typeof window.save === "function") window.save();
-          window.calc();
+          if (typeof window.saveLS === "function") window.saveLS();
+          recalcFin();
         };
       }
     } else {
-      // modo lectura
       impBase.style.display = "block";
       impEdit.style.display = "none";
       if (ivaEdit) ivaEdit.style.display = "none";
@@ -644,60 +613,53 @@ setEdit(false);
     }
   }
 
-  // 5. nuestra capa encima de tu calc
-  window.calc = function () {
-    // primero tu cálculo de siempre
-    ORIG_CALC();
-
-    // luego vemos si hay importe manual y si hay que sobreescribir las 3 cajas
-    ensureFinControls();
-
+  // recalcula SOLO la parte de financiación, sin romper tu renderFin original
+  function recalcFin() {
+    // importe actual que tienes en pantalla
     const impBase = document.getElementById("impBase");
+    let base = 0;
+    if (state.finImporteManual != null) {
+      base = Number(state.finImporteManual) || 0;
+    } else {
+      // leemos el que pintó tu renderFin
+      if (impBase && impBase.textContent) {
+        base = Number(
+          impBase.textContent
+            .replace(/€/g, "")
+            .replace(/\./g, "")
+            .replace(/,/g, ".")
+        ) || 0;
+      }
+    }
+
+    // no aplicamos IVA todavía al total (lo dejas tú a tu gusto)
+    const total = base;
+
+    const c36 = total / 42;
+    const rest = total - c36 * 36;
+    const c6 = total ? (c36 * factorTAE) : 0;
+
     const c36Base = document.getElementById("c36Base");
-    const miniBase = document.getElementById("miniBase");
+    const miniBase = document.getElementById("c36det");
     const restBase = document.getElementById("restBase");
     const c6Base = document.getElementById("c6Base");
 
-    // importe que dejó tu calc
-    let importeActual = impBase ? parseEuro(impBase.textContent) : NaN;
+    if (impBase) impBase.textContent = fmt(total);
+    if (c36Base) c36Base.textContent = fmt(c36);
+    if (miniBase) miniBase.textContent = fmt(total) + " / 42";
+    if (restBase) restBase.textContent = fmt(rest);
+    if (c6Base) c6Base.textContent = fmt(c6);
+  }
 
-    // si el admin puso uno a mano, manda ese
-    if (state.finImporteManual != null) {
-      importeActual = Number(state.finImporteManual) || 0;
-    }
+  // exponerlo para que setEdit() lo llame
+  window.renderFinEditable = renderFinEditable;
 
-    // IVA (por si luego quieres aplicarlo real)
-    const ivaPct = Number(state.finIvaPct ?? 10);
-    // ahora MISMO dejamos el total tal cual (sin sumar IVA)
-    const total = importeActual;
-
-    // recalculamos las 3 cajas con el total forzado
-    if (!isNaN(total)) {
-      const c36 = total / 42;
-      const rest = total - c36 * 36;
-      // tu fórmula de 6m (si no existe mensualidad, simple)
-      const c6 =
-        typeof window.mensualidad === "function"
-          ? window.mensualidad(rest, 6, 0.0795)
-          : rest / 6;
-
-      if (impBase) impBase.textContent = fmt(total);
-      if (c36Base) c36Base.textContent = fmt(c36);
-      if (miniBase) miniBase.textContent = fmt(total) + " / 42";
-      if (restBase) restBase.textContent = fmt(rest);
-      if (c6Base) c6Base.textContent = fmt(c6);
-    }
-
-    // por último pintar modo edición / lectura
-    renderFinControls();
-  };
-
-  // 6. al cargar, montar controles
+  // al cargar
   document.addEventListener("DOMContentLoaded", function () {
-    ensureFinControls();
-    renderFinControls();
+    renderFinEditable();
   });
 })();
 </script>
+
 </body>
 </html>
