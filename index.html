@@ -527,6 +527,179 @@ function renderAll(){
 }
 renderAll();
 setEdit(false);
+<script>
+/* ===========================================================
+   Cross-browser accesorios + Botón EDITAR con PIN (AR4321)
+   -----------------------------------------------------------
+   - No sustituye tu lógica ni funciones existentes.
+   - No modifica datos, imágenes ni tus estilos.
+   - Garantiza activación de elementos de accesorios en Chrome/Firefox
+     (click/touch/teclado, incluso con overlays).
+   - Añade un botón "Editar" con PIN AR4321 que solo alterna clases.
+   =========================================================== */
+(function () {
+  'use strict';
+
+  /* 1) Polyfill mínimo (por si el motor no trae composedPath) */
+  if (!Event.prototype.composedPath) {
+    Event.prototype.composedPath = function () {
+      var el = this.target, path = [];
+      while (el) { path.push(el); el = el.parentNode || el.host; }
+      path.push(window); return path;
+    };
+  }
+
+  /* 2) Selectores objetivo (sin asumir tu estructura exacta) */
+  var ITEM_SEL = '.accItem, .accCard, .accBtn, [data-acc], [data-action="acc"]';
+  var GRID_SEL = '#accGrid, .accGrid, #accImgsLeftGrid, .accImgsGrid';
+
+  /* 3) Utilidades */
+  function gridRoot() {
+    return document.querySelector(GRID_SEL) || document;
+  }
+  function isDisabled(el) {
+    return !!(el && (el.matches('[disabled], [aria-disabled="true"], .dim')));
+  }
+  function timeNow() { return (typeof performance!=='undefined' && performance.now) ? performance.now() : Date.now(); }
+
+  /* 4) Localiza el elemento “accesorio” bajo el puntero aunque haya overlays */
+  function findAccElementFromEvent(e) {
+    // Primera opción: subir desde el target real
+    if (e.target && e.target.closest) {
+      var fromTarget = e.target.closest(ITEM_SEL);
+      if (fromTarget) return fromTarget;
+    }
+    // Segunda opción: por coordenadas (útil si hay overlay por encima)
+    var x = (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : e.clientX);
+    var y = (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : e.clientY);
+    if (typeof x === 'number' && typeof y === 'number' && document.elementFromPoint) {
+      var node = document.elementFromPoint(x, y);
+      if (node && node.closest) {
+        var fromPoint = node.closest(ITEM_SEL);
+        if (fromPoint) return fromPoint;
+      }
+    }
+    return null;
+  }
+
+  /* 5) Activa el elemento sin sustituir tu lógica */
+  function fireActivation(el) {
+    if (!el) return;
+    // Evita doble disparo (touchend -> click)
+    var now = timeNow();
+    if (el.__lastAct && (now - el.__lastAct) < 220) return;
+    el.__lastAct = now;
+
+    // a) Si el elemento tiene onclick inline/propiedad
+    if (typeof el.onclick === 'function') {
+      try { el.onclick.call(el, new MouseEvent('click', { bubbles: true, cancelable: true })); return; } catch (_) {}
+    }
+    // b) Si tiene método click nativo, úsalo
+    if (typeof el.click === 'function') {
+      try { el.click(); return; } catch (_) {}
+    }
+    // c) Re-despacha un click sintético que recorrerá captura/burbujeo
+    try {
+      el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, composed: true }));
+    } catch (_) {
+      // d) Último recurso: señal semántica por si la escuchas
+      el.dispatchEvent(new CustomEvent('acc:click', { bubbles: true, detail: { el: el } }));
+    }
+  }
+
+  /* 6) Ignora ediciones o controles internos (lápiz, inputs, etc.) */
+  function shouldIgnoreTarget(t) {
+    if (!t || !t.closest) return false;
+    if (t.closest('input,select,textarea,button,[contenteditable="true"]')) return true;
+    if (t.closest('.pencil, .edit-handle')) return true;
+    return false;
+  }
+
+  /* 7) Manejadores de activación accesibles y robustos */
+  function onActivate(e) {
+    // No interferir con controles nativos
+    if (shouldIgnoreTarget(e.target)) return;
+
+    var el = findAccElementFromEvent(e);
+    if (!el || isDisabled(el)) return;
+
+    fireActivation(el);
+  }
+
+  function wireActivation() {
+    if (document.__accClicksWired) return;
+    document.__accClicksWired = true;
+
+    var root = gridRoot();
+
+    // Captura en fase capture para “rescatar” clics que otros cancelan en burbujeo
+    root.addEventListener('click', onActivate, true);
+    root.addEventListener('pointerup', onActivate, true);
+    root.addEventListener('touchend', onActivate, { capture: true, passive: true });
+
+    // Accesibilidad por teclado (Enter / Espacio)
+    root.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        var el = e.target && e.target.closest ? e.target.closest(ITEM_SEL) : null;
+        if (el && !isDisabled(el)) { e.preventDefault(); fireActivation(el); }
+      }
+    }, true);
+  }
+
+  /* 8) Botón “Editar” con PIN AR4321 (solo añade/quita clases; tu UI decide) */
+  function ensureEditButton() {
+    if (document.getElementById('pinEditBtn')) return;
+
+    var btn = document.createElement('button');
+    btn.id = 'pinEditBtn';
+    btn.type = 'button';
+    btn.textContent = 'Editar';
+    btn.className = 'no-print';
+    // Estilo mínimo inline para no depender de tu CSS
+    btn.style.cssText = 'position:fixed;top:12px;right:12px;z-index:99999;padding:.55rem .85rem;border-radius:.7rem;border:1px solid rgba(148,163,184,.35);background:rgba(15,23,42,.88);color:#e2e8f0;backdrop-filter:blur(6px);cursor:pointer';
+
+    btn.addEventListener('click', function () {
+      if (!window.__pinUnlocked) {
+        var pin = (prompt('Introduce PIN:') || '').trim().toUpperCase();
+        if (pin !== 'AR4321') { alert('PIN incorrecto'); return; }
+        window.__pinUnlocked = true;
+        try { localStorage.setItem('pin_ar4321_ok', '1'); } catch (_){}
+      }
+      var on = !document.body.classList.contains('edit-on');
+      document.body.classList.toggle('edit-on', on);
+      btn.textContent = on ? 'Bloquear' : 'Editar';
+
+      // Marca elementos habituales con .edit (no cambia tu lógica)
+      ['.accItem','.accCard','.accLeftCard','.card','[data-editable]'].forEach(function (sel) {
+        document.querySelectorAll(sel).forEach(function (n) { n.classList.toggle('edit', on); });
+      });
+    });
+
+    try {
+      if (localStorage.getItem('pin_ar4321_ok') === '1') window.__pinUnlocked = true;
+    } catch (_){}
+
+    document.body.appendChild(btn);
+  }
+
+  /* 9) Inicialización y reenganche si el DOM cambia */
+  function init() { wireActivation(); ensureEditButton(); }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // Si tu app re-renderiza el grid, vuelve a garantizar la delegación
+  try {
+    new MutationObserver(function () {
+      document.__accClicksWired = false;
+      wireActivation();
+    }).observe(document.body || document.documentElement, { subtree: true, childList: true });
+  } catch (_){}
+})();
+</script>
 </script>
 </body>
 </html>
